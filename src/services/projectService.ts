@@ -21,6 +21,8 @@ const placeholderProjects: Project[] = [
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
+    media_files: [],
+    profile_image: null,
     created_at: new Date().toISOString(),
   },
   {
@@ -42,6 +44,8 @@ const placeholderProjects: Project[] = [
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
+    media_files: [],
+    profile_image: null,
     created_at: new Date().toISOString(),
   },
   {
@@ -63,6 +67,8 @@ const placeholderProjects: Project[] = [
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
+    media_files: [],
+    profile_image: null,
     created_at: new Date().toISOString(),
   },
 ];

@@ -17,6 +17,7 @@ const placeholderProjects: Project[] = [
     ],
     tech_stack: ["React", "Node.js", "PostgreSQL", "TypeScript"],
     status: "available",
+    featured: true,
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
@@ -37,6 +38,7 @@ const placeholderProjects: Project[] = [
     ],
     tech_stack: ["React", "Supabase", "TypeScript", "Tailwind CSS"],
     status: "available",
+    featured: true,
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
@@ -57,6 +59,7 @@ const placeholderProjects: Project[] = [
     ],
     tech_stack: ["Next.js", "Supabase", "Tailwind CSS", "TypeScript"],
     status: "upcoming",
+    featured: true,
     upwork_link: null,
     youtube_link: null,
     tiktok_link: null,
@@ -77,6 +80,23 @@ export async function getAllProjects(): Promise<Project[]> {
     return placeholderProjects;
   } catch {
     return placeholderProjects;
+  }
+}
+
+export async function getFeaturedProjects(): Promise<Project[]> {
+  try {
+    const { data, error } = await supabase
+      .from("projects")
+      .select("*")
+      .eq("featured", true)
+      .order("created_at", { ascending: false });
+
+    if (error) throw error;
+    if (data && data.length > 0) return data as Project[];
+
+    return placeholderProjects.filter((p) => p.featured);
+  } catch {
+    return placeholderProjects.filter((p) => p.featured);
   }
 }
 

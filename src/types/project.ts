@@ -6,6 +6,7 @@ export interface Project {
   features: string[];
   tech_stack: string[];
   status: "available" | "upcoming";
+  featured: boolean;
   upwork_link: string | null;
   youtube_link: string | null;
   tiktok_link: string | null;

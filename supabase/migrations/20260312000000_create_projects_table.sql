@@ -6,6 +6,7 @@ create table if not exists projects (
   features text[] not null default '{}',
   tech_stack text[] not null default '{}',
   status text not null default 'upcoming' check (status in ('available', 'upcoming')),
+  featured boolean not null default false,
   upwork_link text,
   youtube_link text,
   tiktok_link text,

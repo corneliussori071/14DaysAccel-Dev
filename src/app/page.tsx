@@ -1,3 +1,4 @@
+import Header from "@/components/layout/Header";
 import HeroSection from "@/components/sections/HeroSection";
 import DevelopmentApproachSection from "@/components/sections/DevelopmentApproachSection";
 import FeaturedProjectsSection from "@/components/sections/FeaturedProjectsSection";
@@ -8,7 +9,8 @@ import Footer from "@/components/sections/Footer";
 
 export default function Home() {
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-zinc-50">
+      <Header />
       <HeroSection />
       <DevelopmentApproachSection />
       <FeaturedProjectsSection />

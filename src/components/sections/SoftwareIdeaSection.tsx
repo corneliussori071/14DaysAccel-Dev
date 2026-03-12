@@ -1,6 +1,6 @@
 export default function SoftwareIdeaSection() {
   return (
-    <section className="border-b border-zinc-200 bg-zinc-50 px-6 py-20 md:px-12 lg:px-24">
+    <section id="software-idea" className="border-b border-zinc-200 bg-zinc-50 px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-12 lg:grid-cols-2 lg:items-start">
           <div>

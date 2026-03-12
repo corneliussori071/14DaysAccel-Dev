@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function CallToActionSection() {
   return (
     <section className="border-b border-zinc-200 bg-zinc-50 px-6 py-20 md:px-12 lg:px-24">
@@ -10,11 +12,16 @@ export default function CallToActionSection() {
           directly to discuss your project requirements.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
-          <button className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700">
+          <Link
+            href="/projects"
+            className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+          >
             View Project Catalogue
-          </button>
+          </Link>
           <a
-            href="#"
+            href="https://www.upwork.com"
+            target="_blank"
+            rel="noopener noreferrer"
             className="rounded-md border border-zinc-300 bg-white px-6 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
           >
             Work With Us on Upwork

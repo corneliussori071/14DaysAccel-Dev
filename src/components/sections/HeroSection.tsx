@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function HeroSection() {
   return (
     <section className="border-b border-zinc-200 bg-white px-6 py-24 md:px-12 lg:px-24">
@@ -20,18 +22,31 @@ export default function HeroSection() {
               production quality software.
             </p>
             <div className="mt-10 flex flex-wrap gap-4">
-              <button className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700">
+              <Link
+                href="/projects"
+                className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+              >
                 View Projects
-              </button>
-              <button className="rounded-md border border-zinc-300 bg-white px-6 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50">
+              </Link>
+              <Link
+                href="/#software-idea"
+                className="rounded-md border border-zinc-300 bg-white px-6 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
                 Describe Your Software Idea
-              </button>
+              </Link>
             </div>
           </div>
           <div className="flex items-center justify-center">
-            <div className="flex h-72 w-full items-center justify-center rounded-lg border border-zinc-200 bg-zinc-50 text-sm text-zinc-400">
-              Video demonstration placeholder
-            </div>
+            <video
+              className="w-full rounded-lg border border-zinc-200"
+              autoPlay
+              loop
+              muted
+              playsInline
+            >
+              <source src="/video_demo.mp4" type="video/mp4" />
+              Your browser does not support the video element.
+            </video>
           </div>
         </div>
       </div>

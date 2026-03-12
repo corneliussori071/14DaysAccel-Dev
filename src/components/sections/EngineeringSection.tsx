@@ -23,7 +23,7 @@ const principles: Principle[] = [
 
 export default function EngineeringSection() {
   return (
-    <section className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
+    <section id="engineering" className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12">
           <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">

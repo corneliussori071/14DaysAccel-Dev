@@ -1,12 +1,14 @@
+import Link from "next/link";
+
 interface NavLink {
   label: string;
   href: string;
 }
 
 const navigationLinks: NavLink[] = [
-  { label: "Projects", href: "#" },
-  { label: "Architecture Planner", href: "#" },
-  { label: "Engineering Philosophy", href: "#" },
+  { label: "Projects", href: "/projects" },
+  { label: "Architecture Planner", href: "/#software-idea" },
+  { label: "Engineering Philosophy", href: "/#engineering" },
 ];
 
 export default function Footer() {
@@ -15,9 +17,9 @@ export default function Footer() {
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-8 md:grid-cols-3">
           <div className="md:col-span-1">
-            <p className="text-sm font-semibold text-zinc-900">
+            <Link href="/" className="text-sm font-semibold text-zinc-900">
               14DaysAccel Dev
-            </p>
+            </Link>
             <p className="mt-2 text-sm leading-relaxed text-zinc-500">
               AI-accelerated software development with professional engineering
               oversight.
@@ -30,12 +32,12 @@ export default function Footer() {
             <ul className="space-y-2">
               {navigationLinks.map((link) => (
                 <li key={link.label}>
-                  <a
+                  <Link
                     href={link.href}
                     className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
                   >
                     {link.label}
-                  </a>
+                  </Link>
                 </li>
               ))}
             </ul>
@@ -47,7 +49,9 @@ export default function Footer() {
             <ul className="space-y-2">
               <li>
                 <a
-                  href="#"
+                  href="https://github.com/corneliussori071"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
                 >
                   GitHub
@@ -55,7 +59,9 @@ export default function Footer() {
               </li>
               <li>
                 <a
-                  href="#"
+                  href="https://www.upwork.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
                 >
                   Upwork

@@ -7,8 +7,8 @@ const statusStyles: Record<string, string> = {
 };
 
 const statusStylesDark: Record<string, string> = {
-  available: "bg-zinc-800 text-zinc-300",
-  upcoming: "bg-zinc-800 text-blue-400",
+  available: "bg-zinc-600 text-zinc-200",
+  upcoming: "bg-zinc-600 text-blue-300",
 };
 
 const statusLabels: Record<string, string> = {
@@ -20,7 +20,7 @@ export default async function FeaturedProjectsSection() {
   const projects = await getFeaturedProjects();
 
   return (
-    <section className="border-b border-zinc-800 bg-zinc-950 px-6 py-20 md:px-12 lg:px-24">
+    <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
@@ -34,7 +34,7 @@ export default async function FeaturedProjectsSection() {
           </div>
           <Link
             href="/projects"
-            className="shrink-0 rounded-md border border-zinc-700 bg-zinc-900 px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:-translate-y-0.5 hover:border-zinc-600 hover:text-white"
+            className="shrink-0 rounded-md border border-zinc-400 bg-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:text-white"
           >
             View Full Project Catalogue
           </Link>
@@ -44,11 +44,11 @@ export default async function FeaturedProjectsSection() {
             <Link
               key={project.id}
               href={`/projects/${project.slug}`}
-              className="group animate-fade-in-up rounded-lg border border-zinc-800 bg-zinc-900 transition-all hover:-translate-y-1 hover:border-zinc-700 hover:shadow-lg hover:shadow-black/20"
+              className="group animate-fade-in-up rounded-lg border border-zinc-500 bg-zinc-700 transition-all hover:-translate-y-1 hover:border-zinc-400 hover:shadow-lg hover:shadow-black/20"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               {project.profile_image && (
-                <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-zinc-800">
+                <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-zinc-600">
                   <img
                     src={project.profile_image}
                     alt={project.title}
@@ -74,7 +74,7 @@ export default async function FeaturedProjectsSection() {
                   {project.tech_stack.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded border border-zinc-700 px-2 py-0.5 text-xs text-zinc-400"
+                      className="rounded border border-zinc-500 px-2 py-0.5 text-xs text-zinc-400"
                     >
                       {tech}
                     </span>

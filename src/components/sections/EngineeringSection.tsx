@@ -23,7 +23,7 @@ const principles: Principle[] = [
 
 export default function EngineeringSection() {
   return (
-    <section id="engineering" className="border-b border-zinc-800 bg-zinc-950 px-6 py-20 md:px-12 lg:px-24">
+    <section id="engineering" className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12">
           <h2 className="text-3xl font-semibold tracking-tight text-white">
@@ -37,7 +37,7 @@ export default function EngineeringSection() {
           {principles.map((item, index) => (
             <div
               key={item.title}
-              className="flex animate-fade-in-up flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-6 transition-all hover:-translate-y-1 hover:border-zinc-700"
+              className="flex animate-fade-in-up flex-col gap-3 rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:border-zinc-400"
               style={{ animationDelay: `${index * 0.12}s` }}
             >
               <div className="text-sm font-medium text-zinc-500">

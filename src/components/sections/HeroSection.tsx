@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function HeroSection() {
   return (
-    <section className="border-b border-zinc-800 bg-zinc-950 px-6 py-24 md:px-12 lg:px-24">
+    <section className="border-b border-zinc-500 bg-[#545454] px-6 py-24 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
           <div className="animate-fade-in-up">
@@ -30,7 +30,7 @@ export default function HeroSection() {
               </Link>
               <Link
                 href="/#software-idea"
-                className="rounded-md border border-zinc-700 bg-zinc-900 px-6 py-3 text-sm font-medium text-zinc-300 transition-all hover:-translate-y-0.5 hover:border-zinc-600 hover:text-white"
+                className="rounded-md border border-zinc-400 bg-zinc-700 px-6 py-3 text-sm font-medium text-zinc-300 transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:text-white"
               >
                 Describe Your Software Idea
               </Link>
@@ -38,7 +38,7 @@ export default function HeroSection() {
           </div>
           <div className="flex items-center justify-center animate-fade-in" style={{ animationDelay: "0.2s" }}>
             <video
-              className="w-full rounded-lg border border-zinc-800"
+              className="w-full rounded-lg border border-zinc-500"
               autoPlay
               loop
               muted

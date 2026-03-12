@@ -23,13 +23,13 @@ const approaches: ApproachItem[] = [
 
 export default function DevelopmentApproachSection() {
   return (
-    <section className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
+    <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <h2 className="text-3xl font-semibold tracking-tight text-white">
             How It Works
           </h2>
-          <p className="mt-3 text-base text-zinc-500">
+          <p className="mt-3 text-base text-zinc-300">
             A disciplined approach that combines AI velocity with engineering
             quality.
           </p>
@@ -38,19 +38,19 @@ export default function DevelopmentApproachSection() {
           {approaches.map((item, index) => (
             <div
               key={item.title}
-              className="animate-fade-in-up rounded-lg border border-zinc-200 bg-zinc-50 p-6 transition-all hover:-translate-y-1 hover:shadow-md"
+              className="animate-fade-in-up rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:shadow-md"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <h3 className="text-base font-semibold text-zinc-900">
+              <h3 className="text-base font-semibold text-zinc-100">
                 {item.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-500">
+              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
                 {item.description}
               </p>
             </div>
           ))}
         </div>
-        <div className="mt-10 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+        <div className="mt-10 overflow-hidden rounded-lg border border-zinc-500 bg-zinc-700">
           <img
             src="/work_flow.png"
             alt="Development workflow showing AI-accelerated coding process"

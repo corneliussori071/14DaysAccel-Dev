@@ -30,7 +30,7 @@ export default function HeroSection() {
               </Link>
               <Link
                 href="/#software-idea"
-                className="rounded-md border border-white/40 bg-white/10 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white/20"
+                className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-lg hover:shadow-white/10"
               >
                 Describe Your Software Idea
               </Link>

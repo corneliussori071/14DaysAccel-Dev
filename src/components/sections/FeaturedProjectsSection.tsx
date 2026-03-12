@@ -34,7 +34,7 @@ export default async function FeaturedProjectsSection() {
           </div>
           <Link
             href="/projects"
-            className="shrink-0 rounded-md border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white/20"
+            className="shrink-0 rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-lg hover:shadow-white/10"
           >
             View Full Project Catalogue
           </Link>

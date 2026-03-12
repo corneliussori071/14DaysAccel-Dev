@@ -22,7 +22,7 @@ export default function CallToActionSection() {
             href="https://www.upwork.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md border border-white/40 bg-white/10 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/20 hover:shadow-md"
+            className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
           >
             Work With Us on Upwork
           </a>

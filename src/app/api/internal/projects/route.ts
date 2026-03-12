@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link } = body;
+    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image } = body;
 
     if (!title || !slug || !description) {
       return NextResponse.json(
@@ -73,6 +73,8 @@ export async function POST(request: NextRequest) {
         upwork_link: upwork_link ? String(upwork_link).slice(0, 1000) : null,
         youtube_link: youtube_link ? String(youtube_link).slice(0, 1000) : null,
         tiktok_link: tiktok_link ? String(tiktok_link).slice(0, 1000) : null,
+        media_files: Array.isArray(body.media_files) ? body.media_files : [],
+        profile_image: body.profile_image ? String(body.profile_image).slice(0, 2000) : null,
       })
       .select()
       .single();
@@ -123,6 +125,10 @@ export async function PUT(request: NextRequest) {
       sanitized.youtube_link = updates.youtube_link ? String(updates.youtube_link).slice(0, 1000) : null;
     if (updates.tiktok_link !== undefined)
       sanitized.tiktok_link = updates.tiktok_link ? String(updates.tiktok_link).slice(0, 1000) : null;
+    if (updates.media_files !== undefined)
+      sanitized.media_files = Array.isArray(updates.media_files) ? updates.media_files : [];
+    if (updates.profile_image !== undefined)
+      sanitized.profile_image = updates.profile_image ? String(updates.profile_image).slice(0, 2000) : null;
 
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase

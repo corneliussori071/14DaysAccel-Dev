@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Image from "next/image";
 
 interface NavItem {
   label: string;
@@ -19,8 +20,15 @@ export default function Header() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4 md:px-12 lg:px-24">
         <Link
           href="/"
-          className="text-base font-semibold tracking-tight text-zinc-900"
+          className="flex items-center gap-2 text-base font-semibold tracking-tight text-zinc-900"
         >
+          <Image
+            src="/logo.jpg"
+            alt="14DaysAccel Dev logo"
+            width={32}
+            height={32}
+            className="rounded"
+          />
           14DaysAccel Dev
         </Link>
         <nav className="hidden items-center gap-8 md:flex">

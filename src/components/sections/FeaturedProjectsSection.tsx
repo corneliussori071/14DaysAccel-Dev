@@ -7,8 +7,8 @@ const statusStyles: Record<string, string> = {
 };
 
 const statusStylesDark: Record<string, string> = {
-  available: "bg-zinc-600 text-zinc-200",
-  upcoming: "bg-zinc-600 text-blue-300",
+  available: "bg-white/20 text-white",
+  upcoming: "bg-white/20 text-white",
 };
 
 const statusLabels: Record<string, string> = {
@@ -27,14 +27,14 @@ export default async function FeaturedProjectsSection() {
             <h2 className="text-3xl font-semibold tracking-tight text-white">
               Featured Software Systems
             </h2>
-            <p className="mt-3 text-base text-zinc-400">
+            <p className="mt-3 text-base text-white">
               A selection of software systems built using this development
               model.
             </p>
           </div>
           <Link
             href="/projects"
-            className="shrink-0 rounded-md border border-zinc-400 bg-zinc-700 px-5 py-2.5 text-sm font-medium text-zinc-300 transition-all hover:-translate-y-0.5 hover:border-zinc-300 hover:text-white"
+            className="shrink-0 rounded-md border border-white/40 bg-white/10 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:border-white hover:bg-white/20"
           >
             View Full Project Catalogue
           </Link>
@@ -58,7 +58,7 @@ export default async function FeaturedProjectsSection() {
               )}
               <div className="p-6">
                 <div className="mb-3 flex items-start justify-between gap-3">
-                  <h3 className="text-base font-semibold text-zinc-100 group-hover:text-white">
+                  <h3 className="text-base font-semibold text-white">
                     {project.title}
                   </h3>
                   <span
@@ -67,14 +67,14 @@ export default async function FeaturedProjectsSection() {
                     {statusLabels[project.status] || project.status}
                   </span>
                 </div>
-                <p className="text-sm leading-relaxed text-zinc-400">
+                <p className="text-sm leading-relaxed text-white/80">
                   {project.description}
                 </p>
                 <div className="mt-4 flex flex-wrap gap-2">
                   {project.tech_stack.map((tech) => (
                     <span
                       key={tech}
-                      className="rounded border border-zinc-500 px-2 py-0.5 text-xs text-zinc-400"
+                      className="rounded border border-white/30 px-2 py-0.5 text-xs text-white/80"
                     >
                       {tech}
                     </span>

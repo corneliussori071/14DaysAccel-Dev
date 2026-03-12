@@ -29,7 +29,7 @@ export default function EngineeringSection() {
           <h2 className="text-3xl font-semibold tracking-tight text-white">
             Engineering Philosophy
           </h2>
-          <p className="mt-3 text-base text-zinc-400">
+          <p className="mt-3 text-base text-white">
             The principles that guide every project built through this platform.
           </p>
         </div>
@@ -40,13 +40,13 @@ export default function EngineeringSection() {
               className="flex animate-fade-in-up flex-col gap-3 rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:border-zinc-400"
               style={{ animationDelay: `${index * 0.12}s` }}
             >
-              <div className="text-sm font-medium text-zinc-500">
+              <div className="text-sm font-medium text-white/60">
                 0{index + 1}
               </div>
-              <h3 className="text-base font-semibold text-zinc-100">
+              <h3 className="text-base font-semibold text-white">
                 {item.title}
               </h3>
-              <p className="text-sm leading-relaxed text-zinc-400">
+              <p className="text-sm leading-relaxed text-white/80">
                 {item.description}
               </p>
             </div>

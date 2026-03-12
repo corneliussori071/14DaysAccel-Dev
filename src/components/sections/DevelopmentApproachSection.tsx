@@ -29,7 +29,7 @@ export default function DevelopmentApproachSection() {
           <h2 className="text-3xl font-semibold tracking-tight text-white">
             How It Works
           </h2>
-          <p className="mt-3 text-base text-zinc-300">
+          <p className="mt-3 text-base text-white">
             A disciplined approach that combines AI velocity with engineering
             quality.
           </p>
@@ -41,10 +41,10 @@ export default function DevelopmentApproachSection() {
               className="animate-fade-in-up rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:shadow-md"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <h3 className="text-base font-semibold text-zinc-100">
+              <h3 className="text-base font-semibold text-white">
                 {item.title}
               </h3>
-              <p className="mt-3 text-sm leading-relaxed text-zinc-400">
+              <p className="mt-3 text-sm leading-relaxed text-white/80">
                 {item.description}
               </p>
             </div>

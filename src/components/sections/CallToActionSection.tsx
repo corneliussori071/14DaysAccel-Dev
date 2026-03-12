@@ -7,14 +7,14 @@ export default function CallToActionSection() {
         <h2 className="text-3xl font-semibold tracking-tight text-white">
           Ready to build professional software?
         </h2>
-        <p className="mx-auto mt-4 max-w-xl text-base text-zinc-300">
+        <p className="mx-auto mt-4 max-w-xl text-base text-white">
           Explore the full catalogue of available software systems or reach out
           directly to discuss your project requirements.
         </p>
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/projects"
-            className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md"
+            className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
           >
             View Project Catalogue
           </Link>
@@ -22,7 +22,7 @@ export default function CallToActionSection() {
             href="https://www.upwork.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md border border-zinc-400 bg-zinc-700 px-6 py-3 text-sm font-medium text-zinc-200 transition-all hover:-translate-y-0.5 hover:bg-zinc-600 hover:shadow-md"
+            className="rounded-md border border-white/40 bg-white/10 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/20 hover:shadow-md"
           >
             Work With Us on Upwork
           </a>

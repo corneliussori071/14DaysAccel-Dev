@@ -2,7 +2,7 @@ import Link from "next/link";
 
 export default function CallToActionSection() {
   return (
-    <section className="border-b border-zinc-200 bg-zinc-50 px-6 py-20 md:px-12 lg:px-24">
+    <section id="contact" className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl text-center">
         <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
           Ready to build professional software?
@@ -14,7 +14,7 @@ export default function CallToActionSection() {
         <div className="mt-10 flex flex-wrap justify-center gap-4">
           <Link
             href="/projects"
-            className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+            className="rounded-md bg-zinc-900 px-6 py-3 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-700 hover:shadow-md"
           >
             View Project Catalogue
           </Link>
@@ -22,7 +22,7 @@ export default function CallToActionSection() {
             href="https://www.upwork.com"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md border border-zinc-300 bg-white px-6 py-3 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+            className="rounded-md border border-zinc-300 bg-white px-6 py-3 text-sm font-medium text-zinc-700 transition-all hover:-translate-y-0.5 hover:bg-zinc-50 hover:shadow-md"
           >
             Work With Us on Upwork
           </a>

@@ -23,26 +23,30 @@ const principles: Principle[] = [
 
 export default function EngineeringSection() {
   return (
-    <section id="engineering" className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
+    <section id="engineering" className="border-b border-zinc-800 bg-zinc-950 px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-12">
-          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
+          <h2 className="text-3xl font-semibold tracking-tight text-white">
             Engineering Philosophy
           </h2>
-          <p className="mt-3 text-base text-zinc-500">
+          <p className="mt-3 text-base text-zinc-400">
             The principles that guide every project built through this platform.
           </p>
         </div>
         <div className="grid grid-cols-1 gap-10 md:grid-cols-3">
           {principles.map((item, index) => (
-            <div key={item.title} className="flex flex-col gap-3">
-              <div className="text-sm font-medium text-zinc-300">
+            <div
+              key={item.title}
+              className="flex animate-fade-in-up flex-col gap-3 rounded-lg border border-zinc-800 bg-zinc-900 p-6 transition-all hover:-translate-y-1 hover:border-zinc-700"
+              style={{ animationDelay: `${index * 0.12}s` }}
+            >
+              <div className="text-sm font-medium text-zinc-500">
                 0{index + 1}
               </div>
-              <h3 className="text-base font-semibold text-zinc-900">
+              <h3 className="text-base font-semibold text-zinc-100">
                 {item.title}
               </h3>
-              <p className="text-sm leading-relaxed text-zinc-500">
+              <p className="text-sm leading-relaxed text-zinc-400">
                 {item.description}
               </p>
             </div>

@@ -49,8 +49,12 @@ export default function DevelopmentApproachSection() {
             </div>
           ))}
         </div>
-        <div className="mt-10 flex h-48 w-full items-center justify-center rounded-lg border border-zinc-200 bg-white text-sm text-zinc-400">
-          Workflow animation placeholder
+        <div className="mt-10 overflow-hidden rounded-lg border border-zinc-200 bg-white">
+          <img
+            src="/work_flow.png"
+            alt="Development workflow showing AI-accelerated coding process"
+            className="h-auto w-full"
+          />
         </div>
       </div>
     </section>

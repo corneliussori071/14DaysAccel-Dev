@@ -1,14 +1,21 @@
+import HeroSection from "@/components/sections/HeroSection";
+import DevelopmentApproachSection from "@/components/sections/DevelopmentApproachSection";
+import FeaturedProjectsSection from "@/components/sections/FeaturedProjectsSection";
+import SoftwareIdeaSection from "@/components/sections/SoftwareIdeaSection";
+import EngineeringSection from "@/components/sections/EngineeringSection";
+import CallToActionSection from "@/components/sections/CallToActionSection";
+import Footer from "@/components/sections/Footer";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center bg-white">
-      <div className="text-center">
-        <h1 className="text-4xl font-semibold tracking-tight text-zinc-900">
-          14DaysAccel Dev
-        </h1>
-        <p className="mt-4 text-lg text-zinc-500">
-          AI-accelerated software architecture platform
-        </p>
-      </div>
+    <main className="min-h-screen bg-white">
+      <HeroSection />
+      <DevelopmentApproachSection />
+      <FeaturedProjectsSection />
+      <SoftwareIdeaSection />
+      <EngineeringSection />
+      <CallToActionSection />
+      <Footer />
     </main>
   );
 }

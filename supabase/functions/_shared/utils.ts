@@ -56,7 +56,17 @@ export async function checkTokenBalance(
     .single();
 
   if (error || !data) {
-    throw new Error("Token wallet not found");
+    // Auto-provision wallet for users who signed up before the trigger existed
+    const { data: newWallet, error: insertError } = await serviceClient
+      .from("token_wallets")
+      .insert({ user_id: userId, balance_tokens: 1000 })
+      .select("balance_tokens")
+      .single();
+
+    if (insertError || !newWallet) {
+      throw new Error("Token wallet not found");
+    }
+    return newWallet.balance_tokens;
   }
   if (data.balance_tokens < minimumTokens) {
     throw new Error("Insufficient token balance");

@@ -7,11 +7,13 @@ import {
   getCorsHeaders,
   errorResponse,
   jsonResponse,
+  callAiModel,
 } from "../_shared/utils.ts";
 
 interface RequestBody {
   businessName: string;
   goalType: "prompts" | "ideas";
+  modelId: string;
   industry?: string;
   softwareFeatures?: string;
   techStack?: string;
@@ -82,79 +84,53 @@ Deno.serve(async (req) => {
       return errorResponse("businessName and goalType are required");
     }
 
-    const openaiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!openaiKey) {
-      return errorResponse("AI service not configured", 500);
-    }
-
+    const modelId = body.modelId || "gpt-5.3-codex";
     const systemPrompt = buildSystemPrompt(body);
+    const isOpenAI = modelId.startsWith("gpt-");
 
-    const aiResponse = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${openaiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `Generate a software plan for: ${body.businessName}`,
-            },
-          ],
-          temperature: 0.7,
-          response_format: { type: "json_object" },
-        }),
-      }
+    const result = await callAiModel(
+      modelId,
+      systemPrompt,
+      `Generate a software plan for: ${body.businessName}`,
+      { jsonMode: isOpenAI }
     );
-
-    if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("OpenAI API error:", errText);
-      return errorResponse("AI service request failed", 502);
-    }
-
-    const aiData = await aiResponse.json();
-
-    const promptTokens = aiData.usage?.prompt_tokens ?? 0;
-    const completionTokens = aiData.usage?.completion_tokens ?? 0;
-    const totalTokens = aiData.usage?.total_tokens ?? 0;
 
     await deductTokens(
       serviceClient,
       user.id,
-      totalTokens,
+      result.billedTokens,
       "generate_plan",
-      `Software plan generation for ${body.businessName}`
+      `Software plan generation for ${body.businessName} (${modelId})`
     );
 
     await logAiRequest(
       serviceClient,
       user.id,
-      promptTokens,
-      completionTokens,
-      totalTokens,
+      result.promptTokens,
+      result.completionTokens,
+      result.totalTokens,
       "generate_plan"
     );
 
-    const content = aiData.choices?.[0]?.message?.content ?? "{}";
     let plan;
     try {
-      plan = JSON.parse(content);
+      plan = JSON.parse(result.content);
     } catch {
       plan = {
-        software_description: content,
+        software_description: result.content,
         app_architecture: "",
         recommended_stack: "",
         modules: [],
       };
     }
 
-    return jsonResponse({ plan, tokensUsed: totalTokens });
+    return jsonResponse({
+      plan,
+      tokensUsed: result.totalTokens,
+      billedTokens: result.billedTokens,
+      promptTokens: result.promptTokens,
+      completionTokens: result.completionTokens,
+    });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
     if (
@@ -166,6 +142,9 @@ Deno.serve(async (req) => {
     }
     if (message.includes("Insufficient")) {
       return errorResponse(message, 402);
+    }
+    if (message.includes("AI service request failed")) {
+      return errorResponse(message, 502);
     }
     console.error("generateBusinessPlan error:", message);
     return errorResponse(message, 500);

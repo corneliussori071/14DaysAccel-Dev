@@ -7,6 +7,7 @@ import {
   getCorsHeaders,
   errorResponse,
   jsonResponse,
+  callAiModel,
 } from "../_shared/utils.ts";
 
 interface RequestBody {
@@ -15,6 +16,7 @@ interface RequestBody {
   softwareDescription: string;
   appArchitecture: string;
   recommendedStack: string;
+  modelId: string;
 }
 
 const STAGE_DEFINITIONS: Record<
@@ -104,10 +106,7 @@ Deno.serve(async (req) => {
       return errorResponse("Invalid stage number. Must be 1-6.");
     }
 
-    const openaiKey = Deno.env.get("OPENAI_API_KEY");
-    if (!openaiKey) {
-      return errorResponse("AI service not configured", 500);
-    }
+    const modelId = body.modelId || "gpt-5.3-codex";
 
     const systemPrompt = `You are an expert software engineering mentor creating step-by-step build prompts for developers.
 
@@ -121,65 +120,37 @@ ${stageDef.systemContext}
 
 Generate a comprehensive, copy-paste-ready prompt that a developer can give to an AI coding assistant to implement this stage. The prompt should be specific to the project described above. Be thorough but concise. Do not use emojis. Do not use em dashes.`;
 
-    const aiResponse = await fetch(
-      "https://api.openai.com/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${openaiKey}`,
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          model: "gpt-4o-mini",
-          messages: [
-            { role: "system", content: systemPrompt },
-            {
-              role: "user",
-              content: `Generate the build prompt for Stage ${body.stage}: ${stageDef.title}`,
-            },
-          ],
-          temperature: 0.7,
-        }),
-      }
+    const result = await callAiModel(
+      modelId,
+      systemPrompt,
+      `Generate the build prompt for Stage ${body.stage}: ${stageDef.title}`
     );
-
-    if (!aiResponse.ok) {
-      const errText = await aiResponse.text();
-      console.error("OpenAI API error:", errText);
-      return errorResponse("AI service request failed", 502);
-    }
-
-    const aiData = await aiResponse.json();
-
-    const promptTokens = aiData.usage?.prompt_tokens ?? 0;
-    const completionTokens = aiData.usage?.completion_tokens ?? 0;
-    const totalTokens = aiData.usage?.total_tokens ?? 0;
 
     await deductTokens(
       serviceClient,
       user.id,
-      totalTokens,
+      result.billedTokens,
       "generate_prompt_stage",
-      `Prompt stage ${body.stage}: ${stageDef.title}`
+      `Prompt stage ${body.stage}: ${stageDef.title} (${modelId})`
     );
 
     await logAiRequest(
       serviceClient,
       user.id,
-      promptTokens,
-      completionTokens,
-      totalTokens,
+      result.promptTokens,
+      result.completionTokens,
+      result.totalTokens,
       "generate_prompt_stage"
     );
-
-    const promptText =
-      aiData.choices?.[0]?.message?.content ?? "No prompt generated.";
 
     return jsonResponse({
       stage: body.stage,
       title: stageDef.title,
-      prompt: promptText,
-      tokensUsed: totalTokens,
+      prompt: result.content || "No prompt generated.",
+      tokensUsed: result.totalTokens,
+      billedTokens: result.billedTokens,
+      promptTokens: result.promptTokens,
+      completionTokens: result.completionTokens,
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "Unknown error";
@@ -192,6 +163,9 @@ Generate a comprehensive, copy-paste-ready prompt that a developer can give to a
     }
     if (message.includes("Insufficient")) {
       return errorResponse(message, 402);
+    }
+    if (message.includes("AI service request failed")) {
+      return errorResponse(message, 502);
     }
     console.error("generatePromptStage error:", message);
     return errorResponse(message, 500);

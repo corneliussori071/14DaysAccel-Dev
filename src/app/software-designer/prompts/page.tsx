@@ -7,6 +7,7 @@ import { PROMPT_STAGES, TOKEN_PRICE_USD } from "@/types/softwarePlan";
 import type { SoftwarePlanResponse, AiModelId } from "@/types/softwarePlan";
 import { generatePromptStage } from "@/services/aiPlannerService";
 import { getTokenBalance } from "@/services/tokenService";
+import { updateSavedPlanPrompts } from "@/services/profileService";
 import CopyButton from "@/components/software-designer/CopyButton";
 
 interface GeneratedPrompt {
@@ -14,6 +15,7 @@ interface GeneratedPrompt {
   title: string;
   prompt: string;
   tokensUsed: number;
+  generatedAt?: string;
 }
 
 interface StoredResult {
@@ -21,6 +23,18 @@ interface StoredResult {
   tokensUsed: number;
   businessName: string;
   modelId?: AiModelId;
+  savedPlanId?: string;
+  generatedPrompts?: Record<string, GeneratedPrompt>;
+}
+
+function toDisplayString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    return Object.entries(value)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join("\n");
+  }
+  return String(value ?? "");
 }
 
 export default function PromptsPage() {
@@ -39,12 +53,43 @@ export default function PromptsPage() {
       router.push("/software-designer");
       return;
     }
-    setStoredResult(JSON.parse(stored));
+    const parsed: StoredResult = JSON.parse(stored);
+    setStoredResult(parsed);
+
+    if (parsed.generatedPrompts) {
+      const map = new Map<number, GeneratedPrompt>();
+      for (const [key, value] of Object.entries(parsed.generatedPrompts)) {
+        map.set(Number(key), value as GeneratedPrompt);
+      }
+      setGeneratedPrompts(map);
+    }
 
     getTokenBalance()
       .then(setTokenBalance)
       .catch(() => setTokenBalance(0));
   }, [router]);
+
+  async function persistPrompts(
+    updatedMap: Map<number, GeneratedPrompt>,
+    savedPlanId?: string
+  ) {
+    if (!savedPlanId) return;
+    const promptsObj: Record<string, GeneratedPrompt> = {};
+    updatedMap.forEach((val, key) => {
+      promptsObj[String(key)] = val;
+    });
+    try {
+      await updateSavedPlanPrompts(savedPlanId, promptsObj);
+      const stored = sessionStorage.getItem("softwarePlanResult");
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        parsed.generatedPrompts = promptsObj;
+        sessionStorage.setItem("softwarePlanResult", JSON.stringify(parsed));
+      }
+    } catch {
+      // Non-critical: prompt is still shown to user
+    }
+  }
 
   async function handleGenerate(stage: number) {
     if (!storedResult) return;
@@ -56,29 +101,42 @@ export default function PromptsPage() {
       const result = await generatePromptStage(
         stage,
         storedResult.businessName,
-        storedResult.plan.software_description,
-        storedResult.plan.app_architecture,
-        storedResult.plan.recommended_stack,
+        toDisplayString(storedResult.plan.software_description),
+        toDisplayString(storedResult.plan.app_architecture),
+        toDisplayString(storedResult.plan.recommended_stack),
         storedResult.modelId || "gpt-5.3-codex"
       );
 
-      setGeneratedPrompts((prev) => {
-        const next = new Map(prev);
-        next.set(stage, {
-          stage: result.stage,
-          title: result.title,
-          prompt: result.prompt,
-          tokensUsed: result.tokensUsed,
-        });
-        return next;
-      });
+      const prompt: GeneratedPrompt = {
+        stage: result.stage,
+        title: result.title,
+        prompt: result.prompt,
+        tokensUsed: result.tokensUsed,
+        generatedAt: new Date().toISOString(),
+      };
+
+      const next = new Map(generatedPrompts);
+      next.set(stage, prompt);
+      setGeneratedPrompts(next);
+
+      await persistPrompts(next, storedResult.savedPlanId);
 
       const balance = await getTokenBalance();
       setTokenBalance(balance);
     } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to generate prompt."
-      );
+      if (
+        err instanceof Error &&
+        err.message.includes("Insufficient")
+      ) {
+        setError(
+          err.message +
+            " — Purchase more tokens from the Subscriptions page."
+        );
+      } else {
+        setError(
+          err instanceof Error ? err.message : "Failed to generate prompt."
+        );
+      }
     } finally {
       setLoadingStage(null);
     }
@@ -115,14 +173,22 @@ export default function PromptsPage() {
             </p>
           </div>
           {tokenBalance !== null && (
-            <div className="rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm">
-              <span className="text-zinc-500">Token Balance: </span>
-              <span className="font-medium text-zinc-900">
-                {tokenBalance.toLocaleString()}
-              </span>
-              <span className="ml-1 text-xs text-zinc-400">
-                (~${(tokenBalance * TOKEN_PRICE_USD).toFixed(2)})
-              </span>
+            <div className="flex items-center gap-3">
+              <div className="rounded-md border border-zinc-200 bg-white px-4 py-2 text-sm">
+                <span className="text-zinc-500">Token Balance: </span>
+                <span className="font-medium text-zinc-900">
+                  {tokenBalance.toLocaleString()}
+                </span>
+                <span className="ml-1 text-xs text-zinc-400">
+                  (~${(tokenBalance * TOKEN_PRICE_USD).toFixed(2)})
+                </span>
+              </div>
+              <Link
+                href="/subscriptions"
+                className="rounded-md border border-zinc-300 bg-white px-3 py-2 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                Buy Tokens
+              </Link>
             </div>
           )}
         </div>
@@ -130,6 +196,14 @@ export default function PromptsPage() {
         {error && (
           <div className="mb-6 rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-700">
             {error}
+            {error.includes("Insufficient") && (
+              <Link
+                href="/subscriptions"
+                className="ml-2 font-medium underline hover:text-red-900"
+              >
+                Purchase tokens
+              </Link>
+            )}
           </div>
         )}
 

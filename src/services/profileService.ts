@@ -103,3 +103,26 @@ export async function deleteSavedPlan(planId: string): Promise<void> {
     throw new Error(error.message);
   }
 }
+
+export async function updateSavedPlanPrompts(
+  planId: string,
+  generatedPrompts: Record<string, unknown>
+): Promise<void> {
+  const {
+    data: { session },
+  } = await supabase.auth.getSession();
+
+  if (!session?.user) {
+    throw new Error("Not authenticated");
+  }
+
+  const { error } = await supabase
+    .from("saved_plans")
+    .update({ generated_prompts: generatedPrompts })
+    .eq("id", planId)
+    .eq("user_id", session.user.id);
+
+  if (error) {
+    throw new Error(error.message);
+  }
+}

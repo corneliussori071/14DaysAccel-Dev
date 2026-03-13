@@ -33,14 +33,15 @@ Given the following details, produce a structured software development plan in J
 
 Return a JSON object with these exact keys:
 {
-  "software_description": "A comprehensive description of the software system",
-  "app_architecture": "Detailed recommended application architecture",
-  "recommended_stack": "The recommended technology stack with justifications",
+  "software_description": "A comprehensive plain-text description of the software system",
+  "app_architecture": "Detailed recommended application architecture as a plain-text string, NOT an object",
+  "recommended_stack": "The recommended technology stack with justifications as a single plain-text string, NOT an object or nested structure",
   "modules": [
     { "name": "Module name", "description": "Module purpose", "priority": "high|medium|low" }
   ]
 }
 
+IMPORTANT: software_description, app_architecture, and recommended_stack must each be a single plain-text string. Never return them as objects or arrays.
 Be specific, actionable, and professional. Do not include markdown formatting. Return only valid JSON.`;
   }
 
@@ -53,14 +54,15 @@ Given the following details, produce a structured software development plan in J
 
 Analyze the business operations and propose a software solution. Return a JSON object with these exact keys:
 {
-  "software_description": "A comprehensive description of the proposed software system that solves their business problem",
-  "app_architecture": "Detailed recommended application architecture",
-  "recommended_stack": "The recommended technology stack with justifications",
+  "software_description": "A comprehensive description of the proposed software system that solves their business problem as a plain-text string",
+  "app_architecture": "Detailed recommended application architecture as a plain-text string, NOT an object",
+  "recommended_stack": "The recommended technology stack with justifications as a single plain-text string, NOT an object or nested structure",
   "modules": [
     { "name": "Module name", "description": "Module purpose", "priority": "high|medium|low" }
   ]
 }
 
+IMPORTANT: software_description, app_architecture, and recommended_stack must each be a single plain-text string. Never return them as objects or arrays.
 Be specific, actionable, and professional. Do not include markdown formatting. Return only valid JSON.`;
 }
 
@@ -122,6 +124,16 @@ Deno.serve(async (req) => {
         recommended_stack: "",
         modules: [],
       };
+    }
+
+    // Normalize fields to strings — AI may return objects instead of plain text
+    for (const key of ["software_description", "app_architecture", "recommended_stack"] as const) {
+      const val = plan[key];
+      if (val && typeof val === "object") {
+        plan[key] = Object.entries(val)
+          .map(([k, v]) => `${k}: ${v}`)
+          .join("\n");
+      }
     }
 
     return jsonResponse({

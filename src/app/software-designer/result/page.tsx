@@ -12,6 +12,16 @@ interface StoredResult {
   businessName: string;
 }
 
+function toDisplayString(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value && typeof value === "object") {
+    return Object.entries(value)
+      .map(([k, v]) => `${k}: ${v}`)
+      .join("\n");
+  }
+  return String(value ?? "");
+}
+
 export default function ResultPage() {
   const router = useRouter();
   const [result, setResult] = useState<StoredResult | null>(null);
@@ -35,11 +45,12 @@ export default function ResultPage() {
 
   const { plan, tokensUsed, businessName } = result;
 
+  const stackText = toDisplayString(plan.recommended_stack);
+  const archText = toDisplayString(plan.app_architecture);
+
   const descriptionText = [
-    plan.software_description,
-    plan.recommended_stack
-      ? `\nRecommended Stack: ${plan.recommended_stack}`
-      : "",
+    toDisplayString(plan.software_description),
+    stackText ? `\nRecommended Stack: ${stackText}` : "",
     plan.modules?.length
       ? `\nModules:\n${plan.modules.map((m) => `- ${m.name}: ${m.description} (Priority: ${m.priority})`).join("\n")}`
       : "",
@@ -73,15 +84,15 @@ export default function ResultPage() {
             </div>
             <div className="space-y-4 text-sm leading-relaxed text-zinc-700">
               <p className="whitespace-pre-wrap">
-                {plan.software_description}
+                {toDisplayString(plan.software_description)}
               </p>
-              {plan.recommended_stack && (
+              {stackText && (
                 <div>
                   <h3 className="mb-1 font-medium text-zinc-900">
                     Recommended Stack
                   </h3>
                   <p className="whitespace-pre-wrap">
-                    {plan.recommended_stack}
+                    {stackText}
                   </p>
                 </div>
               )}
@@ -116,10 +127,10 @@ export default function ResultPage() {
               <h2 className="text-lg font-semibold text-zinc-900">
                 Recommended App Architecture
               </h2>
-              <CopyButton text={plan.app_architecture} />
+              <CopyButton text={archText} />
             </div>
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
-              {plan.app_architecture}
+              {archText}
             </p>
           </section>
         </div>

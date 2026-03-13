@@ -14,6 +14,7 @@ const navigationLinks: NavLink[] = [
 const accountLinks: NavLink[] = [
   { label: "Log In", href: "/software-designer?auth=login" },
   { label: "Sign Up", href: "/software-designer?auth=signup" },
+  { label: "My Account", href: "/profile" },
 ];
 
 export default function Footer() {

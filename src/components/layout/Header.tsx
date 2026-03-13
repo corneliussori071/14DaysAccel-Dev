@@ -84,9 +84,12 @@ export default function Header() {
           <div className="flex items-center gap-3">
             {user ? (
               <>
-                <span className="hidden text-sm text-zinc-500 md:inline">
-                  {user.email}
-                </span>
+                <Link
+                  href="/profile"
+                  className="hidden text-sm text-zinc-500 transition-colors hover:text-zinc-900 md:inline"
+                >
+                  Account
+                </Link>
                 <button
                   onClick={handleLogout}
                   className="rounded-md border border-zinc-300 px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-100"

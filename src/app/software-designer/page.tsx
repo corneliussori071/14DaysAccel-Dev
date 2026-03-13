@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useState, useEffect, Suspense } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { SoftwarePlanRequest } from "@/types/softwarePlan";
 import { generateBusinessPlan } from "@/services/aiPlannerService";
@@ -38,7 +38,16 @@ const INDUSTRIES = [
 type GoalType = "prompts" | "ideas";
 
 export default function SoftwareDesignerPage() {
+  return (
+    <Suspense>
+      <SoftwareDesignerContent />
+    </Suspense>
+  );
+}
+
+function SoftwareDesignerContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
   const [goalType, setGoalType] = useState<GoalType | null>(null);
   const [businessName, setBusinessName] = useState("");
   const [industry, setIndustry] = useState("");
@@ -50,6 +59,7 @@ export default function SoftwareDesignerPage() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState("");
   const [showAuth, setShowAuth] = useState(false);
+  const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
 
@@ -66,6 +76,16 @@ export default function SoftwareDesignerPage() {
 
     return () => subscription.unsubscribe();
   }, []);
+
+  useEffect(() => {
+    const authParam = searchParams.get("auth");
+    if (authParam === "login" || authParam === "signup") {
+      if (!isAuthenticated) {
+        setAuthMode(authParam);
+        setShowAuth(true);
+      }
+    }
+  }, [searchParams, isAuthenticated]);
 
   useEffect(() => {
     if (isAuthenticated && pendingSubmit) {
@@ -107,6 +127,7 @@ export default function SoftwareDesignerPage() {
 
     if (!isAuthenticated) {
       setPendingSubmit(true);
+      setAuthMode("login");
       setShowAuth(true);
       return;
     }
@@ -339,8 +360,10 @@ export default function SoftwareDesignerPage() {
             setShowAuth(false);
             setPendingSubmit(false);
           }}
+          initialMode={authMode}
         />
       )}
     </main>
   );
 }
+

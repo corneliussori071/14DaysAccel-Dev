@@ -8,6 +8,7 @@ interface NavLink {
 const navigationLinks: NavLink[] = [
   { label: "Projects", href: "/projects" },
   { label: "Software Planner", href: "/software-designer" },
+  { label: "Pricing", href: "/subscriptions" },
   { label: "Engineering Philosophy", href: "/#engineering" },
 ];
 

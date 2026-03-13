@@ -2,6 +2,7 @@
 
 import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { SoftwarePlanRequest } from "@/types/softwarePlan";
 import { AI_MODELS, MIN_TOKENS_REQUIRED } from "@/types/softwarePlan";
@@ -366,7 +367,17 @@ function SoftwareDesignerContent() {
           )}
 
           {error && (
-            <p className="text-sm text-red-600">{error}</p>
+            <div className="rounded-md border border-red-200 bg-red-50 p-3 text-sm text-red-600">
+              {error}
+              {error.toLowerCase().includes("insufficient") && (
+                <Link
+                  href="/subscriptions"
+                  className="ml-2 font-medium underline hover:text-red-900"
+                >
+                  Purchase tokens
+                </Link>
+              )}
+            </div>
           )}
 
           <div>

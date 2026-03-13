@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 import { getTokenWallet } from "@/services/tokenService";
 import type { TokenWallet } from "@/types/softwarePlan";
 
@@ -56,6 +57,12 @@ export default function PlansSection() {
             {balance.toLocaleString()}
           </p>
           <p className="mt-1 text-sm text-zinc-500">tokens remaining</p>
+          <Link
+            href="/subscriptions"
+            className="mt-3 inline-block rounded-md border border-zinc-300 px-3 py-1.5 text-xs font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+          >
+            Buy Tokens
+          </Link>
         </div>
 
         <div className="rounded-lg border border-zinc-200 bg-white p-5">

@@ -245,8 +245,8 @@ async function callAnthropic(
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error("Anthropic API error:", errText);
-    throw new Error("AI service request failed");
+    console.error("Anthropic API error:", response.status, errText);
+    throw new Error(`AI service request failed: ${response.status} - ${errText}`);
   }
 
   const data = await response.json();
@@ -300,8 +300,8 @@ async function callOpenAI(
 
   if (!response.ok) {
     const errText = await response.text();
-    console.error("OpenAI API error:", errText);
-    throw new Error("AI service request failed");
+    console.error("OpenAI API error:", response.status, errText);
+    throw new Error(`AI service request failed: ${response.status} - ${errText}`);
   }
 
   const data = await response.json();

@@ -91,11 +91,13 @@ export default function SoftwarePlannerSection() {
           {plans.map((plan) => {
             const promptCount = getGeneratedCount(plan);
             return (
-              <button
+              <div
                 key={plan.id}
-                type="button"
+                role="button"
+                tabIndex={0}
                 onClick={() => handleViewPlan(plan)}
-                className="w-full rounded-lg border border-zinc-200 bg-white p-5 text-left transition-colors hover:border-zinc-300 hover:bg-zinc-50"
+                onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") handleViewPlan(plan); }}
+                className="w-full cursor-pointer rounded-lg border border-zinc-200 bg-white p-5 text-left transition-colors hover:border-zinc-300 hover:bg-zinc-50"
               >
                 <div className="flex items-start justify-between">
                   <div>
@@ -140,7 +142,7 @@ export default function SoftwarePlannerSection() {
                     ) : null}
                   </div>
                 )}
-              </button>
+              </div>
             );
           })}
         </div>

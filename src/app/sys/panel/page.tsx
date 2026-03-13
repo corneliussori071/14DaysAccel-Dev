@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { verifyAdminSession } from "@/lib/adminSession";
-import AdminDashboard from "@/components/admin/AdminDashboard";
+import AdminLayout from "@/components/admin/AdminLayout";
 
 export const metadata: Metadata = {
   title: "Admin Panel | 14DaysAccel Dev",
@@ -17,7 +17,7 @@ export default async function AdminPanelPage() {
 
   return (
     <main className="min-h-screen bg-zinc-50">
-      <AdminDashboard />
+      <AdminLayout />
     </main>
   );
 }

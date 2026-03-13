@@ -1,6 +1,49 @@
+export type AiModelId =
+  | "claude-opus-4-6"
+  | "claude-sonnet-4-6"
+  | "gpt-5.4"
+  | "gpt-5.3-codex";
+
+export interface AiModel {
+  id: AiModelId;
+  label: string;
+  provider: "anthropic" | "openai";
+  tokenMultiplier: number;
+}
+
+export const AI_MODELS: AiModel[] = [
+  {
+    id: "claude-opus-4-6",
+    label: "Claude Opus 4.6",
+    provider: "anthropic",
+    tokenMultiplier: 3,
+  },
+  {
+    id: "claude-sonnet-4-6",
+    label: "Claude Sonnet 4.6",
+    provider: "anthropic",
+    tokenMultiplier: 1,
+  },
+  {
+    id: "gpt-5.4",
+    label: "GPT 5.4",
+    provider: "openai",
+    tokenMultiplier: 1,
+  },
+  {
+    id: "gpt-5.3-codex",
+    label: "GPT 5.3 Codex",
+    provider: "openai",
+    tokenMultiplier: 1,
+  },
+];
+
+export const MIN_TOKENS_REQUIRED = 50;
+
 export interface SoftwarePlanRequest {
   businessName: string;
   goalType: "prompts" | "ideas";
+  modelId: AiModelId;
   industry?: string;
   softwareFeatures?: string;
   techStack?: string;

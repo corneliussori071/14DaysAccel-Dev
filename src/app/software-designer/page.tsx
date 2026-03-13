@@ -157,6 +157,23 @@ function SoftwareDesignerContent() {
         })
       );
 
+      // Persist plan to database for history
+      const { data: { session: currentSession } } = await supabase.auth.getSession();
+      if (currentSession?.user) {
+        supabase
+          .from("saved_plans")
+          .insert({
+            user_id: currentSession.user.id,
+            business_name: businessName,
+            goal_type: goalType,
+            model_id: modelId,
+            plan_data: result.plan,
+            tokens_used: result.tokensUsed,
+            billed_tokens: result.billedTokens,
+          })
+          .then(() => {});
+      }
+
       router.push("/software-designer/result");
     } catch (err) {
       setError(

@@ -4,6 +4,8 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { SoftwarePlanRequest } from "@/types/softwarePlan";
+import { AI_MODELS, MIN_TOKENS_REQUIRED } from "@/types/softwarePlan";
+import type { AiModelId } from "@/types/softwarePlan";
 import { generateBusinessPlan } from "@/services/aiPlannerService";
 import AuthModal from "@/components/software-designer/AuthModal";
 
@@ -62,6 +64,7 @@ function SoftwareDesignerContent() {
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [pendingSubmit, setPendingSubmit] = useState(false);
+  const [modelId, setModelId] = useState<AiModelId>("gpt-5.3-codex");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -101,6 +104,7 @@ function SoftwareDesignerContent() {
       return {
         businessName,
         goalType: "prompts",
+        modelId,
         industry: selectedIndustry,
         softwareFeatures,
         techStack,
@@ -109,6 +113,7 @@ function SoftwareDesignerContent() {
     return {
       businessName,
       goalType: "ideas",
+      modelId,
       dailyOperations,
       softwareProblem,
     };
@@ -144,7 +149,11 @@ function SoftwareDesignerContent() {
         JSON.stringify({
           plan: result.plan,
           tokensUsed: result.tokensUsed,
+          billedTokens: result.billedTokens,
+          promptTokens: result.promptTokens,
+          completionTokens: result.completionTokens,
           businessName,
+          modelId,
         })
       );
 
@@ -342,6 +351,45 @@ function SoftwareDesignerContent() {
           {error && (
             <p className="text-sm text-red-600">{error}</p>
           )}
+
+          <div>
+            <label className="mb-1.5 block text-sm font-medium text-zinc-700">
+              AI Model
+            </label>
+            <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+              {AI_MODELS.map((model) => (
+                <button
+                  key={model.id}
+                  type="button"
+                  onClick={() => setModelId(model.id)}
+                  className={`rounded-md border p-3 text-left text-sm transition-colors ${
+                    modelId === model.id
+                      ? "border-zinc-900 bg-zinc-900 text-white"
+                      : "border-zinc-300 bg-white text-zinc-700 hover:border-zinc-400"
+                  }`}
+                >
+                  <span className="font-medium">{model.label}</span>
+                  <span
+                    className={`ml-2 inline-block rounded-full px-2 py-0.5 text-xs font-medium ${
+                      modelId === model.id
+                        ? model.tokenMultiplier > 1
+                          ? "bg-amber-400 text-amber-900"
+                          : "bg-zinc-700 text-zinc-200"
+                        : model.tokenMultiplier > 1
+                          ? "bg-amber-50 text-amber-700"
+                          : "bg-zinc-100 text-zinc-500"
+                    }`}
+                  >
+                    {model.tokenMultiplier}x tokens
+                  </span>
+                </button>
+              ))}
+            </div>
+            <p className="mt-1.5 text-xs text-zinc-400">
+              Minimum {MIN_TOKENS_REQUIRED} tokens required per request. Higher
+              multiplier models consume more tokens.
+            </p>
+          </div>
 
           <button
             type="button"

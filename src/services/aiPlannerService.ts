@@ -3,6 +3,7 @@ import type {
   SoftwarePlanRequest,
   SoftwarePlanResponse,
   PromptStageResponse,
+  AiModelId,
 } from "@/types/softwarePlan";
 
 const SUPABASE_FUNCTIONS_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
@@ -24,7 +25,13 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
 
 export async function generateBusinessPlan(
   request: SoftwarePlanRequest
-): Promise<{ plan: SoftwarePlanResponse; tokensUsed: number }> {
+): Promise<{
+  plan: SoftwarePlanResponse;
+  tokensUsed: number;
+  billedTokens: number;
+  promptTokens: number;
+  completionTokens: number;
+}> {
   const headers = await getAuthHeaders();
 
   const response = await fetch(
@@ -49,7 +56,8 @@ export async function generatePromptStage(
   businessName: string,
   softwareDescription: string,
   appArchitecture: string,
-  recommendedStack: string
+  recommendedStack: string,
+  modelId: AiModelId
 ): Promise<PromptStageResponse> {
   const headers = await getAuthHeaders();
 
@@ -64,6 +72,7 @@ export async function generatePromptStage(
         softwareDescription,
         appArchitecture,
         recommendedStack,
+        modelId,
       }),
     }
   );

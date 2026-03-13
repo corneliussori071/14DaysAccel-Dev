@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { PROMPT_STAGES, TOKEN_PRICE_USD } from "@/types/softwarePlan";
-import type { SoftwarePlanResponse } from "@/types/softwarePlan";
+import type { SoftwarePlanResponse, AiModelId } from "@/types/softwarePlan";
 import { generatePromptStage } from "@/services/aiPlannerService";
 import { getTokenBalance } from "@/services/tokenService";
 import CopyButton from "@/components/software-designer/CopyButton";
@@ -20,6 +20,7 @@ interface StoredResult {
   plan: SoftwarePlanResponse;
   tokensUsed: number;
   businessName: string;
+  modelId?: AiModelId;
 }
 
 export default function PromptsPage() {
@@ -57,7 +58,8 @@ export default function PromptsPage() {
         storedResult.businessName,
         storedResult.plan.software_description,
         storedResult.plan.app_architecture,
-        storedResult.plan.recommended_stack
+        storedResult.plan.recommended_stack,
+        storedResult.modelId || "gpt-5.3-codex"
       );
 
       setGeneratedPrompts((prev) => {

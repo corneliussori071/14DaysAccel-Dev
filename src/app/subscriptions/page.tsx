@@ -35,7 +35,12 @@ export default function SubscriptionsPage() {
           const custom = allPlans.find((p) => p.plan_type === "custom");
           if (custom) {
             setCustomPlan(custom);
-            setCustomTokens(custom.min_tokens || 1000);
+            setCustomTokens(
+              Math.min(
+                Math.max(custom.min_tokens || 100, 1000),
+                custom.max_tokens || 100000
+              )
+            );
           }
         }
       } catch {
@@ -242,8 +247,13 @@ export default function SubscriptionsPage() {
                   }
                   className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  Purchase {customTokens.toLocaleString()} Tokens - $
+                  Purchase {customTokens.toLocaleString()} Tokens &ndash; $
                   {customCost.toFixed(2)}
+                  <span className="block text-xs font-normal opacity-70 mt-0.5">
+                    {(customPlan.min_tokens ?? 100).toLocaleString()} &ndash;{" "}
+                    {(customPlan.max_tokens ?? 100000).toLocaleString()} tokens
+                    available
+                  </span>
                 </button>
               ) : (
                 <Link

@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 interface ApproachItem {
   title: string;
   description: string;
+  video: string;
 }
 
 const approaches: ApproachItem[] = [
@@ -14,16 +15,19 @@ const approaches: ApproachItem[] = [
     title: "AI Accelerated Coding",
     description:
       "Advanced AI tools generate boilerplate, suggest implementations, and speed up repetitive tasks so engineers can focus on what matters.",
+    video: "/ai_coding.mp4",
   },
   {
     title: "Engineering Architecture",
     description:
       "System design, scalability, and security are handled by experienced engineers who validate every architectural decision.",
+    video: "/experts_oversight.mp4",
   },
   {
     title: "Production Ready Systems",
     description:
       "Final products are structured, maintainable, and scalable, built to meet professional standards from the first deployment.",
+    video: "/to_production.mp4",
   },
 ];
 
@@ -47,32 +51,7 @@ export default function DevelopmentApproachSection() {
   return (
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12">
-          <h2 className="text-3xl font-semibold tracking-tight text-white">
-            How It Works
-          </h2>
-          <p className="mt-3 text-base text-white">
-            A disciplined approach that combines AI velocity with engineering
-            quality.
-          </p>
-        </div>
-        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-          {approaches.map((item, index) => (
-            <div
-              key={item.title}
-              className="animate-fade-in-up rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:shadow-md"
-              style={{ animationDelay: `${index * 0.1}s` }}
-            >
-              <h3 className="text-base font-semibold text-white">
-                {item.title}
-              </h3>
-              <p className="mt-3 text-sm leading-relaxed text-white/80">
-                {item.description}
-              </p>
-            </div>
-          ))}
-        </div>
-        <div className="mt-10 rounded-lg border border-zinc-500 bg-zinc-700 p-6 text-center">
+        <div className="mb-14 rounded-lg border border-zinc-500 bg-zinc-700 p-6 text-center">
           {isLoggedIn ? (
             <>
               <p className="text-base font-medium text-white">
@@ -117,15 +96,44 @@ export default function DevelopmentApproachSection() {
             </>
           )}
         </div>
-        <div className="mt-10 overflow-hidden rounded-lg border border-zinc-500 bg-zinc-700">
-          <video
-            src="/work_flow_new.mp4"
-            autoPlay
-            loop
-            muted
-            playsInline
-            className="h-auto w-full"
-          />
+
+        <div className="mb-12">
+          <h2 className="text-3xl font-semibold tracking-tight text-white">
+            How It Works
+          </h2>
+          <p className="mt-3 text-base text-white">
+            A disciplined approach that combines AI velocity with engineering
+            quality.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
+          {approaches.map((item, index) => (
+            <div
+              key={item.title}
+              className="animate-fade-in-up flex flex-col items-center"
+              style={{ animationDelay: `${index * 0.1}s` }}
+            >
+              <div className="w-full rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:shadow-md">
+                <h3 className="text-base font-semibold text-white">
+                  {item.title}
+                </h3>
+                <p className="mt-3 text-sm leading-relaxed text-white/80">
+                  {item.description}
+                </p>
+              </div>
+              <div className="group mt-6 h-44 w-44 overflow-hidden rounded-full border-2 border-zinc-500 transition-all duration-300 hover:border-white/60 hover:shadow-lg hover:shadow-white/10 lg:h-52 lg:w-52">
+                <video
+                  src={item.video}
+                  autoPlay
+                  loop
+                  muted
+                  playsInline
+                  className="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
+                />
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>

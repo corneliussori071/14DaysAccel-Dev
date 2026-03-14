@@ -8,7 +8,12 @@ function getSupabaseAdmin() {
   if (!url || !serviceKey) {
     throw new Error("Missing Supabase admin environment variables");
   }
-  return createClient(url, serviceKey);
+  return createClient(url, serviceKey, {
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
+  });
 }
 
 const ALLOWED_SECTIONS = new Set([
@@ -56,11 +61,22 @@ export async function GET(
     .eq("key", dbKey)
     .single();
 
+  const noCacheHeaders = {
+    "Cache-Control": "no-store, no-cache, must-revalidate",
+    Pragma: "no-cache",
+  };
+
   if (error) {
-    return NextResponse.json({ [getResponseKey(section)]: getDefault(section) });
+    return NextResponse.json(
+      { [getResponseKey(section)]: getDefault(section) },
+      { headers: noCacheHeaders }
+    );
   }
 
-  return NextResponse.json({ [getResponseKey(section)]: data.value });
+  return NextResponse.json(
+    { [getResponseKey(section)]: data.value },
+    { headers: noCacheHeaders }
+  );
 }
 
 export async function PUT(

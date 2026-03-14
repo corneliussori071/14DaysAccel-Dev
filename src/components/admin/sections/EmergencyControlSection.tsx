@@ -27,7 +27,9 @@ export default function EmergencyControlSection() {
 
   const fetchConfig = useCallback(async () => {
     try {
-      const res = await fetch("/api/internal/admin/emergency");
+      const res = await fetch("/api/internal/admin/emergency", {
+        cache: "no-store",
+      });
       if (res.ok) {
         const data = await res.json();
         if (data.config) setConfig(data.config);

@@ -1,4 +1,8 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 
 interface ApproachItem {
   title: string;
@@ -24,6 +28,22 @@ const approaches: ApproachItem[] = [
 ];
 
 export default function DevelopmentApproachSection() {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setIsLoggedIn(!!session?.user);
+    });
+
+    return () => subscription.unsubscribe();
+  }, []);
+
   return (
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
@@ -53,32 +73,57 @@ export default function DevelopmentApproachSection() {
           ))}
         </div>
         <div className="mt-10 rounded-lg border border-zinc-500 bg-zinc-700 p-6 text-center">
-          <p className="text-base font-medium text-white">
-            Sign up to generate professional software engineering prompts
-          </p>
-          <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
-            Create a free account and receive 1,000 tokens to start generating
-            structured development plans and build prompts.
-          </p>
-          <div className="mt-5 flex flex-wrap justify-center gap-3">
-            <Link
-              href="/software-designer?auth=signup"
-              className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
-            >
-              Create Free Account
-            </Link>
-            <Link
-              href="/software-designer?auth=login"
-              className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
-            >
-              Log In
-            </Link>
-          </div>
+          {isLoggedIn ? (
+            <>
+              <p className="text-base font-medium text-white">
+                Generate professional software engineering prompts
+              </p>
+              <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
+                Use your tokens to create structured development plans and build
+                prompts with the Software Designer.
+              </p>
+              <div className="mt-5">
+                <Link
+                  href="/software-designer"
+                  className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                >
+                  Open Software Designer
+                </Link>
+              </div>
+            </>
+          ) : (
+            <>
+              <p className="text-base font-medium text-white">
+                Sign up to generate professional software engineering prompts
+              </p>
+              <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
+                Create a free account and receive 1,000 tokens to start
+                generating structured development plans and build prompts.
+              </p>
+              <div className="mt-5 flex flex-wrap justify-center gap-3">
+                <Link
+                  href="/software-designer?auth=signup"
+                  className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                >
+                  Create Free Account
+                </Link>
+                <Link
+                  href="/software-designer?auth=login"
+                  className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
+                >
+                  Log In
+                </Link>
+              </div>
+            </>
+          )}
         </div>
         <div className="mt-10 overflow-hidden rounded-lg border border-zinc-500 bg-zinc-700">
-          <img
-            src="/work_flow.png"
-            alt="Development workflow showing AI-accelerated coding process"
+          <video
+            src="/work_flow_new.mp4"
+            autoPlay
+            loop
+            muted
+            playsInline
             className="h-auto w-full"
           />
         </div>

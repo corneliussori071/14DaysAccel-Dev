@@ -45,7 +45,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image } = body;
+    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image, testing_available, testing_instructions, testing_url, testing_doc_url, testing_doc_name } = body;
 
     if (!title || !slug || !description) {
       return NextResponse.json(
@@ -75,6 +75,11 @@ export async function POST(request: NextRequest) {
         tiktok_link: tiktok_link ? String(tiktok_link).slice(0, 1000) : null,
         media_files: Array.isArray(body.media_files) ? body.media_files : [],
         profile_image: body.profile_image ? String(body.profile_image).slice(0, 2000) : null,
+        testing_available: testing_available === true,
+        testing_instructions: testing_instructions ? String(testing_instructions).slice(0, 10000) : null,
+        testing_url: testing_url ? String(testing_url).slice(0, 1000) : null,
+        testing_doc_url: testing_doc_url ? String(testing_doc_url).slice(0, 2000) : null,
+        testing_doc_name: testing_doc_name ? String(testing_doc_name).slice(0, 200) : null,
       })
       .select()
       .single();
@@ -129,6 +134,16 @@ export async function PUT(request: NextRequest) {
       sanitized.media_files = Array.isArray(updates.media_files) ? updates.media_files : [];
     if (updates.profile_image !== undefined)
       sanitized.profile_image = updates.profile_image ? String(updates.profile_image).slice(0, 2000) : null;
+    if (updates.testing_available !== undefined)
+      sanitized.testing_available = updates.testing_available === true;
+    if (updates.testing_instructions !== undefined)
+      sanitized.testing_instructions = updates.testing_instructions ? String(updates.testing_instructions).slice(0, 10000) : null;
+    if (updates.testing_url !== undefined)
+      sanitized.testing_url = updates.testing_url ? String(updates.testing_url).slice(0, 1000) : null;
+    if (updates.testing_doc_url !== undefined)
+      sanitized.testing_doc_url = updates.testing_doc_url ? String(updates.testing_doc_url).slice(0, 2000) : null;
+    if (updates.testing_doc_name !== undefined)
+      sanitized.testing_doc_name = updates.testing_doc_name ? String(updates.testing_doc_name).slice(0, 200) : null;
 
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase

@@ -18,5 +18,10 @@ export interface Project {
   tiktok_link: string | null;
   media_files: ProjectMedia[];
   profile_image: string | null;
+  testing_available: boolean;
+  testing_instructions: string | null;
+  testing_url: string | null;
+  testing_doc_url: string | null;
+  testing_doc_name: string | null;
   created_at: string;
 }

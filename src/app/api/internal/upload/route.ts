@@ -12,6 +12,9 @@ const ALLOWED_TYPES = [
   "video/mp4",
   "video/webm",
   "video/quicktime",
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
 ];
 
 function getSupabaseAdmin() {
@@ -84,7 +87,7 @@ export async function POST(request: NextRequest) {
     }
 
     const supabase = getSupabaseAdmin();
-    const uploaded: { url: string; type: "image" | "video"; name: string }[] =
+    const uploaded: { url: string; type: "image" | "video" | "document"; name: string }[] =
       [];
 
     for (const file of files) {
@@ -115,9 +118,13 @@ export async function POST(request: NextRequest) {
         data: { publicUrl },
       } = supabase.storage.from("project-media").getPublicUrl(storagePath);
 
-      const fileType: "image" | "video" = file.type.startsWith("video/")
+      const fileType: "image" | "video" | "document" = file.type.startsWith("video/")
         ? "video"
-        : "image";
+        : file.type === "application/pdf" ||
+            file.type === "application/msword" ||
+            file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+          ? "document"
+          : "image";
 
       uploaded.push({
         url: publicUrl,

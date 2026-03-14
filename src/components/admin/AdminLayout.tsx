@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import ProjectsSection from "@/components/admin/sections/ProjectsSection";
+import UsersSection from "@/components/admin/sections/UsersSection";
 import TokenPricingSection from "@/components/admin/sections/TokenPricingSection";
 import SubscriptionFlowSection from "@/components/admin/sections/SubscriptionFlowSection";
 import FreeBenefitsSection from "@/components/admin/sections/FreeBenefitsSection";
@@ -11,6 +12,7 @@ import EmergencyControlSection from "@/components/admin/sections/EmergencyContro
 
 type AdminSection =
   | "projects"
+  | "users"
   | "token-pricing"
   | "subscription-flow"
   | "free-benefits"
@@ -19,6 +21,7 @@ type AdminSection =
 
 const NAV_ITEMS: { id: AdminSection; label: string }[] = [
   { id: "projects", label: "Projects" },
+  { id: "users", label: "Users" },
   { id: "token-pricing", label: "Token Pricing" },
   { id: "subscription-flow", label: "Subscription Flow" },
   { id: "free-benefits", label: "Free Benefits Duration" },
@@ -74,6 +77,7 @@ export default function AdminLayout() {
 
       <main className="flex-1 bg-zinc-50">
         {activeSection === "projects" && <ProjectsSection />}
+        {activeSection === "users" && <UsersSection />}
         {activeSection === "token-pricing" && <TokenPricingSection />}
         {activeSection === "subscription-flow" && <SubscriptionFlowSection />}
         {activeSection === "free-benefits" && <FreeBenefitsSection />}

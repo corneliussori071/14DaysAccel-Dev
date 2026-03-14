@@ -2,6 +2,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
 
+export const dynamic = "force-dynamic";
+export const fetchCache = "force-no-store";
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -9,10 +12,7 @@ function getSupabaseAdmin() {
     throw new Error("Missing Supabase admin environment variables");
   }
   return createClient(url, serviceKey, {
-    global: {
-      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
-        fetch(input, { ...init, cache: "no-store" }),
-    },
+    auth: { autoRefreshToken: false, persistSession: false },
   });
 }
 
@@ -96,21 +96,31 @@ export async function PUT(
   const body = await request.json();
   const value = body[getResponseKey(section)] ?? body.config ?? body.pricing ?? body.plans;
 
+  if (value === undefined || value === null) {
+    return NextResponse.json(
+      { error: "No data provided" },
+      { status: 400 }
+    );
+  }
+
   const supabase = getSupabaseAdmin();
   const dbKey = section.replace(/-/g, "_");
 
-  const { error } = await supabase
+  const { data: updated, error } = await supabase
     .from("admin_settings")
-    .upsert({ key: dbKey, value }, { onConflict: "key" });
+    .update({ value })
+    .eq("key", dbKey)
+    .select("value")
+    .single();
 
-  if (error) {
+  if (error || !updated) {
     return NextResponse.json(
       { error: "Failed to save settings" },
       { status: 500 }
     );
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, saved: updated.value });
 }
 
 function getResponseKey(section: string): string {

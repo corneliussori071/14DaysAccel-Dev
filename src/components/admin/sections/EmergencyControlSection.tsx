@@ -55,10 +55,19 @@ export default function EmergencyControlSection() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ config }),
       });
-      if (!res.ok) throw new Error("Failed to save");
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save");
+      }
+      const result = await res.json();
+      if (result.saved) {
+        setConfig(result.saved);
+      }
       setSuccess("Emergency controls updated.");
-    } catch {
-      setError("Failed to save emergency controls.");
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save emergency controls."
+      );
     } finally {
       setSaving(false);
     }

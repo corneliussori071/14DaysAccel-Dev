@@ -26,6 +26,7 @@ export async function middleware(request: NextRequest) {
 
   try {
     const supabase = createClient(url, serviceKey, {
+      auth: { autoRefreshToken: false, persistSession: false },
       global: {
         fetch: (input: RequestInfo | URL, init?: RequestInit) =>
           fetch(input, { ...init, cache: "no-store" }),

@@ -52,6 +52,23 @@ export default function ProjectFormModal({
   const [profileImage, setProfileImage] = useState<string | null>(
     project?.profile_image ?? null
   );
+  const [testingAvailable, setTestingAvailable] = useState(
+    project?.testing_available ?? false
+  );
+  const [testingInstructions, setTestingInstructions] = useState(
+    project?.testing_instructions ?? ""
+  );
+  const [testingUrl, setTestingUrl] = useState(
+    project?.testing_url ?? ""
+  );
+  const [testingDocUrl, setTestingDocUrl] = useState<string | null>(
+    project?.testing_doc_url ?? null
+  );
+  const [testingDocName, setTestingDocName] = useState<string | null>(
+    project?.testing_doc_name ?? null
+  );
+  const testingDocInputRef = useRef<HTMLInputElement>(null);
+  const [uploadingDoc, setUploadingDoc] = useState(false);
   const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -167,6 +184,11 @@ export default function ProjectFormModal({
       tiktok_link: tiktokLink || null,
       media_files: mediaFiles,
       profile_image: profileImage,
+      testing_available: testingAvailable,
+      testing_instructions: testingInstructions || null,
+      testing_url: testingUrl || null,
+      testing_doc_url: testingDocUrl,
+      testing_doc_name: testingDocName,
     };
 
     try {
@@ -351,6 +373,135 @@ export default function ProjectFormModal({
               className={inputClass}
               placeholder="https://tiktok.com/..."
             />
+          </div>
+
+          <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4">
+            <label className="flex items-center gap-2 text-sm font-medium text-zinc-700">
+              <input
+                type="checkbox"
+                checked={testingAvailable}
+                onChange={(e) => setTestingAvailable(e.target.checked)}
+                className="rounded border-zinc-300"
+              />
+              Available for Testing
+            </label>
+
+            {testingAvailable && (
+              <div className="mt-4 space-y-4">
+                <div>
+                  <label htmlFor="testingInstructions" className={labelClass}>
+                    Testing Instructions
+                  </label>
+                  <textarea
+                    id="testingInstructions"
+                    value={testingInstructions}
+                    onChange={(e) => setTestingInstructions(e.target.value)}
+                    rows={4}
+                    className={inputClass}
+                    placeholder="Describe how to test this project..."
+                  />
+                </div>
+
+                <div>
+                  <label htmlFor="testingUrl" className={labelClass}>
+                    Testing URL
+                  </label>
+                  <input
+                    id="testingUrl"
+                    type="url"
+                    value={testingUrl}
+                    onChange={(e) => setTestingUrl(e.target.value)}
+                    className={inputClass}
+                    placeholder="https://demo.example.com"
+                  />
+                </div>
+
+                <div>
+                  <label className={labelClass}>Instruction Document</label>
+                  <p className="mb-2 text-xs text-zinc-400">
+                    Upload a PDF or Word document with testing instructions.
+                  </p>
+
+                  {testingDocUrl && testingDocName && (
+                    <div className="mb-3 flex items-center gap-3 rounded-md border border-zinc-200 bg-white px-3 py-2">
+                      <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-200 text-xs text-zinc-500">
+                        DOC
+                      </div>
+                      <p className="min-w-0 flex-1 truncate text-sm text-zinc-700">
+                        {testingDocName}
+                      </p>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setTestingDocUrl(null);
+                          setTestingDocName(null);
+                        }}
+                        className="shrink-0 text-xs text-red-500 transition-colors hover:text-red-700"
+                      >
+                        Remove
+                      </button>
+                    </div>
+                  )}
+
+                  {!testingDocUrl && (
+                    <div>
+                      <input
+                        ref={testingDocInputRef}
+                        type="file"
+                        accept=".pdf,.doc,.docx,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const currentSlug = slug || generateSlug(title);
+                          if (!currentSlug) {
+                            setError("Enter a title or slug before uploading files.");
+                            return;
+                          }
+                          setUploadingDoc(true);
+                          setError("");
+                          try {
+                            const formData = new FormData();
+                            formData.set("projectSlug", currentSlug);
+                            formData.append("files", file);
+                            const res = await fetch("/api/internal/upload", {
+                              method: "POST",
+                              body: formData,
+                            });
+                            if (!res.ok) {
+                              const data = await res.json();
+                              setError(data.error || "Upload failed.");
+                              return;
+                            }
+                            const data = await res.json();
+                            if (data.files?.[0]) {
+                              setTestingDocUrl(data.files[0].url);
+                              setTestingDocName(data.files[0].name);
+                            }
+                          } catch {
+                            setError("Document upload failed. Please try again.");
+                          } finally {
+                            setUploadingDoc(false);
+                            if (testingDocInputRef.current) {
+                              testingDocInputRef.current.value = "";
+                            }
+                          }
+                        }}
+                        className="hidden"
+                        id="testingDocUpload"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => testingDocInputRef.current?.click()}
+                        disabled={uploadingDoc}
+                        className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+                      >
+                        {uploadingDoc ? "Uploading..." : "Choose Document"}
+                      </button>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
           </div>
 
           <div>

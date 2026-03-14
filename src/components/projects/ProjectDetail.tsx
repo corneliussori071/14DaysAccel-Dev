@@ -103,6 +103,48 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
         </div>
       </div>
 
+      {project.testing_available && (
+        <div className="mt-10 rounded-lg border border-zinc-200 bg-zinc-50 p-6">
+          <h2 className="text-lg font-semibold text-zinc-900">
+            Testing Available
+          </h2>
+
+          {project.testing_instructions && (
+            <div className="mt-4">
+              <h3 className="text-sm font-medium text-zinc-700">
+                Instructions
+              </h3>
+              <p className="mt-2 whitespace-pre-wrap text-sm leading-relaxed text-zinc-600">
+                {project.testing_instructions}
+              </p>
+            </div>
+          )}
+
+          <div className="mt-4 flex flex-wrap gap-3">
+            {project.testing_url && (
+              <a
+                href={project.testing_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+              >
+                Open Testing URL
+              </a>
+            )}
+            {project.testing_doc_url && project.testing_doc_name && (
+              <a
+                href={project.testing_doc_url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-block rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50"
+              >
+                Download {project.testing_doc_name}
+              </a>
+            )}
+          </div>
+        </div>
+      )}
+
       {(project.upwork_link || project.youtube_link || project.tiktok_link) && (
         <div className="mt-10 flex flex-wrap gap-3">
           {project.upwork_link && (

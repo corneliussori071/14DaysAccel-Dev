@@ -25,7 +25,12 @@ export async function middleware(request: NextRequest) {
   }
 
   try {
-    const supabase = createClient(url, serviceKey);
+    const supabase = createClient(url, serviceKey, {
+      global: {
+        fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+          fetch(input, { ...init, cache: "no-store" }),
+      },
+    });
     const { data } = await supabase
       .from("admin_settings")
       .select("value")

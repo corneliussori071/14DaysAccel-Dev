@@ -1,18 +1,40 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
+import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TOKEN_PRICE_USD } from "@/types/softwarePlan";
 import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
+const SUPABASE_FUNCTIONS_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
+
 export default function SubscriptionsPage() {
+  return (
+    <Suspense
+      fallback={
+        <main className="flex min-h-screen items-center justify-center bg-zinc-50">
+          <p className="text-sm text-zinc-500">Loading plans...</p>
+        </main>
+      }
+    >
+      <SubscriptionsContent />
+    </Suspense>
+  );
+}
+
+function SubscriptionsContent() {
+  const searchParams = useSearchParams();
   const [plans, setPlans] = useState<SubscriptionPlan[]>([]);
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<User | null>(null);
   const [customTokens, setCustomTokens] = useState(1000);
   const [customPlan, setCustomPlan] = useState<SubscriptionPlan | null>(null);
+  const [checkingOut, setCheckingOut] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const paymentStatus = searchParams.get("payment");
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -52,22 +74,60 @@ export default function SubscriptionsPage() {
     loadPlans();
   }, []);
 
-  function handleSubscribe(plan: SubscriptionPlan) {
-    // Payment gateway integration point
-    // Replace with actual payment flow (Stripe, Paddle, etc.)
-    alert(
-      `Payment integration pending.\n\nPlan: ${plan.name}\nPrice: $${plan.price_usd}/month\nTokens: ${plan.tokens_per_month.toLocaleString()}/month`
-    );
+  async function initiateCheckout(tokens: number, amountCents: number, planName?: string) {
+    setError(null);
+    const {
+      data: { session },
+    } = await supabase.auth.getSession();
+    if (!session?.access_token) {
+      setError("You must be logged in to purchase tokens.");
+      return;
+    }
+
+    const res = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-checkout`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${session.access_token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        tokens,
+        amountCents,
+        planName,
+        redirectUrl: `${window.location.origin}/subscriptions?payment=success`,
+      }),
+    });
+
+    if (!res.ok) {
+      const data = await res.json().catch(() => ({ error: "Checkout failed" }));
+      throw new Error(data.error || "Checkout failed");
+    }
+
+    const { checkoutUrl } = await res.json();
+    window.location.href = checkoutUrl;
   }
 
-  function handleCustomPurchase() {
+  async function handleSubscribe(plan: SubscriptionPlan) {
+    setCheckingOut(plan.id);
+    try {
+      const amountCents = Math.round(plan.price_usd * 100);
+      await initiateCheckout(plan.tokens_per_month, amountCents, plan.name);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Checkout failed");
+      setCheckingOut(null);
+    }
+  }
+
+  async function handleCustomPurchase() {
     if (!customPlan) return;
-    const cost = customTokens * TOKEN_PRICE_USD;
-    // Payment gateway integration point  
-    // Replace with actual payment flow (Stripe, Paddle, etc.)
-    alert(
-      `Payment integration pending.\n\nTokens: ${customTokens.toLocaleString()}\nCost: $${cost.toFixed(2)}`
-    );
+    setCheckingOut("custom");
+    try {
+      const amountCents = Math.round(customTokens * TOKEN_PRICE_USD * 100);
+      await initiateCheckout(customTokens, amountCents, customPlan.name);
+    } catch (err: unknown) {
+      setError(err instanceof Error ? err.message : "Checkout failed");
+      setCheckingOut(null);
+    }
   }
 
   if (loading) {
@@ -83,6 +143,21 @@ export default function SubscriptionsPage() {
   return (
     <main className="min-h-screen bg-zinc-50">
       <div className="mx-auto max-w-5xl px-6 py-16 md:px-12">
+        {paymentStatus === "success" && (
+          <div className="mb-8 rounded-lg border border-green-200 bg-green-50 px-5 py-4 text-center">
+            <p className="text-sm font-medium text-green-800">
+              Payment successful! Your tokens will be credited to your account
+              shortly.
+            </p>
+          </div>
+        )}
+
+        {error && (
+          <div className="mb-8 rounded-lg border border-red-200 bg-red-50 px-5 py-4 text-center">
+            <p className="text-sm font-medium text-red-800">{error}</p>
+          </div>
+        )}
+
         <div className="mb-12 text-center">
           <h1 className="text-3xl font-semibold tracking-tight text-zinc-900">
             Pricing
@@ -152,9 +227,10 @@ export default function SubscriptionsPage() {
                     {user ? (
                       <button
                         onClick={() => handleSubscribe(plan)}
-                        className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700"
+                        disabled={checkingOut !== null}
+                        className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
                       >
-                        Subscribe
+                        {checkingOut === plan.id ? "Redirecting…" : "Subscribe"}
                       </button>
                     ) : (
                       <Link
@@ -242,18 +318,25 @@ export default function SubscriptionsPage() {
                 <button
                   onClick={handleCustomPurchase}
                   disabled={
+                    checkingOut !== null ||
                     customTokens < (customPlan.min_tokens ?? 100) ||
                     customTokens > (customPlan.max_tokens ?? 100000)
                   }
                   className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
                 >
-                  Purchase {customTokens.toLocaleString()} Tokens &ndash; $
-                  {customCost.toFixed(2)}
-                  <span className="block text-xs font-normal opacity-70 mt-0.5">
-                    {(customPlan.min_tokens ?? 100).toLocaleString()} &ndash;{" "}
-                    {(customPlan.max_tokens ?? 100000).toLocaleString()} tokens
-                    available
-                  </span>
+                  {checkingOut === "custom" ? (
+                    "Redirecting…"
+                  ) : (
+                    <>
+                      Purchase {customTokens.toLocaleString()} Tokens &ndash; $
+                      {customCost.toFixed(2)}
+                      <span className="block text-xs font-normal opacity-70 mt-0.5">
+                        {(customPlan.min_tokens ?? 100).toLocaleString()} &ndash;{" "}
+                        {(customPlan.max_tokens ?? 100000).toLocaleString()} tokens
+                        available
+                      </span>
+                    </>
+                  )}
                 </button>
               ) : (
                 <Link

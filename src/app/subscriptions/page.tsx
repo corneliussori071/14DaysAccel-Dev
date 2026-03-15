@@ -8,8 +8,6 @@ import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
-const SUPABASE_FUNCTIONS_URL = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1`;
-
 export default function SubscriptionsPage() {
   return (
     <Suspense
@@ -84,7 +82,7 @@ function SubscriptionsContent() {
       return;
     }
 
-    const res = await fetch(`${SUPABASE_FUNCTIONS_URL}/create-checkout`, {
+    const res = await fetch("/api/internal/checkout", {
       method: "POST",
       headers: {
         Authorization: `Bearer ${session.access_token}`,

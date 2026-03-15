@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { cookies } from "next/headers";
 import { createClient } from "@supabase/supabase-js";
+import { verifyAdminSession } from "@/lib/adminSession";
 
 export const dynamic = "force-dynamic";
 export const fetchCache = "force-no-store";
@@ -25,17 +25,7 @@ const ALLOWED_SECTIONS = new Set([
 ]);
 
 async function verifyAdmin(): Promise<boolean> {
-  try {
-    const cookieStore = await cookies();
-    const token = cookieStore.get("admin_session")?.value;
-    if (!token) return false;
-    const decoded = JSON.parse(Buffer.from(token, "base64").toString("utf-8"));
-    if (decoded.role !== "admin") return false;
-    if (Date.now() > decoded.exp) return false;
-    return true;
-  } catch {
-    return false;
-  }
+  return verifyAdminSession();
 }
 
 export async function GET(

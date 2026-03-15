@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { signAdminToken } from "@/lib/adminSession";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -53,13 +54,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const token = Buffer.from(
-      JSON.stringify({
-        role: "admin",
-        iat: Date.now(),
-        exp: Date.now() + 4 * 60 * 60 * 1000,
-      })
-    ).toString("base64");
+    const token = signAdminToken();
 
     const response = NextResponse.json({
       authenticated: true,

@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 interface NavLink {
   label: string;
@@ -19,6 +22,10 @@ const accountLinks: NavLink[] = [
 ];
 
 export default function Footer() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/sys")) return null;
+
   return (
     <footer className="bg-zinc-950 px-6 py-12 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">

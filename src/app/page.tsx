@@ -5,6 +5,8 @@ import SoftwareIdeaSection from "@/components/sections/SoftwareIdeaSection";
 import EngineeringSection from "@/components/sections/EngineeringSection";
 import CallToActionSection from "@/components/sections/CallToActionSection";
 
+export const dynamic = "force-dynamic";
+
 export default function Home() {
   return (
     <main className="min-h-screen">

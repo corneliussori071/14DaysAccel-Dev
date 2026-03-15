@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import AuthModal from "@/components/software-designer/AuthModal";
@@ -21,9 +22,14 @@ const navItems: NavItem[] = [
 ];
 
 export default function Header() {
+  const pathname = usePathname();
   const [user, setUser] = useState<User | null>(null);
   const [showAuth, setShowAuth] = useState(false);
   const [authMode, setAuthMode] = useState<"login" | "signup">("login");
+
+  const isAdminRoute = pathname.startsWith("/sys");
+
+  if (isAdminRoute) return null;
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {

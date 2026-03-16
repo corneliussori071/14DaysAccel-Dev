@@ -3,6 +3,8 @@ import Link from "next/link";
 import { getAllProjects } from "@/services/projectService";
 import ProjectGrid from "@/components/projects/ProjectGrid";
 
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "Software Systems Catalogue | 14DaysAccel Dev",
   description:

@@ -9,7 +9,12 @@ function getClient(): SupabaseClient {
   if (!url || !key) {
     throw new Error("Missing Supabase environment variables. Check .env.local");
   }
-  _client = createClient(url, key);
+  _client = createClient(url, key, {
+    global: {
+      fetch: (input, init) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
+  });
   return _client;
 }
 

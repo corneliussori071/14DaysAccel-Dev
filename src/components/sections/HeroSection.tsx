@@ -4,33 +4,30 @@ export default function HeroSection() {
   return (
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-24 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
+        <h1 className="mb-16 text-center text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
+          Accelerated Software Development
+        </h1>
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
           <div className="animate-fade-in-up">
-            <p className="mb-4 text-sm font-medium uppercase tracking-widest text-white/70">
-              AI-Accelerated Development
+            <p className="text-lg font-medium text-white sm:text-xl">
+              Build production-ready software faster using AI-powered
+              development guided by real engineering standards.
             </p>
-            <h1 className="text-5xl font-semibold tracking-tight text-white md:text-6xl">
-              14DaysAccel Dev
-            </h1>
-            <p className="mt-6 text-xl font-medium text-white">
-              Accelerated software development using advanced AI tools and
-              professional engineering practices.
+            <p className="mt-4 text-sm leading-relaxed text-white/80 sm:text-base">
+              AI accelerates implementation while experienced engineers handle
+              architecture, security, and performance, ensuring every system is
+              built to scale from day one.
             </p>
-            <p className="mt-4 text-base leading-relaxed text-white/80">
-              AI accelerates code generation while experienced engineers make
-              architectural, security, and performance decisions to ensure
-              production quality software.
-            </p>
-            <div className="mt-10 flex flex-wrap gap-4">
+            <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link
                 href="/projects"
-                className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10"
+                className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:shadow-lg hover:shadow-white/10"
               >
                 View Projects
               </Link>
               <Link
                 href="/#software-idea"
-                className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-lg hover:shadow-white/10"
+                className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-lg hover:shadow-white/10"
               >
                 Describe Your Software Idea
               </Link>

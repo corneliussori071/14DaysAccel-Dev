@@ -79,16 +79,16 @@ export default function DevelopmentApproachSection() {
                 Create a free account and receive 1,000 tokens to start
                 generating structured development plans and build prompts.
               </p>
-              <div className="mt-5 flex flex-wrap justify-center gap-3">
+              <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
                   href="/software-designer?auth=signup"
-                  className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                  className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
                 >
                   Create Free Account
                 </Link>
                 <Link
                   href="/software-designer?auth=login"
-                  className="rounded-md border border-white/30 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
+                  className="rounded-md border border-white/30 px-5 py-2.5 text-center text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
                 >
                   Log In
                 </Link>
@@ -97,13 +97,17 @@ export default function DevelopmentApproachSection() {
           )}
         </div>
 
-        <div className="mb-12">
+        <div className="mb-12 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-white">
             How It Works
           </h2>
-          <p className="mt-3 text-base text-white">
-            A disciplined approach that combines AI velocity with engineering
-            quality.
+          <p className="mt-3 text-sm text-white sm:text-base">
+            A Structured Approach to Modern Software Development
+          </p>
+          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/80">
+            We combine AI speed with disciplined engineering practices to
+            deliver systems that are both fast to build and reliable in
+            production.
           </p>
         </div>
 

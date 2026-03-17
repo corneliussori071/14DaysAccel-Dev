@@ -11,18 +11,18 @@ export default function CallToActionSection() {
           Explore the full catalogue of available software systems or reach out
           directly to discuss your project requirements.
         </p>
-        <div className="mt-10 flex flex-wrap justify-center gap-4">
+        <div className="mt-10 flex flex-col justify-center gap-3 sm:flex-row sm:gap-4">
           <Link
             href="/projects"
-            className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
+            className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
           >
             View Project Catalogue
           </Link>
           <a
-            href="https://www.upwork.com"
+            href="https://www.upwork.com/freelancers/14daysaccel"
             target="_blank"
             rel="noopener noreferrer"
-            className="rounded-md bg-white px-6 py-3 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
+            className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-md"
           >
             Work With Us on Upwork
           </a>

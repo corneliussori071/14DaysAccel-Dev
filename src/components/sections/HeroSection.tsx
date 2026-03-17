@@ -26,7 +26,7 @@ export default function HeroSection() {
                 View Projects
               </Link>
               <Link
-                href="/#software-idea"
+                href="/software-designer"
                 className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90 hover:shadow-lg hover:shadow-white/10"
               >
                 Describe Your Software Idea

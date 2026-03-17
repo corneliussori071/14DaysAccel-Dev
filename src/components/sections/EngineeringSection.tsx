@@ -25,11 +25,11 @@ export default function EngineeringSection() {
   return (
     <section id="engineering" className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-12">
+        <div className="mb-12 text-center">
           <h2 className="text-3xl font-semibold tracking-tight text-white">
             Engineering Philosophy
           </h2>
-          <p className="mt-3 text-base text-white">
+          <p className="mx-auto mt-3 max-w-xl text-sm text-white sm:text-base">
             The principles that guide every project built through this platform.
           </p>
         </div>

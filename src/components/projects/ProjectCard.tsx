@@ -54,6 +54,11 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           ))}
         </div>
+        <div className="mt-5">
+          <span className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white">
+            View Details
+          </span>
+        </div>
       </div>
     </Link>
   );

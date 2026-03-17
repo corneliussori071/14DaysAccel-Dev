@@ -57,6 +57,11 @@ function ProjectCard({ project }: { project: Project }) {
             </span>
           ))}
         </div>
+        <div className="mt-5">
+          <span className="rounded-md border border-white/30 px-4 py-2 text-xs font-medium text-white transition-colors group-hover:bg-white group-hover:text-zinc-900">
+            View Details
+          </span>
+        </div>
       </div>
     </Link>
   );

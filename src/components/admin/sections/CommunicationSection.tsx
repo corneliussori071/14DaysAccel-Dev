@@ -182,7 +182,7 @@ export default function CommunicationSection() {
 
       const providerNote =
         data.provider === "log_only"
-          ? " (logged only — configure SENDGRID_API_KEY to send real emails)"
+          ? " (not delivered — SENDGRID_API_KEY is missing from hosting environment variables)"
           : "";
       setSuccess(
         `Email sent to ${data.sent} of ${data.total} recipients.${providerNote}`

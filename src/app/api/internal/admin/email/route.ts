@@ -222,5 +222,8 @@ export async function POST(request: NextRequest) {
     total: recipientEmails.length,
     errors: errors.length > 0 ? errors : undefined,
     provider: sendgridApiKey ? "sendgrid" : "log_only",
+    message: !sendgridApiKey
+      ? "SENDGRID_API_KEY is not set. Add it to your hosting provider environment variables."
+      : undefined,
   });
 }

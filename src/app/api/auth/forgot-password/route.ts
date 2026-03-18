@@ -99,15 +99,12 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ success: true });
   }
 
-  // Build the reset URL from the generated token
-  const tokenHash = linkData.properties?.hashed_token;
-  const siteUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  // Use the action_link returned by Supabase Admin API
+  const resetUrl = linkData.properties?.action_link;
 
-  if (!tokenHash || !siteUrl) {
+  if (!resetUrl) {
     return NextResponse.json({ success: true });
   }
-
-  const resetUrl = `${siteUrl}/auth/v1/verify?token=${tokenHash}&type=recovery&redirect_to=${encodeURIComponent(redirectTo || "")}`;
 
   // Send via SendGrid
   const sendgridApiKey = process.env.SENDGRID_API_KEY;

@@ -52,16 +52,26 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
     setError("");
     setSuccess("");
 
-    const { error: resetError } = await supabase.auth.resetPasswordForEmail(
-      email,
-      { redirectTo: `${window.location.origin}/auth/reset-password` }
-    );
+    try {
+      const res = await fetch("/api/auth/forgot-password", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          email,
+          redirectTo: `${window.location.origin}/auth/reset-password`,
+        }),
+      });
 
-    if (resetError) {
-      setError(resetError.message);
-    } else {
-      setSuccess("Password reset link sent. Check your email.");
+      if (!res.ok) {
+        const data = await res.json().catch(() => null);
+        setError(data?.error || "Failed to send reset link. Please try again.");
+      } else {
+        setSuccess("Password reset link sent. Check your email.");
+      }
+    } catch {
+      setError("Failed to send reset link. Please try again.");
     }
+
     setLoading(false);
   }
 

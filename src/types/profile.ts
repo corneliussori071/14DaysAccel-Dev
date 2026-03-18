@@ -37,4 +37,5 @@ export interface SubscriptionPlan {
   plan_type: "subscription" | "custom";
   min_tokens?: number;
   max_tokens?: number;
+  lemon_variant_id?: string;
 }

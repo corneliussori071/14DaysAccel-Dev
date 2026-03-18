@@ -13,6 +13,7 @@ interface SubscriptionPlan {
   plan_type: "subscription" | "custom";
   min_tokens?: number;
   max_tokens?: number;
+  lemon_variant_id?: string;
 }
 
 const EMPTY_SUBSCRIPTION: SubscriptionPlan = {
@@ -85,6 +86,11 @@ export default function SubscriptionFlowSection() {
         next[index] = {
           ...next[index],
           [field]: parseFloat(value as string) || 0,
+        };
+      } else if (field === "lemon_variant_id") {
+        next[index] = {
+          ...next[index],
+          [field]: value as string,
         };
       } else if (field === "is_active") {
         next[index] = { ...next[index], [field]: value as boolean };
@@ -341,6 +347,26 @@ export default function SubscriptionFlowSection() {
                         Token price: ${TOKEN_PRICE_USD}/token (system-wide rate)
                       </p>
 
+                      {/* Lemon Squeezy Variant ID */}
+                      <div className="mt-4">
+                        <label className="mb-1 block text-xs font-medium text-zinc-500">
+                          Lemon Squeezy Variant ID
+                        </label>
+                        <input
+                          type="text"
+                          value={plan.lemon_variant_id || ""}
+                          onChange={(e) =>
+                            handleChange(
+                              globalIndex,
+                              "lemon_variant_id",
+                              e.target.value
+                            )
+                          }
+                          placeholder="e.g. 123456"
+                          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                        />
+                      </div>
+
                       {/* Features for custom plan */}
                       <div className="mt-5 border-t border-zinc-100 pt-4">
                         <p className="mb-2 text-xs font-medium text-zinc-500">
@@ -479,6 +505,22 @@ function PlanCard({
             Token value: ~${monthlyTokenValue.toFixed(2)} at system rate
           </p>
         )}
+
+        {/* Lemon Squeezy Variant ID */}
+        <div className="mt-4">
+          <label className="mb-1 block text-xs font-medium text-zinc-500">
+            Lemon Squeezy Variant ID
+          </label>
+          <input
+            type="text"
+            value={plan.lemon_variant_id || ""}
+            onChange={(e) =>
+              onChange(index, "lemon_variant_id", e.target.value)
+            }
+            placeholder="e.g. 123456"
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          />
+        </div>
       </div>
 
       {/* Features */}

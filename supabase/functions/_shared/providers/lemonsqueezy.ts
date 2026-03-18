@@ -13,14 +13,13 @@ function getConfig() {
     Deno.env.get("LEMON_SQUEEZY_API_KEY") ||
     Deno.env.get("LEMON_SQUEEZY_TEST_API_KEY");
   const storeId = Deno.env.get("LEMON_SQUEEZY_STORE_ID");
-  const variantId = Deno.env.get("LEMON_SQUEEZY_VARIANT_ID");
+  const defaultVariantId = Deno.env.get("LEMON_SQUEEZY_VARIANT_ID");
   const webhookSecret = Deno.env.get("LEMON_SQUEEZY_WEBHOOK_SECRET");
 
   if (!apiKey) throw new Error("Missing LEMON_SQUEEZY_API_KEY");
   if (!storeId) throw new Error("Missing LEMON_SQUEEZY_STORE_ID");
-  if (!variantId) throw new Error("Missing LEMON_SQUEEZY_VARIANT_ID");
 
-  return { apiKey, storeId, variantId, webhookSecret };
+  return { apiKey, storeId, defaultVariantId, webhookSecret };
 }
 
 function createLemonSqueezyProvider(): PaymentProvider {
@@ -28,7 +27,12 @@ function createLemonSqueezyProvider(): PaymentProvider {
     name: "lemonsqueezy",
 
     async createCheckout(params: CheckoutParams): Promise<CheckoutResult> {
-      const { apiKey, storeId, variantId } = getConfig();
+      const { apiKey, storeId, defaultVariantId } = getConfig();
+      const variantId = params.variantId || defaultVariantId;
+
+      if (!variantId) {
+        throw new Error("No variant ID provided and no default LEMON_SQUEEZY_VARIANT_ID configured");
+      }
 
       const body = {
         data: {

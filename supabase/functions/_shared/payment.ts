@@ -9,6 +9,7 @@ export interface CheckoutParams {
   amountCents: number;
   redirectUrl: string;
   planName?: string;
+  variantId?: string;
 }
 
 export interface CheckoutResult {

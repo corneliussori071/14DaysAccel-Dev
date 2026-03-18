@@ -37,7 +37,7 @@ export default function EngineeringSection() {
           {principles.map((item, index) => (
             <div
               key={item.title}
-              className="flex animate-fade-in-up flex-col gap-3 rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:border-zinc-400"
+              className="flex animate-fade-in-up flex-col gap-3 transition-all"
               style={{ animationDelay: `${index * 0.12}s` }}
             >
               <div className="text-sm font-medium text-white/60">

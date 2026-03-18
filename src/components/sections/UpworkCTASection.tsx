@@ -2,7 +2,7 @@ export default function UpworkCTASection() {
   return (
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
-        <div className="rounded-lg border border-zinc-500 bg-zinc-700 p-8 text-center">
+        <div className="text-center">
           <h2 className="text-xl font-semibold tracking-tight text-white sm:text-2xl">
             Finished generating your software design and need our team to build
             it for you?

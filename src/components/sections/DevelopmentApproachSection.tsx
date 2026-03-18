@@ -51,7 +51,7 @@ export default function DevelopmentApproachSection() {
   return (
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
-        <div className="mb-14 rounded-lg border border-zinc-500 bg-zinc-700 p-6 text-center">
+        <div className="mb-14 text-center">
           {isLoggedIn ? (
             <>
               <p className="text-base font-medium text-white">
@@ -118,7 +118,7 @@ export default function DevelopmentApproachSection() {
               className="animate-fade-in-up flex flex-col items-center"
               style={{ animationDelay: `${index * 0.1}s` }}
             >
-              <div className="w-full rounded-lg border border-zinc-500 bg-zinc-700 p-6 transition-all hover:-translate-y-1 hover:shadow-md">
+              <div className="w-full p-6 transition-all">
                 <h3 className="text-base font-semibold text-white">
                   {item.title}
                 </h3>

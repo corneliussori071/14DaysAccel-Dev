@@ -81,6 +81,11 @@ function SoftwareDesignerContent() {
   }, []);
 
   useEffect(() => {
+    const authError = searchParams.get("auth_error");
+    if (authError) {
+      setError(`Authentication failed: ${authError}`);
+    }
+
     const authParam = searchParams.get("auth");
     if (authParam === "login" || authParam === "signup") {
       if (!isAuthenticated) {

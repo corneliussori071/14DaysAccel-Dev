@@ -27,16 +27,23 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
   async function handleGoogleLogin() {
     setLoading(true);
     setError("");
-    const { error: oauthError } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
-      },
-    });
-    if (oauthError) {
-      setError(oauthError.message);
+    try {
+      const { error: oauthError } = await supabase.auth.signInWithOAuth({
+        provider: "google",
+        options: {
+          redirectTo: `${window.location.origin}/auth/callback`,
+        },
+      });
+      if (oauthError) {
+        setError(oauthError.message);
+        setLoading(false);
+      }
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to start Google sign-in"
+      );
+      setLoading(false);
     }
-    setLoading(false);
   }
 
   async function handleForgotPassword(e: React.FormEvent) {

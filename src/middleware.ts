@@ -7,11 +7,12 @@ const ADMIN_PATHS = ["/sys/gate", "/sys/panel", "/api/internal/auth", "/api/inte
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Never block admin routes or static assets
+  // Never block admin routes, static assets, or auth callback
   if (
     ADMIN_PATHS.some((p) => pathname.startsWith(p)) ||
     pathname.startsWith("/_next") ||
     pathname.startsWith("/favicon") ||
+    pathname.startsWith("/auth/callback") ||
     pathname.match(/\.\w+$/)
   ) {
     return NextResponse.next();

@@ -15,5 +15,7 @@ export async function GET(request: Request) {
     }
   }
 
-  return NextResponse.redirect(`${origin}/software-designer`);
+  // Redirect destination — check for next param, default to planner
+  const next = searchParams.get("next") || "/software-designer";
+  return NextResponse.redirect(`${origin}${next}`);
 }

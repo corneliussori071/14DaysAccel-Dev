@@ -7,7 +7,6 @@ import { supabase } from "@/lib/supabase";
 import type { SoftwarePlanRequest } from "@/types/softwarePlan";
 import { AI_MODELS, MIN_TOKENS_REQUIRED } from "@/types/softwarePlan";
 import type { AiModelId } from "@/types/softwarePlan";
-import { generateBusinessPlan } from "@/services/aiPlannerService";
 import AuthModal from "@/components/software-designer/AuthModal";
 
 const INDUSTRIES = [
@@ -128,7 +127,7 @@ function SoftwareDesignerContent() {
     return !!(dailyOperations.trim() && softwareProblem.trim());
   }
 
-  async function handleSubmit() {
+  function handleSubmit() {
     if (!isFormValid()) return;
 
     if (!isAuthenticated) {
@@ -141,48 +140,13 @@ function SoftwareDesignerContent() {
     setIsSubmitting(true);
     setError("");
 
-    try {
-      const request = buildRequest();
-      const result = await generateBusinessPlan(request);
-
-      sessionStorage.setItem(
-        "softwarePlanResult",
-        JSON.stringify({
-          plan: result.plan,
-          tokensUsed: result.tokensUsed,
-          billedTokens: result.billedTokens,
-          promptTokens: result.promptTokens,
-          completionTokens: result.completionTokens,
-          businessName,
-          modelId,
-        })
-      );
-
-      // Persist plan to database for history
-      const { data: { session: currentSession } } = await supabase.auth.getSession();
-      if (currentSession?.user) {
-        supabase
-          .from("saved_plans")
-          .insert({
-            user_id: currentSession.user.id,
-            business_name: businessName,
-            goal_type: goalType,
-            model_id: modelId,
-            plan_data: result.plan,
-            tokens_used: result.tokensUsed,
-            billed_tokens: result.billedTokens,
-          })
-          .then(() => {});
-      }
-
-      router.push("/software-designer/result");
-    } catch (err) {
-      setError(
-        err instanceof Error ? err.message : "Failed to generate plan."
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
+    const request = buildRequest();
+    sessionStorage.setItem(
+      "softwarePlanPending",
+      JSON.stringify({ request, businessName, modelId, goalType })
+    );
+    sessionStorage.removeItem("softwarePlanResult");
+    router.push("/software-designer/result");
   }
 
   return (

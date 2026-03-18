@@ -9,6 +9,8 @@ import { generatePromptStage } from "@/services/aiPlannerService";
 import { getTokenBalance } from "@/services/tokenService";
 import { updateSavedPlanPrompts } from "@/services/profileService";
 import CopyButton from "@/components/software-designer/CopyButton";
+import TypewriterText from "@/components/software-designer/TypewriterText";
+import ThinkingIndicator from "@/components/software-designer/ThinkingIndicator";
 
 interface GeneratedPrompt {
   stage: number;
@@ -46,6 +48,7 @@ export default function PromptsPage() {
   const [loadingStage, setLoadingStage] = useState<number | null>(null);
   const [error, setError] = useState("");
   const [tokenBalance, setTokenBalance] = useState<number | null>(null);
+  const [newlyGenerated, setNewlyGenerated] = useState<Set<number>>(new Set());
 
   useEffect(() => {
     const stored = sessionStorage.getItem("softwarePlanResult");
@@ -118,6 +121,7 @@ export default function PromptsPage() {
       const next = new Map(generatedPrompts);
       next.set(stage, prompt);
       setGeneratedPrompts(next);
+      setNewlyGenerated((prev) => new Set(prev).add(stage));
 
       await persistPrompts(next, storedResult.savedPlanId);
 
@@ -243,6 +247,18 @@ export default function PromptsPage() {
                   )}
                 </div>
 
+                {isLoading && (
+                  <div className="mt-5 ml-10">
+                    <ThinkingIndicator
+                      messages={[
+                        "Analysing context...",
+                        "Generating prompt...",
+                        "Building instructions...",
+                      ]}
+                    />
+                  </div>
+                )}
+
                 {generated && (
                   <div className="mt-5 ml-10">
                     <div className="mb-3 flex items-center justify-between">
@@ -253,7 +269,11 @@ export default function PromptsPage() {
                     </div>
                     <div className="rounded-md border border-zinc-100 bg-zinc-50 p-4">
                       <pre className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
-                        {generated.prompt}
+                        {newlyGenerated.has(stageDef.stage) ? (
+                          <TypewriterText text={generated.prompt} />
+                        ) : (
+                          generated.prompt
+                        )}
                       </pre>
                     </div>
                   </div>

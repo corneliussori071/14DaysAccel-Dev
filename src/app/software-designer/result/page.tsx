@@ -1,15 +1,27 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
-import type { SoftwarePlanResponse } from "@/types/softwarePlan";
+import type { SoftwarePlanResponse, SoftwarePlanRequest, AiModelId } from "@/types/softwarePlan";
+import { generateBusinessPlan } from "@/services/aiPlannerService";
+import { supabase } from "@/lib/supabase";
 import CopyButton from "@/components/software-designer/CopyButton";
+import TypewriterText from "@/components/software-designer/TypewriterText";
+import ThinkingIndicator from "@/components/software-designer/ThinkingIndicator";
 
 interface StoredResult {
   plan: SoftwarePlanResponse;
   tokensUsed: number;
   businessName: string;
+  modelId?: AiModelId;
+}
+
+interface PendingRequest {
+  request: SoftwarePlanRequest;
+  businessName: string;
+  modelId: AiModelId;
+  goalType: string;
 }
 
 function toDisplayString(value: unknown): string {
@@ -25,15 +37,147 @@ function toDisplayString(value: unknown): string {
 export default function ResultPage() {
   const router = useRouter();
   const [result, setResult] = useState<StoredResult | null>(null);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isNewResult, setIsNewResult] = useState(false);
+  const [error, setError] = useState("");
+  const [pendingBusinessName, setPendingBusinessName] = useState("");
+  const hasStartedRef = useRef(false);
 
   useEffect(() => {
-    const stored = sessionStorage.getItem("softwarePlanResult");
-    if (!stored) {
+    // Check for existing result first
+    const storedResult = sessionStorage.getItem("softwarePlanResult");
+    if (storedResult) {
+      setResult(JSON.parse(storedResult));
+      return;
+    }
+
+    // Check for pending request
+    const pendingStr = sessionStorage.getItem("softwarePlanPending");
+    if (!pendingStr) {
       router.push("/software-designer");
       return;
     }
-    setResult(JSON.parse(stored));
+
+    // Prevent double execution in React strict mode
+    if (hasStartedRef.current) return;
+    hasStartedRef.current = true;
+
+    const pending: PendingRequest = JSON.parse(pendingStr);
+    sessionStorage.removeItem("softwarePlanPending");
+    setPendingBusinessName(pending.businessName);
+    setIsGenerating(true);
+
+    generateBusinessPlan(pending.request)
+      .then(async (apiResult) => {
+        const stored: StoredResult = {
+          plan: apiResult.plan,
+          tokensUsed: apiResult.tokensUsed,
+          businessName: pending.businessName,
+          modelId: pending.modelId,
+        };
+
+        sessionStorage.setItem(
+          "softwarePlanResult",
+          JSON.stringify({
+            ...stored,
+            billedTokens: apiResult.billedTokens,
+            promptTokens: apiResult.promptTokens,
+            completionTokens: apiResult.completionTokens,
+          })
+        );
+
+        // Persist plan to database for history
+        const {
+          data: { session },
+        } = await supabase.auth.getSession();
+        if (session?.user) {
+          supabase
+            .from("saved_plans")
+            .insert({
+              user_id: session.user.id,
+              business_name: pending.businessName,
+              goal_type: pending.goalType,
+              model_id: pending.modelId,
+              plan_data: apiResult.plan,
+              tokens_used: apiResult.tokensUsed,
+              billed_tokens: apiResult.billedTokens,
+            })
+            .then(() => {});
+        }
+
+        setResult(stored);
+        setIsNewResult(true);
+      })
+      .catch((err) => {
+        setError(
+          err instanceof Error ? err.message : "Failed to generate plan."
+        );
+      })
+      .finally(() => {
+        setIsGenerating(false);
+      });
   }, [router]);
+
+  // Thinking state while API call is in progress
+  if (isGenerating) {
+    return (
+      <main className="min-h-screen bg-zinc-50">
+        <div className="mx-auto max-w-4xl px-6 py-16 md:px-12">
+          <div className="mb-8">
+            <Link
+              href="/software-designer"
+              className="text-sm text-zinc-500 hover:text-zinc-900"
+            >
+              Back to planner
+            </Link>
+            <h1 className="mt-3 text-3xl font-semibold tracking-tight text-zinc-900">
+              Software Plan: {pendingBusinessName}
+            </h1>
+          </div>
+          <div className="flex justify-center py-20">
+            <ThinkingIndicator />
+          </div>
+        </div>
+      </main>
+    );
+  }
+
+  // Error state
+  if (error) {
+    return (
+      <main className="min-h-screen bg-zinc-50">
+        <div className="mx-auto max-w-4xl px-6 py-16 md:px-12">
+          <div className="mb-8">
+            <Link
+              href="/software-designer"
+              className="text-sm text-zinc-500 hover:text-zinc-900"
+            >
+              Back to planner
+            </Link>
+          </div>
+          <div className="rounded-md border border-red-200 bg-red-50 p-6 text-center">
+            <p className="text-sm text-red-700">{error}</p>
+            {error.toLowerCase().includes("insufficient") && (
+              <Link
+                href="/subscriptions"
+                className="mt-2 inline-block text-sm font-medium text-red-700 underline hover:text-red-900"
+              >
+                Purchase tokens
+              </Link>
+            )}
+            <div className="mt-4">
+              <Link
+                href="/software-designer"
+                className="text-sm text-zinc-500 hover:text-zinc-900"
+              >
+                Try again
+              </Link>
+            </div>
+          </div>
+        </div>
+      </main>
+    );
+  }
 
   if (!result) {
     return (
@@ -84,7 +228,11 @@ export default function ResultPage() {
             </div>
             <div className="space-y-4 text-sm leading-relaxed text-zinc-700">
               <p className="whitespace-pre-wrap">
-                {toDisplayString(plan.software_description)}
+                {isNewResult ? (
+                  <TypewriterText text={toDisplayString(plan.software_description)} />
+                ) : (
+                  toDisplayString(plan.software_description)
+                )}
               </p>
               {stackText && (
                 <div>
@@ -92,7 +240,11 @@ export default function ResultPage() {
                     Recommended Stack
                   </h3>
                   <p className="whitespace-pre-wrap">
-                    {stackText}
+                    {isNewResult ? (
+                      <TypewriterText text={stackText} />
+                    ) : (
+                      stackText
+                    )}
                   </p>
                 </div>
               )}
@@ -130,7 +282,11 @@ export default function ResultPage() {
               <CopyButton text={archText} />
             </div>
             <p className="whitespace-pre-wrap text-sm leading-relaxed text-zinc-700">
-              {archText}
+              {isNewResult ? (
+                <TypewriterText text={archText} />
+              ) : (
+                archText
+              )}
             </p>
           </section>
         </div>

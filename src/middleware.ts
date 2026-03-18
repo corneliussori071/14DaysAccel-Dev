@@ -1,5 +1,6 @@
-import { NextRequest, NextResponse } from "next/server";
+import { createServerClient } from "@supabase/ssr";
 import { createClient } from "@supabase/supabase-js";
+import { NextRequest, NextResponse } from "next/server";
 
 const ADMIN_PATHS = ["/sys/gate", "/sys/panel", "/api/internal/auth", "/api/internal/admin"];
 
@@ -16,23 +17,47 @@ export async function middleware(request: NextRequest) {
     return NextResponse.next();
   }
 
+  // Refresh the Supabase auth session on every request (cookie-based)
+  let response = NextResponse.next({ request });
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (supabaseUrl && supabaseAnonKey) {
+    const supabase = createServerClient(supabaseUrl, supabaseAnonKey, {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll();
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value }) => request.cookies.set(name, value));
+          response = NextResponse.next({ request });
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          );
+        },
+      },
+    });
+
+    await supabase.auth.getUser();
+  }
+
   // Check maintenance mode from Supabase
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-  if (!url || !serviceKey) {
-    return NextResponse.next();
+  if (!supabaseUrl || !serviceKey) {
+    return response;
   }
 
   try {
-    const supabase = createClient(url, serviceKey, {
+    const supabaseService = createClient(supabaseUrl, serviceKey, {
       auth: { autoRefreshToken: false, persistSession: false },
       global: {
         fetch: (input: RequestInfo | URL, init?: RequestInit) =>
           fetch(input, { ...init, cache: "no-store" }),
       },
     });
-    const { data } = await supabase
+    const { data } = await supabaseService
       .from("admin_settings")
       .select("value")
       .eq("key", "emergency")
@@ -103,7 +128,7 @@ export async function middleware(request: NextRequest) {
     // If we can't check maintenance status, allow the request through
   }
 
-  return NextResponse.next();
+  return response;
 }
 
 export const config = {

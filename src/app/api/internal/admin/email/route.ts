@@ -26,6 +26,18 @@ const EMAIL_CATEGORIES = [
 
 type EmailCategory = (typeof EMAIL_CATEGORIES)[number];
 
+function getFromEmail(category: EmailCategory): string {
+  switch (category) {
+    case "transaction":
+    case "low_token":
+      return "no-reply.transaction@14daysaccel.dev";
+    case "welcome":
+      return "Registration@14daysaccel.dev";
+    default:
+      return "support@14daysaccel.dev";
+  }
+}
+
 function buildEmailHtml(subject: string, body: string): string {
   return `<!DOCTYPE html>
 <html>
@@ -155,35 +167,36 @@ export async function POST(request: NextRequest) {
     );
   }
 
-  const resendApiKey = process.env.RESEND_API_KEY;
-  const fromEmail = process.env.EMAIL_FROM || "noreply@14daysaccel.dev";
+  const sendgridApiKey = process.env.SENDGRID_API_KEY;
+  const fromName = "14DaysAccel Dev";
+  const fromEmail = getFromEmail(category as EmailCategory);
   const htmlContent = buildEmailHtml(subject, emailBody);
 
   let sentCount = 0;
   const errors: string[] = [];
 
-  if (resendApiKey) {
-    // Send via Resend API
+  if (sendgridApiKey) {
+    // Send via SendGrid API
     for (const email of recipientEmails) {
       try {
-        const res = await fetch("https://api.resend.com/emails", {
+        const res = await fetch("https://api.sendgrid.com/v3/mail/send", {
           method: "POST",
           headers: {
-            Authorization: `Bearer ${resendApiKey}`,
+            Authorization: `Bearer ${sendgridApiKey}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            from: `14DaysAccel Dev <${fromEmail}>`,
-            to: [email],
+            personalizations: [{ to: [{ email }] }],
+            from: { email: fromEmail, name: fromName },
             subject,
-            html: htmlContent,
+            content: [{ type: "text/html", value: htmlContent }],
           }),
         });
-        if (res.ok) {
+        if (res.status >= 200 && res.status < 300) {
           sentCount++;
         } else {
-          const errData = await res.json().catch(() => ({}));
-          errors.push(`${email}: ${errData.message || res.statusText}`);
+          const errText = await res.text().catch(() => res.statusText);
+          errors.push(`${email}: ${errText}`);
         }
       } catch (err) {
         errors.push(`${email}: ${err instanceof Error ? err.message : "Send failed"}`);
@@ -208,6 +221,6 @@ export async function POST(request: NextRequest) {
     sent: sentCount,
     total: recipientEmails.length,
     errors: errors.length > 0 ? errors : undefined,
-    provider: resendApiKey ? "resend" : "log_only",
+    provider: sendgridApiKey ? "sendgrid" : "log_only",
   });
 }

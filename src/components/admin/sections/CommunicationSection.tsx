@@ -182,7 +182,7 @@ export default function CommunicationSection() {
 
       const providerNote =
         data.provider === "log_only"
-          ? " (logged only — configure RESEND_API_KEY to send real emails)"
+          ? " (logged only — configure SENDGRID_API_KEY to send real emails)"
           : "";
       setSuccess(
         `Email sent to ${data.sent} of ${data.total} recipients.${providerNote}`

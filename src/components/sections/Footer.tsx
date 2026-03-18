@@ -102,10 +102,26 @@ export default function Footer() {
           </div>
         </div>
         <div className="mt-10 border-t border-zinc-800 pt-6">
-          <p className="text-xs text-zinc-500">
-            &copy; {new Date().getFullYear()} 14DaysAccel Dev. All rights
-            reserved.
-          </p>
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-xs text-zinc-500">
+              &copy; {new Date().getFullYear()} 14DaysAccel Dev. All rights
+              reserved.
+            </p>
+            <div className="flex gap-4">
+              <Link
+                href="/terms"
+                className="text-xs text-zinc-500 transition-colors hover:text-white"
+              >
+                Terms and Conditions
+              </Link>
+              <Link
+                href="/privacy"
+                className="text-xs text-zinc-500 transition-colors hover:text-white"
+              >
+                Privacy Policy
+              </Link>
+            </div>
+          </div>
         </div>
       </div>
     </footer>

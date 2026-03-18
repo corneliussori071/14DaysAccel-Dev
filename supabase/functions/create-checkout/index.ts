@@ -3,6 +3,7 @@ import {
   getCorsHeaders,
   errorResponse,
   jsonResponse,
+  createServiceClient,
 } from "../_shared/utils.ts";
 import { getProvider } from "../_shared/payment.ts";
 import "../_shared/providers/lemonsqueezy.ts";
@@ -19,10 +20,62 @@ Deno.serve(async (req: Request) => {
   try {
     const user = await verifyUser(req.headers.get("Authorization"));
 
-    const { tokens, amountCents, planName, redirectUrl } = await req.json();
+    const { tokens, amountCents, planName, variantId, planId, redirectUrl } = await req.json();
 
     if (!tokens || !amountCents || tokens <= 0 || amountCents <= 0) {
       return errorResponse("Invalid tokens or amount");
+    }
+
+    // Price validation: look up the plan from admin_settings to verify pricing
+    const supabase = createServiceClient();
+    const { data: plansRow } = await supabase
+      .from("admin_settings")
+      .select("value")
+      .eq("key", "subscription_plans")
+      .single();
+
+    const plans = (plansRow?.value ?? []) as Array<{
+      id: string;
+      price_usd: number;
+      tokens_per_month: number;
+      plan_type: string;
+    }>;
+
+    const matchedPlan = planId
+      ? plans.find((p) => p.id === planId)
+      : undefined;
+
+    if (matchedPlan) {
+      if (matchedPlan.plan_type === "custom") {
+        // Custom plans: validate against per-token rate from token_pricing
+        let tokenPriceUsd = 0.0003;
+        const { data: pricingRow } = await supabase
+          .from("admin_settings")
+          .select("value")
+          .eq("key", "token_pricing")
+          .single();
+        if (pricingRow?.value) {
+          const models = pricingRow.value as Array<{ cost_per_token_usd: number }>;
+          const baseCost = Math.min(...models.map((m) => m.cost_per_token_usd));
+          if (baseCost > 0) tokenPriceUsd = baseCost;
+        }
+        const expectedCents = Math.round(tokens * tokenPriceUsd * 100);
+        if (Math.abs(amountCents - expectedCents) > 1) {
+          return errorResponse(
+            `Price mismatch: expected ${expectedCents} cents for ${tokens} tokens, got ${amountCents}`,
+            400
+          );
+        }
+      } else {
+        // Subscription plans: validate against the plan's configured price_usd
+        const expectedCents = Math.round(matchedPlan.price_usd * 100);
+        if (Math.abs(amountCents - expectedCents) > 1) {
+          return errorResponse(
+            `Price mismatch: expected ${expectedCents} cents for plan, got ${amountCents}`,
+            400
+          );
+        }
+      }
     }
 
     const provider = getProvider();
@@ -39,6 +92,7 @@ Deno.serve(async (req: Request) => {
       amountCents,
       redirectUrl: finalRedirectUrl,
       planName,
+      variantId,
     });
 
     return jsonResponse({

@@ -72,7 +72,7 @@ function SubscriptionsContent() {
     loadPlans();
   }, []);
 
-  async function initiateCheckout(tokens: number, amountCents: number, planName?: string) {
+  async function initiateCheckout(tokens: number, amountCents: number, planName?: string, variantId?: string, planId?: string) {
     setError(null);
     const {
       data: { session },
@@ -92,6 +92,8 @@ function SubscriptionsContent() {
         tokens,
         amountCents,
         planName,
+        variantId,
+        planId,
         redirectUrl: `${window.location.origin}/subscriptions?payment=success`,
       }),
     });
@@ -109,7 +111,7 @@ function SubscriptionsContent() {
     setCheckingOut(plan.id);
     try {
       const amountCents = Math.round(plan.price_usd * 100);
-      await initiateCheckout(plan.tokens_per_month, amountCents, plan.name);
+      await initiateCheckout(plan.tokens_per_month, amountCents, plan.name, plan.lemon_variant_id, plan.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Checkout failed");
       setCheckingOut(null);
@@ -121,7 +123,7 @@ function SubscriptionsContent() {
     setCheckingOut("custom");
     try {
       const amountCents = Math.round(customTokens * TOKEN_PRICE_USD * 100);
-      await initiateCheckout(customTokens, amountCents, customPlan.name);
+      await initiateCheckout(customTokens, amountCents, customPlan.name, customPlan.lemon_variant_id, customPlan.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Checkout failed");
       setCheckingOut(null);

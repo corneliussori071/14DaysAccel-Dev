@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface AuthModalProps {
@@ -17,11 +17,38 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [signupsAllowed, setSignupsAllowed] = useState(true);
+  const [checkingSignups, setCheckingSignups] = useState(false);
+
+  const checkSignupStatus = useCallback(async () => {
+    setCheckingSignups(true);
+    try {
+      const res = await fetch("/api/auth/signup-status", { cache: "no-store" });
+      if (res.ok) {
+        const data = await res.json();
+        setSignupsAllowed(data.allowed);
+        if (!data.allowed && mode === "signup") {
+          setError("New account registration is temporarily disabled. Please try again later.");
+        }
+      }
+    } catch {
+      // Allow signups if status check fails to avoid blocking legitimate users
+    } finally {
+      setCheckingSignups(false);
+    }
+  }, [mode]);
+
+  useEffect(() => {
+    checkSignupStatus();
+  }, [checkSignupStatus]);
 
   function switchMode(next: AuthMode) {
     setMode(next);
     setError("");
     setSuccess("");
+    if (next === "signup" && !signupsAllowed) {
+      setError("New account registration is temporarily disabled. Please try again later.");
+    }
   }
 
   async function handleGoogleLogin() {
@@ -82,6 +109,12 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
     setLoading(true);
     setError("");
     setSuccess("");
+
+    if (mode === "signup" && !signupsAllowed) {
+      setError("New account registration is temporarily disabled. Please try again later.");
+      setLoading(false);
+      return;
+    }
 
     if (mode === "login") {
       const { error: authError } = await supabase.auth.signInWithPassword({
@@ -148,7 +181,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
             <button
               type="button"
               onClick={handleGoogleLogin}
-              disabled={loading}
+              disabled={loading || (mode === "signup" && !signupsAllowed)}
               className="flex w-full items-center justify-center gap-3 rounded-md border border-zinc-300 bg-white px-5 py-2.5 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:opacity-50"
             >
               <svg width="18" height="18" viewBox="0 0 48 48">
@@ -225,7 +258,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
 
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || checkingSignups || (mode === "signup" && !signupsAllowed)}
             className="w-full rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
           >
             {loading

@@ -2,6 +2,7 @@ import {
   verifyUser,
   createServiceClient,
   checkTokenBalance,
+  checkAiServicesEnabled,
   deductTokens,
   logAiRequest,
   getCorsHeaders,
@@ -200,6 +201,7 @@ Deno.serve(async (req) => {
   try {
     const user = await verifyUser(req.headers.get("Authorization"));
     const serviceClient = createServiceClient();
+    await checkAiServicesEnabled(serviceClient);
     await checkTokenBalance(serviceClient, user.id);
 
     const body: RequestBody = await req.json();
@@ -272,6 +274,9 @@ Generate a comprehensive, copy-paste-ready prompt that a developer can give to a
     }
     if (message.includes("Insufficient")) {
       return errorResponse(message, 402);
+    }
+    if (message.includes("AI services are temporarily unavailable")) {
+      return errorResponse(message, 503);
     }
     if (message.includes("AI service request failed")) {
       return errorResponse(message, 502);

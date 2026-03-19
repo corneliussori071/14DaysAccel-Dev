@@ -100,6 +100,20 @@ export async function deductTokens(
   return data as number;
 }
 
+export async function checkAiServicesEnabled(
+  serviceClient: ReturnType<typeof createServiceClient>
+): Promise<void> {
+  const { data } = await serviceClient
+    .from("admin_settings")
+    .select("value")
+    .eq("key", "emergency")
+    .single();
+
+  if (data?.value?.ai_services_disabled) {
+    throw new Error("AI services are temporarily unavailable. Please try again later.");
+  }
+}
+
 export async function logAiRequest(
   serviceClient: ReturnType<typeof createServiceClient>,
   userId: string,

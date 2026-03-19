@@ -16,7 +16,13 @@ export function createServiceClient() {
   if (!url || !serviceKey) {
     throw new Error("Missing Supabase environment variables");
   }
-  return createClient(url, serviceKey);
+  return createClient(url, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+    global: {
+      fetch: (input: RequestInfo | URL, init?: RequestInit) =>
+        fetch(input, { ...init, cache: "no-store" }),
+    },
+  });
 }
 
 export function createUserClient(authHeader: string) {

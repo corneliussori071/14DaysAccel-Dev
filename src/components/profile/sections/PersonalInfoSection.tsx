@@ -101,6 +101,7 @@ export default function PersonalInfoSection() {
             type="text"
             value={fullName}
             onChange={(e) => setFullName(e.target.value)}
+            maxLength={100}
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
             placeholder="Your full name"
           />
@@ -114,6 +115,8 @@ export default function PersonalInfoSection() {
             type="tel"
             value={phoneNumber}
             onChange={(e) => setPhoneNumber(e.target.value)}
+            maxLength={20}
+            pattern="[+]?[0-9\s()-]*"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
             placeholder="+1 (555) 000-0000"
           />
@@ -147,6 +150,7 @@ export default function PersonalInfoSection() {
             type="password"
             value={newPassword}
             onChange={(e) => setNewPassword(e.target.value)}
+            minLength={8}
             autoComplete="new-password"
             className="mt-1 block w-full rounded-md border border-zinc-300 px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none"
             placeholder="Min. 8 characters"

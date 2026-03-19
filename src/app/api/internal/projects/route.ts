@@ -66,6 +66,20 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-]/g, "")
       .slice(0, 200);
 
+    if (!sanitizedSlug) {
+      return NextResponse.json(
+        { error: "Invalid slug" },
+        { status: 400 }
+      );
+    }
+
+    function validateUrl(url: unknown): string | null {
+      if (!url) return null;
+      const s = String(url).slice(0, 1000);
+      if (s && !s.startsWith("https://")) return null;
+      return s;
+    }
+
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase
       .from("projects")
@@ -77,14 +91,14 @@ export async function POST(request: NextRequest) {
         tech_stack: Array.isArray(tech_stack) ? tech_stack.map(String) : [],
         status: status === "available" ? "available" : "upcoming",
         featured: featured === true,
-        upwork_link: upwork_link ? String(upwork_link).slice(0, 1000) : null,
-        youtube_link: youtube_link ? String(youtube_link).slice(0, 1000) : null,
-        tiktok_link: tiktok_link ? String(tiktok_link).slice(0, 1000) : null,
+        upwork_link: validateUrl(upwork_link),
+        youtube_link: validateUrl(youtube_link),
+        tiktok_link: validateUrl(tiktok_link),
         media_files: Array.isArray(body.media_files) ? body.media_files : [],
         profile_image: body.profile_image ? String(body.profile_image).slice(0, 2000) : null,
         testing_available: testing_available === true,
         testing_instructions: testing_instructions ? String(testing_instructions).slice(0, 10000) : null,
-        testing_url: testing_url ? String(testing_url).slice(0, 1000) : null,
+        testing_url: validateUrl(testing_url),
         testing_doc_url: testing_doc_url ? String(testing_doc_url).slice(0, 2000) : null,
         testing_doc_name: testing_doc_name ? String(testing_doc_name).slice(0, 200) : null,
       })
@@ -126,9 +140,22 @@ export async function PUT(request: NextRequest) {
     }
 
     const sanitized: Record<string, unknown> = {};
+
+    function validateUrlUpdate(url: unknown): string | null {
+      if (!url) return null;
+      const s = String(url).slice(0, 1000);
+      if (s && !s.startsWith("https://")) return null;
+      return s;
+    }
+
     if (updates.title !== undefined) sanitized.title = String(updates.title).slice(0, 500);
-    if (updates.slug !== undefined)
-      sanitized.slug = String(updates.slug).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 200);
+    if (updates.slug !== undefined) {
+      const slug = String(updates.slug).toLowerCase().replace(/[^a-z0-9-]/g, "").slice(0, 200);
+      if (!slug) {
+        return NextResponse.json({ error: "Invalid slug" }, { status: 400 });
+      }
+      sanitized.slug = slug;
+    }
     if (updates.description !== undefined) sanitized.description = String(updates.description).slice(0, 5000);
     if (updates.features !== undefined)
       sanitized.features = Array.isArray(updates.features) ? updates.features.map(String) : [];
@@ -138,11 +165,11 @@ export async function PUT(request: NextRequest) {
       sanitized.status = updates.status === "available" ? "available" : "upcoming";
     if (updates.featured !== undefined) sanitized.featured = updates.featured === true;
     if (updates.upwork_link !== undefined)
-      sanitized.upwork_link = updates.upwork_link ? String(updates.upwork_link).slice(0, 1000) : null;
+      sanitized.upwork_link = validateUrlUpdate(updates.upwork_link);
     if (updates.youtube_link !== undefined)
-      sanitized.youtube_link = updates.youtube_link ? String(updates.youtube_link).slice(0, 1000) : null;
+      sanitized.youtube_link = validateUrlUpdate(updates.youtube_link);
     if (updates.tiktok_link !== undefined)
-      sanitized.tiktok_link = updates.tiktok_link ? String(updates.tiktok_link).slice(0, 1000) : null;
+      sanitized.tiktok_link = validateUrlUpdate(updates.tiktok_link);
     if (updates.media_files !== undefined)
       sanitized.media_files = Array.isArray(updates.media_files) ? updates.media_files : [];
     if (updates.profile_image !== undefined)
@@ -152,7 +179,7 @@ export async function PUT(request: NextRequest) {
     if (updates.testing_instructions !== undefined)
       sanitized.testing_instructions = updates.testing_instructions ? String(updates.testing_instructions).slice(0, 10000) : null;
     if (updates.testing_url !== undefined)
-      sanitized.testing_url = updates.testing_url ? String(updates.testing_url).slice(0, 1000) : null;
+      sanitized.testing_url = validateUrlUpdate(updates.testing_url);
     if (updates.testing_doc_url !== undefined)
       sanitized.testing_doc_url = updates.testing_doc_url ? String(updates.testing_doc_url).slice(0, 2000) : null;
     if (updates.testing_doc_name !== undefined)

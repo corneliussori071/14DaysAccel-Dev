@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/adminSession";
+import { logInfo } from "@/lib/logger";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -121,6 +122,7 @@ export async function PUT(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: "Failed to suspend user" }, { status: 500 });
       }
+      await logInfo({ message: `Admin suspended user ${userId}`, source: "admin", path: "/api/internal/admin/users" });
       return NextResponse.json({ success: true, message: "User suspended" });
     }
 
@@ -132,6 +134,7 @@ export async function PUT(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: "Failed to activate user" }, { status: 500 });
       }
+      await logInfo({ message: `Admin activated user ${userId}`, source: "admin", path: "/api/internal/admin/users" });
       return NextResponse.json({ success: true, message: "User activated" });
     }
 
@@ -143,6 +146,7 @@ export async function PUT(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: "Failed to freeze tokens" }, { status: 500 });
       }
+      await logInfo({ message: `Admin froze tokens for user ${userId}`, source: "admin", path: "/api/internal/admin/users" });
       return NextResponse.json({ success: true, message: "Tokens frozen" });
     }
 
@@ -154,6 +158,7 @@ export async function PUT(request: NextRequest) {
       if (error) {
         return NextResponse.json({ error: "Failed to unfreeze tokens" }, { status: 500 });
       }
+      await logInfo({ message: `Admin unfroze tokens for user ${userId}`, source: "admin", path: "/api/internal/admin/users" });
       return NextResponse.json({ success: true, message: "Tokens unfrozen" });
     }
 
@@ -199,6 +204,8 @@ export async function PUT(request: NextRequest) {
         operation_type: parsedAmount > 0 ? "admin_credit" : "admin_debit",
         description: reason || `Admin ${parsedAmount > 0 ? "credit" : "debit"} of ${Math.abs(parsedAmount)} tokens`,
       });
+
+      await logInfo({ message: `Admin adjusted tokens for user ${userId} by ${parsedAmount}`, source: "admin", path: "/api/internal/admin/users" });
 
       return NextResponse.json({
         success: true,

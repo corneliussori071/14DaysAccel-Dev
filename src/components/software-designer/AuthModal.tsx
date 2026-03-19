@@ -201,9 +201,9 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={8}
                 className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                placeholder="Minimum 6 characters"
+                placeholder="Minimum 8 characters"
               />
             </div>
           )}

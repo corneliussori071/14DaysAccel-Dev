@@ -60,7 +60,7 @@ Deno.serve(async (req: Request) => {
           if (baseCost > 0) tokenPriceUsd = baseCost;
         }
         const expectedCents = Math.round(tokens * tokenPriceUsd * 100);
-        if (Math.abs(amountCents - expectedCents) > 1) {
+        if (amountCents !== expectedCents) {
           return errorResponse(
             `Price mismatch: expected ${expectedCents} cents for ${tokens} tokens, got ${amountCents}`,
             400
@@ -69,7 +69,7 @@ Deno.serve(async (req: Request) => {
       } else {
         // Subscription plans: validate against the plan's configured price_usd
         const expectedCents = Math.round(matchedPlan.price_usd * 100);
-        if (Math.abs(amountCents - expectedCents) > 1) {
+        if (amountCents !== expectedCents) {
           return errorResponse(
             `Price mismatch: expected ${expectedCents} cents for plan, got ${amountCents}`,
             400

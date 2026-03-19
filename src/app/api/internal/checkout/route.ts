@@ -69,7 +69,7 @@ export async function POST(request: NextRequest) {
 
     if (!res.ok) {
       return NextResponse.json(
-        { error: data.error || "Checkout failed" },
+        { error: "Checkout failed" },
         { status: res.status }
       );
     }

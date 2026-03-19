@@ -2,6 +2,22 @@ import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { signAdminToken } from "@/lib/adminSession";
 
+// In-memory rate limiter: max 5 attempts per IP per 15 minutes
+const loginAttempts = new Map<string, { count: number; resetAt: number }>();
+const MAX_ATTEMPTS = 5;
+const WINDOW_MS = 15 * 60 * 1000;
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = loginAttempts.get(ip);
+  if (!entry || now > entry.resetAt) {
+    loginAttempts.set(ip, { count: 1, resetAt: now + WINDOW_MS });
+    return false;
+  }
+  entry.count++;
+  return entry.count > MAX_ATTEMPTS;
+}
+
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -15,6 +31,14 @@ function getSupabaseAdmin() {
 
 export async function POST(request: NextRequest) {
   try {
+    const ip = request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+    if (isRateLimited(ip)) {
+      return NextResponse.json(
+        { error: "Too many attempts. Try again later." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { passphrase } = body;
 

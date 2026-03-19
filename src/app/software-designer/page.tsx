@@ -181,9 +181,11 @@ function SoftwareDesignerContent() {
               type="text"
               value={businessName}
               onChange={(e) => setBusinessName(e.target.value)}
+              maxLength={60}
               placeholder="Enter the name of your business or software"
               className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
             />
+            <p className="mt-1 text-xs text-zinc-400">{`${businessName.length}/60`}</p>
           </div>
 
           <div>
@@ -251,13 +253,17 @@ function SoftwareDesignerContent() {
                   ))}
                 </select>
                 {industry === "Other" && (
-                  <input
-                    type="text"
-                    value={customIndustry}
-                    onChange={(e) => setCustomIndustry(e.target.value)}
-                    placeholder="Enter your industry"
-                    className="mt-2 w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                  />
+                  <>
+                    <input
+                      type="text"
+                      value={customIndustry}
+                      onChange={(e) => setCustomIndustry(e.target.value)}
+                      maxLength={100}
+                      placeholder="Enter your industry"
+                      className="mt-2 w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                    />
+                    <p className="mt-1 text-xs text-zinc-400">{`${customIndustry.length}/100`}</p>
+                  </>
                 )}
               </div>
 
@@ -272,10 +278,12 @@ function SoftwareDesignerContent() {
                   id="softwareFeatures"
                   value={softwareFeatures}
                   onChange={(e) => setSoftwareFeatures(e.target.value)}
+                  maxLength={5000}
                   rows={4}
                   placeholder="List the key features and capabilities you need"
                   className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
                 />
+                <p className="mt-1 text-xs text-zinc-400">{`${softwareFeatures.length}/5000`}</p>
               </div>
 
               <div>
@@ -289,10 +297,12 @@ function SoftwareDesignerContent() {
                   id="techStack"
                   value={techStack}
                   onChange={(e) => setTechStack(e.target.value)}
+                  maxLength={200}
                   rows={2}
                   placeholder="e.g. React, Node.js, PostgreSQL, Supabase"
                   className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
                 />
+                <p className="mt-1 text-xs text-zinc-400">{`${techStack.length}/200`}</p>
               </div>
             </div>
           )}
@@ -310,10 +320,12 @@ function SoftwareDesignerContent() {
                   id="dailyOperations"
                   value={dailyOperations}
                   onChange={(e) => setDailyOperations(e.target.value)}
+                  maxLength={5000}
                   rows={4}
                   placeholder="Describe what your business does on a daily basis"
                   className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
                 />
+                <p className="mt-1 text-xs text-zinc-400">{`${dailyOperations.length}/5000`}</p>
               </div>
 
               <div>
@@ -327,10 +339,12 @@ function SoftwareDesignerContent() {
                   id="softwareProblem"
                   value={softwareProblem}
                   onChange={(e) => setSoftwareProblem(e.target.value)}
+                  maxLength={5000}
                   rows={4}
                   placeholder="What specific problem should the software address?"
                   className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
                 />
+                <p className="mt-1 text-xs text-zinc-400">{`${softwareProblem.length}/5000`}</p>
               </div>
             </div>
           )}

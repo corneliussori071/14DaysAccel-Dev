@@ -1,8 +1,9 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export function getCorsHeaders(): Record<string, string> {
+  const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN") || "https://14daysaccel.com";
   return {
-    "Access-Control-Allow-Origin": "*",
+    "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers":
       "authorization, x-client-info, apikey, content-type",
     "Access-Control-Allow-Methods": "POST, OPTIONS",
@@ -81,42 +82,22 @@ export async function deductTokens(
   operationType: string,
   description: string
 ) {
-  const { data: wallet } = await serviceClient
-    .from("token_wallets")
-    .select("balance_tokens")
-    .eq("user_id", userId)
-    .single();
+  const { data, error } = await serviceClient.rpc("deduct_tokens", {
+    p_user_id: userId,
+    p_amount: tokensUsed,
+    p_operation_type: operationType,
+    p_description: description,
+  });
 
-  if (!wallet) {
-    throw new Error("Wallet not found during deduction");
+  if (error) {
+    throw new Error(
+      error.message.includes("Insufficient")
+        ? "Insufficient token balance"
+        : "Failed to deduct tokens"
+    );
   }
 
-  const newBalance = wallet.balance_tokens - tokensUsed;
-  if (newBalance < 0) {
-    throw new Error("Insufficient token balance");
-  }
-
-  const { error: deductError } = await serviceClient
-    .from("token_wallets")
-    .update({ balance_tokens: newBalance })
-    .eq("user_id", userId);
-
-  if (deductError) {
-    throw new Error("Failed to deduct tokens");
-  }
-
-  const { error: txError } = await serviceClient
-    .from("token_transactions")
-    .insert({
-      user_id: userId,
-      tokens_used: tokensUsed,
-      operation_type: operationType,
-      description,
-    });
-
-  if (txError) {
-    throw new Error("Failed to log token transaction");
-  }
+  return data as number;
 }
 
 export async function logAiRequest(

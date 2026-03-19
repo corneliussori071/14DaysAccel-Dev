@@ -39,13 +39,24 @@ function getFromEmail(category: EmailCategory): string {
   }
 }
 
+function escapeHtml(text: string): string {
+  return text
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
+}
+
 function buildEmailHtml(subject: string, body: string): string {
+  const safeSubject = escapeHtml(subject);
+  const safeBody = escapeHtml(body);
   return `<!DOCTYPE html>
 <html>
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>${subject}</title>
+  <title>${safeSubject}</title>
 </head>
 <body style="margin:0;padding:0;background-color:#f4f4f5;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;">
   <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#f4f4f5;padding:32px 16px;">
@@ -61,9 +72,9 @@ function buildEmailHtml(subject: string, body: string): string {
           <!-- Body -->
           <tr>
             <td style="padding:32px;">
-              <h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">${subject}</h2>
+              <h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">${safeSubject}</h2>
               <div style="color:#3f3f46;font-size:14px;line-height:1.7;">
-                ${body.replace(/\n/g, "<br />")}
+                ${safeBody.replace(/\n/g, "<br />")}
               </div>
             </td>
           </tr>

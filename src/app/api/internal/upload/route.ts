@@ -51,6 +51,13 @@ export async function POST(request: NextRequest) {
       .replace(/[^a-z0-9-]/g, "")
       .slice(0, 200);
 
+    if (!sanitizedSlug) {
+      return NextResponse.json(
+        { error: "Invalid project slug" },
+        { status: 400 }
+      );
+    }
+
     const files: File[] = [];
     for (const entry of formData.getAll("files")) {
       if (entry instanceof File) {

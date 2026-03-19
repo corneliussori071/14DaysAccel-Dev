@@ -86,6 +86,14 @@ Deno.serve(async (req) => {
       return errorResponse("businessName and goalType are required");
     }
 
+    // Enforce backend input length limits
+    body.businessName = String(body.businessName).slice(0, 60);
+    if (body.industry) body.industry = String(body.industry).slice(0, 100);
+    if (body.softwareFeatures) body.softwareFeatures = String(body.softwareFeatures).slice(0, 5000);
+    if (body.techStack) body.techStack = String(body.techStack).slice(0, 200);
+    if (body.dailyOperations) body.dailyOperations = String(body.dailyOperations).slice(0, 5000);
+    if (body.softwareProblem) body.softwareProblem = String(body.softwareProblem).slice(0, 5000);
+
     const modelId = body.modelId || "gpt-5.3-codex";
     const systemPrompt = buildSystemPrompt(body);
     const isOpenAI = modelId.startsWith("gpt-");

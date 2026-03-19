@@ -1,7 +1,7 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
 export function getCorsHeaders(): Record<string, string> {
-  const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN") || "https://14daysaccel.com";
+  const allowedOrigin = Deno.env.get("ALLOWED_ORIGIN") || "https://14daysaccel.dev";
   return {
     "Access-Control-Allow-Origin": allowedOrigin,
     "Access-Control-Allow-Headers":

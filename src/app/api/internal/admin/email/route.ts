@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/adminSession";
+import { logError } from "@/lib/logger";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -103,6 +104,12 @@ export async function GET() {
     .limit(50);
 
   if (error) {
+    await logError({
+      message: "Failed to fetch email log",
+      source: "api",
+      path: "/api/internal/admin/email",
+      details: { error: error.message },
+    });
     return NextResponse.json({ error: "Failed to fetch email log" }, { status: 500 });
   }
 

@@ -9,6 +9,7 @@ import SubscriptionFlowSection from "@/components/admin/sections/SubscriptionFlo
 import FreeBenefitsSection from "@/components/admin/sections/FreeBenefitsSection";
 import CommunicationSection from "@/components/admin/sections/CommunicationSection";
 import EmergencyControlSection from "@/components/admin/sections/EmergencyControlSection";
+import SystemMonitorSection from "@/components/admin/sections/SystemMonitorSection";
 
 type AdminSection =
   | "projects"
@@ -17,7 +18,8 @@ type AdminSection =
   | "subscription-flow"
   | "free-benefits"
   | "communication"
-  | "emergency-control";
+  | "emergency-control"
+  | "system-monitor";
 
 const NAV_ITEMS: { id: AdminSection; label: string }[] = [
   { id: "projects", label: "Projects" },
@@ -27,6 +29,7 @@ const NAV_ITEMS: { id: AdminSection; label: string }[] = [
   { id: "free-benefits", label: "Free Benefits Duration" },
   { id: "communication", label: "Communication" },
   { id: "emergency-control", label: "Emergency Control" },
+  { id: "system-monitor", label: "System Monitor" },
 ];
 
 export default function AdminLayout() {
@@ -83,6 +86,7 @@ export default function AdminLayout() {
         {activeSection === "free-benefits" && <FreeBenefitsSection />}
         {activeSection === "communication" && <CommunicationSection />}
         {activeSection === "emergency-control" && <EmergencyControlSection />}
+        {activeSection === "system-monitor" && <SystemMonitorSection />}
       </main>
     </div>
   );

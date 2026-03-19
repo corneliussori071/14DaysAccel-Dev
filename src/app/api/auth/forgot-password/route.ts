@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { logError } from "@/lib/logger";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -110,6 +111,11 @@ export async function POST(request: NextRequest) {
   const sendgridApiKey = process.env.SENDGRID_API_KEY;
   if (!sendgridApiKey) {
     console.error("[forgot-password] SENDGRID_API_KEY not configured");
+    await logError({
+      message: "SENDGRID_API_KEY not configured for password reset",
+      source: "api",
+      path: "/api/auth/forgot-password",
+    });
     return NextResponse.json({ success: true });
   }
 
@@ -133,11 +139,18 @@ export async function POST(request: NextRequest) {
   });
 
   if (sgResponse.status < 200 || sgResponse.status >= 300) {
+    const errText = await sgResponse.text().catch(() => sgResponse.statusText);
     console.error(
       "[forgot-password] SendGrid error:",
       sgResponse.status,
-      await sgResponse.text().catch(() => sgResponse.statusText)
+      errText
     );
+    await logError({
+      message: "SendGrid password reset email failed",
+      source: "api",
+      path: "/api/auth/forgot-password",
+      details: { status: sgResponse.status, response: errText },
+    });
   }
 
   // Always return success to prevent email enumeration

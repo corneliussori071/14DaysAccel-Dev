@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/adminSession";
+import { logError } from "@/lib/logger";
 
 const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
 const MAX_FILES = 5;
@@ -134,7 +135,13 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json({ files: uploaded }, { status: 201 });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "File upload failed",
+      source: "api",
+      path: "/api/internal/upload",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Upload failed" },
       { status: 500 }
@@ -167,7 +174,13 @@ export async function DELETE(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ deleted: true });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to delete file",
+      source: "api",
+      path: "/api/internal/upload",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to delete file" },
       { status: 500 }

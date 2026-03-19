@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/adminSession";
+import { logError } from "@/lib/logger";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -29,7 +30,13 @@ export async function GET() {
     if (error) throw error;
 
     return NextResponse.json({ projects: data });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to fetch projects",
+      source: "api",
+      path: "/api/internal/projects",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to fetch projects" },
       { status: 500 }
@@ -87,7 +94,13 @@ export async function POST(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ project: data }, { status: 201 });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to create project",
+      source: "api",
+      path: "/api/internal/projects",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to create project" },
       { status: 500 }
@@ -156,7 +169,13 @@ export async function PUT(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ project: data });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to update project",
+      source: "api",
+      path: "/api/internal/projects",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to update project" },
       { status: 500 }
@@ -190,7 +209,13 @@ export async function DELETE(request: NextRequest) {
     if (error) throw error;
 
     return NextResponse.json({ deleted: true });
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to delete project",
+      source: "api",
+      path: "/api/internal/projects",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to delete project" },
       { status: 500 }

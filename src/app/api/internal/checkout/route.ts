@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { logError } from "@/lib/logger";
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -74,7 +75,13 @@ export async function POST(request: NextRequest) {
     }
 
     return NextResponse.json(data);
-  } catch {
+  } catch (err) {
+    await logError({
+      message: "Failed to create checkout",
+      source: "api",
+      path: "/api/internal/checkout",
+      details: { error: err instanceof Error ? err.message : "Unknown error" },
+    });
     return NextResponse.json(
       { error: "Failed to create checkout" },
       { status: 500 }

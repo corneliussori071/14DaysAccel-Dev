@@ -23,6 +23,16 @@ async function getAuthHeaders(): Promise<Record<string, string>> {
   };
 }
 
+async function verifyAiServicesEnabled(): Promise<void> {
+  const res = await fetch("/api/ai/status", { cache: "no-store" });
+  if (res.ok) {
+    const data = await res.json();
+    if (!data.enabled) {
+      throw new Error("AI services are temporarily unavailable. Please try again later.");
+    }
+  }
+}
+
 export async function generateBusinessPlan(
   request: SoftwarePlanRequest
 ): Promise<{
@@ -32,6 +42,7 @@ export async function generateBusinessPlan(
   promptTokens: number;
   completionTokens: number;
 }> {
+  await verifyAiServicesEnabled();
   const headers = await getAuthHeaders();
 
   const response = await fetch(
@@ -59,6 +70,7 @@ export async function generatePromptStage(
   recommendedStack: string,
   modelId: AiModelId
 ): Promise<PromptStageResponse> {
+  await verifyAiServicesEnabled();
   const headers = await getAuthHeaders();
 
   const response = await fetch(

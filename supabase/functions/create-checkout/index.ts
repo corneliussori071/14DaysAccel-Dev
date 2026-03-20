@@ -118,8 +118,8 @@ Deno.serve(async (req: Request) => {
     console.error("create-checkout error:", message);
 
     if (
-      message.includes("authorization") ||
-      message.includes("session")
+      message.includes("Missing authorization") ||
+      message.includes("Invalid or expired session")
     ) {
       return errorResponse(message, 401);
     }

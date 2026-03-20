@@ -12,13 +12,21 @@ function getConfig() {
   const username = Deno.env.get("FASTSPRING_API_USERNAME");
   const password = Deno.env.get("FASTSPRING_API_PASSWORD");
   const webhookSecret = Deno.env.get("FASTSPRING_WEBHOOK_SECRET");
+  const storefront = Deno.env.get("FASTSPRING_STOREFRONT") || "";
 
   if (!username || !password) {
     throw new Error("Missing FASTSPRING_API_USERNAME or FASTSPRING_API_PASSWORD");
   }
+  if (!storefront) {
+    throw new Error("Missing FASTSPRING_STOREFRONT (e.g. 'yourstorename.onfastspring.com' or just 'yourstorename')");
+  }
 
   const credentials = btoa(`${username}:${password}`);
-  return { credentials, webhookSecret };
+  // Allow either full domain or just the subdomain
+  const storefrontDomain = storefront.includes(".")
+    ? storefront
+    : `${storefront}.onfastspring.com`;
+  return { credentials, webhookSecret, storefrontDomain };
 }
 
 function createFastSpringProvider(): PaymentProvider {
@@ -26,7 +34,7 @@ function createFastSpringProvider(): PaymentProvider {
     name: "fastspring",
 
     async createCheckout(params: CheckoutParams): Promise<CheckoutResult> {
-      const { credentials } = getConfig();
+      const { credentials, storefrontDomain } = getConfig();
 
       const productPath = params.variantId || "tokens";
 
@@ -71,7 +79,7 @@ function createFastSpringProvider(): PaymentProvider {
       }
 
       // FastSpring checkout URL uses the session ID
-      const checkoutUrl = `https://14daysaccel.onfastspring.com/session/${sessionId}`;
+      const checkoutUrl = `https://${storefrontDomain}/session/${sessionId}`;
 
       return {
         checkoutUrl,

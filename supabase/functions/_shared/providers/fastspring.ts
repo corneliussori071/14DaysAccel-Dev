@@ -30,30 +30,19 @@ function createFastSpringProvider(): PaymentProvider {
 
       const productPath = params.variantId || "tokens";
 
-      const sessionPayload = {
-        account: {
-          contact: {
-            email: params.userEmail,
-          },
+      const sessionPayload: Record<string, unknown> = {
+        contact: {
+          email: params.userEmail,
         },
         items: [
           {
             product: productPath,
             quantity: 1,
-            pricing: {
-              price: {
-                USD: params.amountCents / 100,
-              },
-            },
           },
         ],
         tags: {
           user_id: params.userId,
           tokens: String(params.tokens),
-        },
-        checkout: true,
-        paymentContact: {
-          email: params.userEmail,
         },
       };
 
@@ -61,6 +50,7 @@ function createFastSpringProvider(): PaymentProvider {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
+          Accept: "application/json",
           Authorization: `Basic ${credentials}`,
         },
         body: JSON.stringify(sessionPayload),

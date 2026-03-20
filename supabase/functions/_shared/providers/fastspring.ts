@@ -5,26 +5,49 @@ import {
   type PaymentProvider,
   type WebhookVerification,
 } from "../payment.ts";
-
-const FASTSPRING_API = "https://api.fastspring.com";
+import { createServiceClient } from "../utils.ts";
 
 function getConfig() {
   const username = Deno.env.get("FASTSPRING_API_USERNAME");
   const password = Deno.env.get("FASTSPRING_API_PASSWORD");
   const webhookSecret = Deno.env.get("FASTSPRING_WEBHOOK_SECRET");
-  const storefront = Deno.env.get("FASTSPRING_STOREFRONT") || "";
+  const rawStorefront = (Deno.env.get("FASTSPRING_STOREFRONT") || "").trim();
 
   if (!username || !password) {
     throw new Error("Missing FASTSPRING_API_USERNAME or FASTSPRING_API_PASSWORD");
   }
-  if (!storefront) {
-    throw new Error("Missing FASTSPRING_STOREFRONT – set to your popup checkout URL (e.g. 'yourstore.test.onfastspring.com/popup-checkout')");
+  if (!rawStorefront) {
+    throw new Error(
+      "Missing FASTSPRING_STOREFRONT (e.g. '14daysaccel.test.onfastspring.com')"
+    );
   }
 
   const credentials = btoa(`${username}:${password}`);
-  // Store the full storefront URL as-is (used as SBL data-storefront value)
-  const storefrontUrl = storefront;
-  return { credentials, webhookSecret, storefrontUrl };
+  // Strip protocol and trailing slashes so we can build clean URLs
+  const storefront = rawStorefront
+    .replace(/^https?:\/\//, "")
+    .replace(/\/+$/, "");
+  return { credentials, webhookSecret, storefront };
+}
+
+/** Look up the plan's token count by its FastSpring product path. */
+async function resolveTokensByProductPath(
+  productPath: string
+): Promise<number> {
+  const supabase = createServiceClient();
+  const { data } = await supabase
+    .from("admin_settings")
+    .select("value")
+    .eq("key", "subscription_plans")
+    .single();
+
+  const plans = (data?.value ?? []) as Array<{
+    fastspring_product_path?: string;
+    tokens_per_month: number;
+  }>;
+
+  const plan = plans.find((p) => p.fastspring_product_path === productPath);
+  return plan?.tokens_per_month ?? 0;
 }
 
 function createFastSpringProvider(): PaymentProvider {
@@ -32,57 +55,18 @@ function createFastSpringProvider(): PaymentProvider {
     name: "fastspring",
 
     async createCheckout(params: CheckoutParams): Promise<CheckoutResult> {
-      const { credentials, storefrontUrl } = getConfig();
+      const { storefront } = getConfig();
 
       const productPath = params.variantId || "tokens";
 
-      const sessionPayload: Record<string, unknown> = {
-        contact: {
-          email: params.userEmail,
-        },
-        items: [
-          {
-            product: productPath,
-            quantity: 1,
-          },
-        ],
-        tags: {
-          user_id: params.userId,
-          tokens: String(params.tokens),
-        },
-      };
+      // Build a direct storefront URL: storefront/{product_path}?referrer={userId}
+      // The referrer field is passed through to FastSpring webhooks automatically.
+      const checkoutUrl =
+        `https://${storefront}/${productPath}?referrer=${encodeURIComponent(params.userId)}`;
 
-      const response = await fetch(`${FASTSPRING_API}/sessions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Accept: "application/json",
-          Authorization: `Basic ${credentials}`,
-        },
-        body: JSON.stringify(sessionPayload),
-      });
-
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(
-          `FastSpring session creation failed: ${response.status} - ${errText}`
-        );
-      }
-
-      const data = await response.json();
-      const sessionId = data.id;
-
-      if (!sessionId) {
-        throw new Error("Invalid session response from FastSpring");
-      }
-
-      // FastSpring uses the Store Builder Library (SBL) for checkout.
-      // The frontend loads the SBL script and calls push({checkout: sessionId}).
       return {
-        checkoutUrl: "", // Not used – SBL handles checkout via popup
-        providerOrderId: sessionId,
-        sessionId,
-        storefrontUrl,
+        checkoutUrl,
+        providerOrderId: "",
       };
     },
 
@@ -96,7 +80,6 @@ function createFastSpringProvider(): PaymentProvider {
         throw new Error("Missing FASTSPRING_WEBHOOK_SECRET");
       }
 
-      // FastSpring uses HMAC-SHA256 with base64 encoding via X-FS-Signature header
       const encoder = new TextEncoder();
       const key = await crypto.subtle.importKey(
         "raw",
@@ -136,12 +119,20 @@ function createFastSpringProvider(): PaymentProvider {
       const eventType = event.type || "";
       const orderData = event.data || {};
 
-      // Extract tags containing our custom data
+      // User ID is passed via the referrer query parameter
       const tags = orderData.tags || {};
-      const userId = String(tags.user_id || "");
-      const tokens = parseInt(String(tags.tokens || "0"), 10);
+      const userId = String(
+        tags.user_id || orderData.referrer || ""
+      );
 
-      // Order total is in dollars, convert to cents
+      // Determine token count from the purchased product path
+      const items = orderData.items || [];
+      const firstProductPath = items[0]?.product || "";
+      let tokens = parseInt(String(tags.tokens || "0"), 10);
+      if (!tokens && firstProductPath) {
+        tokens = await resolveTokensByProductPath(firstProductPath);
+      }
+
       const totalDollars = orderData.total || orderData.subtotal || 0;
       const amountCents = Math.round(totalDollars * 100);
 
@@ -158,5 +149,4 @@ function createFastSpringProvider(): PaymentProvider {
   };
 }
 
-// Auto-register the provider
 registerProvider("fastspring", createFastSpringProvider);

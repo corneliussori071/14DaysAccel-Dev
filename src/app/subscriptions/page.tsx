@@ -8,46 +8,6 @@ import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 
-declare global {
-  interface Window {
-    fastspring?: {
-      builder: {
-        push(data: Record<string, unknown>): void;
-        checkout(): void;
-        reset(): void;
-      };
-    };
-  }
-}
-
-/** Dynamically loads the FastSpring Store Builder Library script. */
-function loadFastSpringScript(storefrontUrl: string): Promise<void> {
-  return new Promise((resolve, reject) => {
-    if (document.getElementById("fsc-api")) {
-      resolve();
-      return;
-    }
-    const script = document.createElement("script");
-    script.id = "fsc-api";
-    script.src =
-      "https://sbl.onfastspring.com/sbl/1.0.3/fastspring-builder.min.js";
-    script.type = "text/javascript";
-    script.setAttribute("data-storefront", storefrontUrl);
-    script.onload = () => resolve();
-    script.onerror = () => reject(new Error("Failed to load FastSpring checkout"));
-    document.head.appendChild(script);
-  });
-}
-
-/** Waits for the SBL global to become available after script load. */
-async function waitForFastSpring(): Promise<void> {
-  for (let i = 0; i < 50; i++) {
-    if (window.fastspring?.builder?.push) return;
-    await new Promise((r) => setTimeout(r, 100));
-  }
-  throw new Error("FastSpring checkout failed to initialize");
-}
-
 export default function SubscriptionsPage() {
   return (
     <Suspense
@@ -143,20 +103,8 @@ function SubscriptionsContent() {
       throw new Error(data.error || "Checkout failed");
     }
 
-    const data = await res.json();
-
-    // FastSpring: use Store Builder Library popup checkout
-    if (data.provider === "fastspring" && data.sessionId) {
-      await loadFastSpringScript(data.storefrontUrl);
-      await waitForFastSpring();
-      window.fastspring!.builder.push({ checkout: data.sessionId });
-      // Popup opens — reset button state after a short delay
-      setTimeout(() => setCheckingOut(null), 1500);
-      return;
-    }
-
-    // Lemon Squeezy (or other): redirect to hosted checkout
-    window.location.href = data.checkoutUrl;
+    const { checkoutUrl } = await res.json();
+    window.location.href = checkoutUrl;
   }
 
   async function handleSubscribe(plan: SubscriptionPlan) {
@@ -283,7 +231,7 @@ function SubscriptionsContent() {
                         className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
                       >
                         {checkingOut === plan.id
-                          ? "Opening checkout..."
+                          ? "Redirecting..."
                           : "Subscribe"}
                       </button>
                     ) : (
@@ -379,7 +327,7 @@ function SubscriptionsContent() {
                   className="w-full rounded-md bg-zinc-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
                 >
                   {checkingOut === "custom" ? (
-                    "Opening checkout..."
+                    "Redirecting..."
                   ) : (
                     <>
                       Purchase {customTokens.toLocaleString()} Tokens &ndash; $

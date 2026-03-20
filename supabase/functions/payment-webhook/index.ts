@@ -1,6 +1,7 @@
 import { getCorsHeaders, errorResponse, jsonResponse } from "../_shared/utils.ts";
-import { getProvider, creditTokensToUser } from "../_shared/payment.ts";
+import { getProvider, getActiveProviderName, creditTokensToUser } from "../_shared/payment.ts";
 import "../_shared/providers/lemonsqueezy.ts";
+import "../_shared/providers/fastspring.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -13,14 +14,21 @@ Deno.serve(async (req: Request) => {
 
   try {
     const rawBody = await req.text();
-    const signature = req.headers.get("X-Signature") || "";
+
+    // Detect provider by signature header:
+    // LemonSqueezy uses X-Signature, FastSpring uses X-FS-Signature
+    const lsSignature = req.headers.get("X-Signature") || "";
+    const fsSignature = req.headers.get("X-FS-Signature") || "";
+    const signature = lsSignature || fsSignature;
 
     if (!signature) {
       console.error("Webhook received without signature");
       return errorResponse("Missing signature", 401);
     }
 
-    const provider = getProvider();
+    // Pick provider based on which signature header was present
+    const providerName = fsSignature ? "fastspring" : "lemonsqueezy";
+    const provider = getProvider(providerName);
     const verification = await provider.verifyWebhook(rawBody, signature);
 
     if (!verification.isValid) {
@@ -28,8 +36,10 @@ Deno.serve(async (req: Request) => {
       return errorResponse("Invalid signature", 401);
     }
 
-    // Only process order_created events
-    if (verification.eventName !== "order_created") {
+    // Process completed order events from either provider
+    // LemonSqueezy: "order_created", FastSpring: "order.completed"
+    const completedEvents = ["order_created", "order.completed"];
+    if (!completedEvents.includes(verification.eventName)) {
       return jsonResponse({ received: true, skipped: verification.eventName });
     }
 

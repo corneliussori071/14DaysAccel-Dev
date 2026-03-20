@@ -14,6 +14,7 @@ interface SubscriptionPlan {
   min_tokens?: number;
   max_tokens?: number;
   lemon_variant_id?: string;
+  fastspring_product_path?: string;
 }
 
 const EMPTY_SUBSCRIPTION: SubscriptionPlan = {
@@ -87,7 +88,7 @@ export default function SubscriptionFlowSection() {
           ...next[index],
           [field]: parseFloat(value as string) || 0,
         };
-      } else if (field === "lemon_variant_id") {
+      } else if (field === "lemon_variant_id" || field === "fastspring_product_path") {
         next[index] = {
           ...next[index],
           [field]: value as string,
@@ -367,6 +368,26 @@ export default function SubscriptionFlowSection() {
                         />
                       </div>
 
+                      {/* FastSpring Product Path */}
+                      <div className="mt-3">
+                        <label className="mb-1 block text-xs font-medium text-zinc-500">
+                          FastSpring Product Path
+                        </label>
+                        <input
+                          type="text"
+                          value={plan.fastspring_product_path || ""}
+                          onChange={(e) =>
+                            handleChange(
+                              globalIndex,
+                              "fastspring_product_path",
+                              e.target.value
+                            )
+                          }
+                          placeholder="e.g. tokens"
+                          className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                        />
+                      </div>
+
                       {/* Features for custom plan */}
                       <div className="mt-5 border-t border-zinc-100 pt-4">
                         <p className="mb-2 text-xs font-medium text-zinc-500">
@@ -518,6 +539,22 @@ function PlanCard({
               onChange(index, "lemon_variant_id", e.target.value)
             }
             placeholder="e.g. 123456"
+            className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+          />
+        </div>
+
+        {/* FastSpring Product Path */}
+        <div className="mt-3">
+          <label className="mb-1 block text-xs font-medium text-zinc-500">
+            FastSpring Product Path
+          </label>
+          <input
+            type="text"
+            value={plan.fastspring_product_path || ""}
+            onChange={(e) =>
+              onChange(index, "fastspring_product_path", e.target.value)
+            }
+            placeholder="e.g. tokens"
             className="w-full rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
           />
         </div>

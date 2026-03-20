@@ -22,6 +22,7 @@ const ALLOWED_SECTIONS = new Set([
   "free-benefits",
   "communication",
   "emergency",
+  "payment-providers",
 ]);
 
 async function verifyAdmin(): Promise<boolean> {
@@ -120,6 +121,7 @@ function getResponseKey(section: string): string {
     "free-benefits": "config",
     communication: "config",
     emergency: "config",
+    "payment-providers": "config",
   };
   return map[section] || "config";
 }
@@ -147,6 +149,9 @@ function getDefault(section: string): unknown {
       ai_services_disabled: false,
       signups_disabled: false,
       disable_reason: "",
+    },
+    "payment-providers": {
+      active_provider: "lemonsqueezy",
     },
   };
   return defaults[section] || {};

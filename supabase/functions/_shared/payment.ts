@@ -59,6 +59,25 @@ export function getProvider(name?: string): PaymentProvider {
   return factory();
 }
 
+/** Reads the active payment provider name from admin_settings DB. */
+export async function getActiveProviderName(): Promise<string> {
+  try {
+    const supabase = createServiceClient();
+    const { data } = await supabase
+      .from("admin_settings")
+      .select("value")
+      .eq("key", "payment_providers")
+      .single();
+    if (data?.value && typeof data.value === "object") {
+      const config = data.value as { active_provider?: string };
+      if (config.active_provider) return config.active_provider;
+    }
+  } catch {
+    // Fall back to env var / default
+  }
+  return Deno.env.get("PAYMENT_PROVIDER") || "lemonsqueezy";
+}
+
 // --- Token crediting (shared across all providers) ---
 
 export async function creditTokensToUser(

@@ -15,6 +15,8 @@ export interface CheckoutParams {
 export interface CheckoutResult {
   checkoutUrl: string;
   providerOrderId: string;
+  /** Session ID for Store Builder Library integrations (e.g. FastSpring) */
+  sessionId?: string;
 }
 
 export interface WebhookVerification {

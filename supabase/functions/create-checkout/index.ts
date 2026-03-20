@@ -112,6 +112,8 @@ Deno.serve(async (req: Request) => {
     return jsonResponse({
       checkoutUrl: result.checkoutUrl,
       orderId: result.providerOrderId,
+      provider: activeProviderName,
+      sessionId: result.sessionId,
     });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Checkout failed";

@@ -1,12 +1,24 @@
 "use client";
 
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TOKEN_PRICE_USD } from "@/types/softwarePlan";
 import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+
+declare global {
+  interface Window {
+    fastspring?: {
+      builder: {
+        push(data: Record<string, unknown>): void;
+        checkout(): void;
+        reset(): void;
+      };
+    };
+  }
+}
 
 export default function SubscriptionsPage() {
   return (
@@ -31,8 +43,27 @@ function SubscriptionsContent() {
   const [customPlan, setCustomPlan] = useState<SubscriptionPlan | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const sblLoaded = useRef(false);
 
   const paymentStatus = searchParams.get("payment");
+
+  // Load the FastSpring Store Builder Library script once
+  useEffect(() => {
+    const storefront = process.env.NEXT_PUBLIC_FASTSPRING_STOREFRONT;
+    if (!storefront || sblLoaded.current) return;
+    if (document.getElementById("fsc-api")) {
+      sblLoaded.current = true;
+      return;
+    }
+    const script = document.createElement("script");
+    script.id = "fsc-api";
+    script.src =
+      "https://sbl.onfastspring.com/sbl/1.0.7/fastspring-builder.min.js";
+    script.type = "text/javascript";
+    script.setAttribute("data-storefront", storefront);
+    document.head.appendChild(script);
+    sblLoaded.current = true;
+  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -103,8 +134,22 @@ function SubscriptionsContent() {
       throw new Error(data.error || "Checkout failed");
     }
 
-    const { checkoutUrl } = await res.json();
-    window.location.href = checkoutUrl;
+    const data = await res.json();
+
+    // FastSpring: trigger popup checkout via Store Builder Library
+    if (data.provider === "fastspring" && data.sessionId) {
+      if (!window.fastspring?.builder?.push) {
+        throw new Error(
+          "FastSpring checkout is not available. Please refresh and try again."
+        );
+      }
+      window.fastspring.builder.push({ checkout: data.sessionId });
+      setTimeout(() => setCheckingOut(null), 2000);
+      return;
+    }
+
+    // Lemon Squeezy (or other redirect-based provider)
+    window.location.href = data.checkoutUrl;
   }
 
   async function handleSubscribe(plan: SubscriptionPlan) {

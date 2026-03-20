@@ -18,15 +18,13 @@ function getConfig() {
     throw new Error("Missing FASTSPRING_API_USERNAME or FASTSPRING_API_PASSWORD");
   }
   if (!storefront) {
-    throw new Error("Missing FASTSPRING_STOREFRONT (e.g. 'yourstorename.onfastspring.com' or just 'yourstorename')");
+    throw new Error("Missing FASTSPRING_STOREFRONT – set to your popup checkout URL (e.g. 'yourstore.test.onfastspring.com/popup-checkout')");
   }
 
   const credentials = btoa(`${username}:${password}`);
-  // Allow either full domain or just the subdomain
-  const storefrontDomain = storefront.includes(".")
-    ? storefront
-    : `${storefront}.onfastspring.com`;
-  return { credentials, webhookSecret, storefrontDomain };
+  // Store the full storefront URL as-is (used as SBL data-storefront value)
+  const storefrontUrl = storefront;
+  return { credentials, webhookSecret, storefrontUrl };
 }
 
 function createFastSpringProvider(): PaymentProvider {
@@ -34,7 +32,7 @@ function createFastSpringProvider(): PaymentProvider {
     name: "fastspring",
 
     async createCheckout(params: CheckoutParams): Promise<CheckoutResult> {
-      const { credentials, storefrontDomain } = getConfig();
+      const { credentials, storefrontUrl } = getConfig();
 
       const productPath = params.variantId || "tokens";
 
@@ -78,12 +76,13 @@ function createFastSpringProvider(): PaymentProvider {
         throw new Error("Invalid session response from FastSpring");
       }
 
-      // FastSpring checkout URL uses the session ID
-      const checkoutUrl = `https://${storefrontDomain}/session/${sessionId}`;
-
+      // FastSpring uses the Store Builder Library (SBL) for checkout.
+      // The frontend loads the SBL script and calls push({checkout: sessionId}).
       return {
-        checkoutUrl,
+        checkoutUrl: "", // Not used – SBL handles checkout via popup
         providerOrderId: sessionId,
+        sessionId,
+        storefrontUrl,
       };
     },
 

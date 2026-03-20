@@ -15,6 +15,10 @@ export interface CheckoutParams {
 export interface CheckoutResult {
   checkoutUrl: string;
   providerOrderId: string;
+  /** For SBL-based providers (e.g. FastSpring) – the pre-built session ID */
+  sessionId?: string;
+  /** The storefront URL for the Store Builder Library script */
+  storefrontUrl?: string;
 }
 
 export interface WebhookVerification {

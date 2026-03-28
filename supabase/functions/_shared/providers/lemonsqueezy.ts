@@ -49,6 +49,7 @@ function createLemonSqueezyProvider(): PaymentProvider {
               custom: {
                 user_id: params.userId,
                 tokens: String(params.tokens),
+                ...(params.projectId ? { project_id: params.projectId } : {}),
               },
             },
             test_mode: !!Deno.env.get("LEMON_SQUEEZY_TEST_API_KEY"),
@@ -150,6 +151,7 @@ function createLemonSqueezyProvider(): PaymentProvider {
         tokens: parseInt(String(customData.tokens || "0"), 10),
         amountCents: attributes.total || attributes.subtotal || 0,
         currency: attributes.currency || "USD",
+        projectId: customData.project_id ? String(customData.project_id) : undefined,
       };
     },
   };

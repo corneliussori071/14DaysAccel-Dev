@@ -63,6 +63,7 @@ function createFastSpringProvider(): PaymentProvider {
         tags: {
           user_id: params.userId,
           tokens: String(params.tokens),
+          ...(params.projectId ? { project_id: params.projectId } : {}),
         },
       };
 
@@ -172,6 +173,7 @@ function createFastSpringProvider(): PaymentProvider {
         tokens,
         amountCents,
         currency: orderData.currency || "USD",
+        projectId: tags.project_id ? String(tags.project_id) : undefined,
       };
     },
   };

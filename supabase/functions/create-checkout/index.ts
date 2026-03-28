@@ -21,7 +21,38 @@ Deno.serve(async (req: Request) => {
   try {
     const user = await verifyUser(req.headers.get("Authorization"));
 
-    const { tokens, amountCents, planName, variantId, planId, redirectUrl } = await req.json();
+    const { tokens, amountCents, planName, variantId, planId, redirectUrl, projectId } = await req.json();
+
+    // Project purchases: skip token validation, require amountCents only
+    if (projectId) {
+      if (!amountCents || amountCents <= 0) {
+        return errorResponse("Invalid amount for project purchase");
+      }
+
+      const activeProviderName = await getActiveProviderName();
+      const provider = getProvider(activeProviderName);
+
+      const siteUrl = Deno.env.get("SITE_URL") || "https://14daysaccel.com";
+      const finalRedirectUrl = redirectUrl || `${siteUrl}/purchases?payment=success`;
+
+      const result = await provider.createCheckout({
+        userId: user.id,
+        userEmail: user.email || "",
+        tokens: 0,
+        amountCents,
+        redirectUrl: finalRedirectUrl,
+        planName,
+        variantId: variantId || undefined,
+        projectId,
+      });
+
+      return jsonResponse({
+        checkoutUrl: result.checkoutUrl,
+        orderId: result.providerOrderId,
+        provider: activeProviderName,
+        sessionId: result.sessionId,
+      });
+    }
 
     if (!tokens || !amountCents || tokens <= 0 || amountCents <= 0) {
       return errorResponse("Invalid tokens or amount");

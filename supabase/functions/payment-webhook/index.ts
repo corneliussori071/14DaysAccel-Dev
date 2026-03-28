@@ -1,5 +1,5 @@
 import { getCorsHeaders, errorResponse, jsonResponse } from "../_shared/utils.ts";
-import { getProvider, getActiveProviderName, creditTokensToUser } from "../_shared/payment.ts";
+import { getProvider, getActiveProviderName, creditTokensToUser, recordProjectPurchase } from "../_shared/payment.ts";
 import "../_shared/providers/lemonsqueezy.ts";
 import "../_shared/providers/fastspring.ts";
 
@@ -43,26 +43,48 @@ Deno.serve(async (req: Request) => {
       return jsonResponse({ received: true, skipped: verification.eventName });
     }
 
-    if (!verification.userId || !verification.tokens || verification.tokens <= 0) {
-      console.error("Webhook missing required custom data:", {
+    if (!verification.userId) {
+      console.error("Webhook missing user ID:", {
         userId: verification.userId,
-        tokens: verification.tokens,
       });
       return errorResponse("Missing custom data in webhook", 400);
     }
 
-    await creditTokensToUser(
-      verification.userId,
-      verification.tokens,
-      provider.name,
-      verification.orderId,
-      verification.amountCents,
-      verification.currency
-    );
+    // Route to project purchase or token credit based on projectId
+    if (verification.projectId) {
+      await recordProjectPurchase(
+        verification.userId,
+        verification.projectId,
+        provider.name,
+        verification.orderId,
+        verification.amountCents,
+        verification.currency
+      );
 
-    console.log(
-      `Payment processed: ${verification.tokens} tokens credited to user ${verification.userId}`
-    );
+      console.log(
+        `Project purchase processed: project ${verification.projectId} for user ${verification.userId}`
+      );
+    } else {
+      if (!verification.tokens || verification.tokens <= 0) {
+        console.error("Webhook missing tokens for token purchase:", {
+          tokens: verification.tokens,
+        });
+        return errorResponse("Missing token count in webhook", 400);
+      }
+
+      await creditTokensToUser(
+        verification.userId,
+        verification.tokens,
+        provider.name,
+        verification.orderId,
+        verification.amountCents,
+        verification.currency
+      );
+
+      console.log(
+        `Payment processed: ${verification.tokens} tokens credited to user ${verification.userId}`
+      );
+    }
 
     return jsonResponse({ received: true, processed: true });
   } catch (err: unknown) {

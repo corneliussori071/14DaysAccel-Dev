@@ -1,5 +1,8 @@
 import Link from "next/link";
 import type { Project } from "@/types/project";
+import ProjectReactions from "./ProjectReactions";
+import ProjectBuyButton from "./ProjectBuyButton";
+import RegisterInterestButton from "./RegisterInterestButton";
 
 const statusStyles: Record<Project["status"], string> = {
   available: "bg-zinc-100 text-zinc-700",
@@ -54,10 +57,32 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             </span>
           ))}
         </div>
-        <div className="mt-5">
+        <div className="mt-4">
+          <ProjectReactions
+            projectId={project.id}
+            initialLikes={project.likes_count ?? 0}
+            initialDislikes={project.dislikes_count ?? 0}
+            initialComments={project.comments_count ?? 0}
+            variant="light"
+          />
+        </div>
+        <div className="mt-4 flex items-center gap-3">
           <span className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white">
             View Details
           </span>
+          {project.status === "available" && project.price_usd && (
+            <ProjectBuyButton
+              projectId={project.id}
+              priceUsd={project.price_usd}
+              variant="light"
+            />
+          )}
+          {project.status === "upcoming" && (
+            <RegisterInterestButton
+              projectId={project.id}
+              variant="light"
+            />
+          )}
         </div>
       </div>
     </Link>

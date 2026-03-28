@@ -3,6 +3,9 @@
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import type { Project } from "@/types/project";
+import ProjectReactions from "@/components/projects/ProjectReactions";
+import ProjectBuyButton from "@/components/projects/ProjectBuyButton";
+import RegisterInterestButton from "@/components/projects/RegisterInterestButton";
 
 const statusStylesDark: Record<string, string> = {
   available: "bg-white/20 text-white",
@@ -57,10 +60,32 @@ function ProjectCard({ project }: { project: Project }) {
             </span>
           ))}
         </div>
-        <div className="mt-5">
+        <div className="mt-4">
+          <ProjectReactions
+            projectId={project.id}
+            initialLikes={project.likes_count ?? 0}
+            initialDislikes={project.dislikes_count ?? 0}
+            initialComments={project.comments_count ?? 0}
+            variant="dark"
+          />
+        </div>
+        <div className="mt-4 flex items-center gap-3">
           <span className="rounded-md border border-white/30 px-4 py-2 text-xs font-medium text-white transition-colors group-hover:bg-white group-hover:text-zinc-900">
             View Details
           </span>
+          {project.status === "available" && project.price_usd && (
+            <ProjectBuyButton
+              projectId={project.id}
+              priceUsd={project.price_usd}
+              variant="dark"
+            />
+          )}
+          {project.status === "upcoming" && (
+            <RegisterInterestButton
+              projectId={project.id}
+              variant="dark"
+            />
+          )}
         </div>
       </div>
     </Link>

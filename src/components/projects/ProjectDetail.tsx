@@ -1,4 +1,8 @@
 import type { Project } from "@/types/project";
+import ProjectReactions from "./ProjectReactions";
+import ProjectBuyButton from "./ProjectBuyButton";
+import RegisterInterestButton from "./RegisterInterestButton";
+import ProjectComments from "./ProjectComments";
 
 const statusStyles: Record<Project["status"], string> = {
   available: "bg-zinc-100 text-zinc-700",
@@ -42,6 +46,31 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
       <p className="mt-6 text-base leading-relaxed text-zinc-500">
         {project.description}
       </p>
+
+      <div className="mt-6 flex flex-wrap items-center gap-4">
+        <ProjectReactions
+          projectId={project.id}
+          initialLikes={project.likes_count ?? 0}
+          initialDislikes={project.dislikes_count ?? 0}
+          initialComments={project.comments_count ?? 0}
+          variant="light"
+        />
+        {project.status === "available" && project.price_usd && (
+          <ProjectBuyButton
+            projectId={project.id}
+            priceUsd={project.price_usd}
+            variant="light"
+            size="md"
+          />
+        )}
+        {project.status === "upcoming" && (
+          <RegisterInterestButton
+            projectId={project.id}
+            variant="light"
+            size="md"
+          />
+        )}
+      </div>
 
       {project.media_files && project.media_files.length > 0 && (
         <div className="mt-10">
@@ -179,6 +208,11 @@ export default function ProjectDetail({ project }: ProjectDetailProps) {
           )}
         </div>
       )}
+
+      <ProjectComments
+        projectId={project.id}
+        initialCount={project.comments_count ?? 0}
+      />
     </div>
   );
 }

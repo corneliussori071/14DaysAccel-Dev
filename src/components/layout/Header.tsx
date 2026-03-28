@@ -99,6 +99,12 @@ export default function Header() {
             {user ? (
               <>
                 <Link
+                  href="/purchases"
+                  className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
+                >
+                  My Purchases
+                </Link>
+                <Link
                   href="/profile"
                   className="text-sm text-zinc-500 transition-colors hover:text-zinc-900"
                 >
@@ -162,13 +168,22 @@ export default function Header() {
                 </Link>
               ))}
               {user && (
-                <Link
-                  href="/profile"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="rounded-md px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
-                >
-                  Account
-                </Link>
+                <>
+                  <Link
+                    href="/purchases"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-md px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                  >
+                    My Purchases
+                  </Link>
+                  <Link
+                    href="/profile"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="rounded-md px-3 py-2 text-sm text-zinc-600 transition-colors hover:bg-zinc-100 hover:text-zinc-900"
+                  >
+                    Account
+                  </Link>
+                </>
               )}
             </nav>
             <div className="mt-3 flex flex-col gap-2 border-t border-zinc-100 pt-3">

@@ -17,13 +17,14 @@ export default function ProjectComments({
     (ProjectComment & { display_name?: string; user_display_name?: string })[]
   >([]);
   const [total, setTotal] = useState(initialCount);
-  const [page, setPage] = useState(0);
+  const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [content, setContent] = useState("");
   const [userId, setUserId] = useState<string | null>(null);
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const [initialLoaded, setInitialLoaded] = useState(false);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -40,7 +41,7 @@ export default function ProjectComments({
         );
         if (res.ok) {
           const data = await res.json();
-          if (pageNum === 0) {
+          if (pageNum === 1) {
             setComments(data.comments);
           } else {
             setComments((prev) => [...prev, ...data.comments]);
@@ -58,8 +59,11 @@ export default function ProjectComments({
   );
 
   useEffect(() => {
-    fetchComments(0);
-  }, [fetchComments]);
+    if (!initialLoaded) {
+      setInitialLoaded(true);
+      fetchComments(1);
+    }
+  }, [fetchComments, initialLoaded]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();

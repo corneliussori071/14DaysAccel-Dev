@@ -129,6 +129,9 @@ export default function ProjectsSection() {
                   <th className="px-4 py-3 font-medium text-zinc-600">
                     Featured
                   </th>
+                  <th className="px-4 py-3 font-medium text-zinc-600">
+                    Price
+                  </th>
                   <th className="px-4 py-3 text-right font-medium text-zinc-600">
                     Actions
                   </th>
@@ -168,6 +171,22 @@ export default function ProjectsSection() {
                       >
                         {project.featured ? "Featured" : "Not Featured"}
                       </button>
+                    </td>
+                    <td className="px-4 py-3">
+                      {project.price_usd != null && project.price_usd > 0 ? (
+                        <span className="text-sm text-zinc-700">
+                          ${project.price_usd.toFixed(2)}
+                        </span>
+                      ) : (
+                        <span className="text-xs text-zinc-400">
+                          {project.status === "available" ? "No price set" : "--"}
+                        </span>
+                      )}
+                      {project.source_code_url && (
+                        <span className="ml-2 inline-block rounded bg-zinc-100 px-1.5 py-0.5 text-[10px] font-medium text-zinc-500">
+                          Has files
+                        </span>
+                      )}
                     </td>
                     <td className="px-4 py-3 text-right">
                       <div className="flex justify-end gap-2">

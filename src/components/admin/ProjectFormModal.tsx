@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, useState, type FormEvent } from "react";
-import type { Project, ProjectMedia } from "@/types/project";
+import type { Project, ProjectMedia, SupplementaryFile } from "@/types/project";
 
 interface ProjectFormModalProps {
   project: Project | null;
@@ -68,10 +68,36 @@ export default function ProjectFormModal({
     project?.testing_doc_name ?? null
   );
   const testingDocInputRef = useRef<HTMLInputElement>(null);
+  const sourceCodeInputRef = useRef<HTMLInputElement>(null);
+  const supplementaryInputRef = useRef<HTMLInputElement>(null);
   const [uploadingDoc, setUploadingDoc] = useState(false);
   const [uploading, setUploading] = useState(false);
+  const [uploadingSourceCode, setUploadingSourceCode] = useState(false);
+  const [uploadingSupplementary, setUploadingSupplementary] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  const [priceUsd, setPriceUsd] = useState<string>(
+    project?.price_usd != null ? String(project.price_usd) : ""
+  );
+  const [productPath, setProductPath] = useState(
+    project?.product_path ?? ""
+  );
+  const [productVariable, setProductVariable] = useState(
+    project?.product_variable ?? ""
+  );
+  const [sourceCodeUrl, setSourceCodeUrl] = useState<string | null>(
+    project?.source_code_url ?? null
+  );
+  const [sourceCodeName, setSourceCodeName] = useState<string | null>(
+    project?.source_code_name ?? null
+  );
+  const [sourceCodeSize, setSourceCodeSize] = useState<number | null>(
+    project?.source_code_size ?? null
+  );
+  const [supplementaryFiles, setSupplementaryFiles] = useState<SupplementaryFile[]>(
+    project?.supplementary_files ?? []
+  );
 
   function generateSlug(value: string) {
     return value
@@ -189,6 +215,13 @@ export default function ProjectFormModal({
       testing_url: testingUrl || null,
       testing_doc_url: testingDocUrl,
       testing_doc_name: testingDocName,
+      price_usd: priceUsd ? Number(priceUsd) : null,
+      product_path: productPath || null,
+      product_variable: productVariable || null,
+      source_code_url: sourceCodeUrl,
+      source_code_name: sourceCodeName,
+      source_code_size: sourceCodeSize,
+      supplementary_files: supplementaryFiles,
     };
 
     try {
@@ -500,6 +533,277 @@ export default function ProjectFormModal({
                     </div>
                   )}
                 </div>
+              </div>
+            )}
+          </div>
+
+          {status === "available" && (
+            <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4">
+              <h3 className="mb-3 text-sm font-semibold text-zinc-800">
+                Pricing
+              </h3>
+              <div className="space-y-3">
+                <div>
+                  <label htmlFor="priceUsd" className={labelClass}>
+                    Price (USD)
+                  </label>
+                  <input
+                    id="priceUsd"
+                    type="number"
+                    min="0"
+                    step="0.01"
+                    value={priceUsd}
+                    onChange={(e) => setPriceUsd(e.target.value)}
+                    className={inputClass}
+                    placeholder="49.99"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="productPath" className={labelClass}>
+                    Product Path (FastSpring)
+                  </label>
+                  <input
+                    id="productPath"
+                    type="text"
+                    value={productPath}
+                    onChange={(e) => setProductPath(e.target.value)}
+                    className={inputClass}
+                    placeholder="inventory-system"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="productVariable" className={labelClass}>
+                    Product Variable (Lemon Squeezy Variant ID)
+                  </label>
+                  <input
+                    id="productVariable"
+                    type="text"
+                    value={productVariable}
+                    onChange={(e) => setProductVariable(e.target.value)}
+                    className={inputClass}
+                    placeholder="12345"
+                  />
+                </div>
+              </div>
+            </div>
+          )}
+
+          <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4">
+            <h3 className="mb-3 text-sm font-semibold text-zinc-800">
+              Source Code
+            </h3>
+            <p className="mb-2 text-xs text-zinc-400">
+              Upload a zipped source code file (.zip, .tar.gz, .rar). Up to 1GB.
+            </p>
+
+            {sourceCodeUrl && sourceCodeName && (
+              <div className="mb-3 flex items-center gap-3 rounded-md border border-zinc-200 bg-white px-3 py-2">
+                <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-200 text-xs text-zinc-500">
+                  ZIP
+                </div>
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm text-zinc-700">
+                    {sourceCodeName}
+                  </p>
+                  {sourceCodeSize != null && (
+                    <p className="text-xs text-zinc-400">
+                      {(sourceCodeSize / (1024 * 1024)).toFixed(1)} MB
+                    </p>
+                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSourceCodeUrl(null);
+                    setSourceCodeName(null);
+                    setSourceCodeSize(null);
+                  }}
+                  className="shrink-0 text-xs text-red-500 transition-colors hover:text-red-700"
+                >
+                  Remove
+                </button>
+              </div>
+            )}
+
+            {!sourceCodeUrl && (
+              <div>
+                <input
+                  ref={sourceCodeInputRef}
+                  type="file"
+                  accept=".zip,.tar.gz,.rar,application/zip,application/x-zip-compressed,application/gzip,application/x-rar-compressed"
+                  onChange={async (e) => {
+                    const file = e.target.files?.[0];
+                    if (!file) return;
+                    const currentSlug = slug || generateSlug(title);
+                    if (!currentSlug) {
+                      setError("Enter a title or slug before uploading files.");
+                      return;
+                    }
+                    setUploadingSourceCode(true);
+                    setError("");
+                    try {
+                      const formData = new FormData();
+                      formData.set("projectSlug", currentSlug);
+                      formData.set("uploadType", "source-code");
+                      formData.append("files", file);
+                      const res = await fetch("/api/internal/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      if (!res.ok) {
+                        const data = await res.json();
+                        setError(data.error || "Source code upload failed.");
+                        return;
+                      }
+                      const data = await res.json();
+                      if (data.files?.[0]) {
+                        setSourceCodeUrl(data.files[0].url);
+                        setSourceCodeName(data.files[0].name);
+                        setSourceCodeSize(data.files[0].size);
+                      }
+                    } catch {
+                      setError("Source code upload failed. Please try again.");
+                    } finally {
+                      setUploadingSourceCode(false);
+                      if (sourceCodeInputRef.current) {
+                        sourceCodeInputRef.current.value = "";
+                      }
+                    }
+                  }}
+                  className="hidden"
+                  id="sourceCodeUpload"
+                />
+                <button
+                  type="button"
+                  onClick={() => sourceCodeInputRef.current?.click()}
+                  disabled={uploadingSourceCode}
+                  className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {uploadingSourceCode ? "Uploading..." : "Upload Source Code"}
+                </button>
+              </div>
+            )}
+          </div>
+
+          <div className="rounded-md border border-zinc-200 bg-zinc-50 p-4">
+            <h3 className="mb-3 text-sm font-semibold text-zinc-800">
+              Supplementary Files ({supplementaryFiles.length}/10)
+            </h3>
+            <p className="mb-2 text-xs text-zinc-400">
+              Upload deployment instructions, documentation, etc. Up to 10 files. Combined total with source code must not exceed 1GB.
+            </p>
+
+            {supplementaryFiles.length > 0 && (
+              <div className="mb-3 space-y-2">
+                {supplementaryFiles.map((file, index) => (
+                  <div
+                    key={file.url}
+                    className="flex items-center gap-3 rounded-md border border-zinc-200 bg-white px-3 py-2"
+                  >
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded bg-zinc-200 text-xs text-zinc-500">
+                      FILE
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <p className="truncate text-sm text-zinc-700">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-zinc-400">
+                        {(file.size / (1024 * 1024)).toFixed(1)} MB
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setSupplementaryFiles((prev) =>
+                          prev.filter((_, i) => i !== index)
+                        )
+                      }
+                      className="shrink-0 text-xs text-red-500 transition-colors hover:text-red-700"
+                    >
+                      Remove
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {supplementaryFiles.length < 10 && (
+              <div>
+                <input
+                  ref={supplementaryInputRef}
+                  type="file"
+                  accept=".zip,.tar.gz,.rar,.pdf,.doc,.docx,.txt,.md,.jpg,.jpeg,.png,.webp,.gif,.mp4,.webm,.mov"
+                  multiple
+                  onChange={async (e) => {
+                    if (!e.target.files || e.target.files.length === 0) return;
+                    const currentSlug = slug || generateSlug(title);
+                    if (!currentSlug) {
+                      setError("Enter a title or slug before uploading files.");
+                      return;
+                    }
+                    const remaining = 10 - supplementaryFiles.length;
+                    const filesToUpload = Array.from(e.target.files).slice(
+                      0,
+                      remaining
+                    );
+                    setUploadingSupplementary(true);
+                    setError("");
+                    try {
+                      const formData = new FormData();
+                      formData.set("projectSlug", currentSlug);
+                      formData.set("uploadType", "supplementary");
+                      for (const file of filesToUpload) {
+                        formData.append("files", file);
+                      }
+                      const res = await fetch("/api/internal/upload", {
+                        method: "POST",
+                        body: formData,
+                      });
+                      if (!res.ok) {
+                        const data = await res.json();
+                        setError(
+                          data.error || "Supplementary file upload failed."
+                        );
+                        return;
+                      }
+                      const data = await res.json();
+                      if (data.files) {
+                        setSupplementaryFiles((prev) => [
+                          ...prev,
+                          ...data.files.map(
+                            (f: { url: string; name: string; size: number; type: string }) => ({
+                              url: f.url,
+                              name: f.name,
+                              size: f.size,
+                              type: f.type,
+                            })
+                          ),
+                        ]);
+                      }
+                    } catch {
+                      setError(
+                        "Supplementary file upload failed. Please try again."
+                      );
+                    } finally {
+                      setUploadingSupplementary(false);
+                      if (supplementaryInputRef.current) {
+                        supplementaryInputRef.current.value = "";
+                      }
+                    }
+                  }}
+                  className="hidden"
+                  id="supplementaryUpload"
+                />
+                <button
+                  type="button"
+                  onClick={() => supplementaryInputRef.current?.click()}
+                  disabled={uploadingSupplementary}
+                  className="rounded-md border border-zinc-300 bg-white px-4 py-2 text-sm font-medium text-zinc-700 transition-colors hover:bg-zinc-50 disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  {uploadingSupplementary
+                    ? "Uploading..."
+                    : "Upload Supplementary Files"}
+                </button>
               </div>
             )}
           </div>

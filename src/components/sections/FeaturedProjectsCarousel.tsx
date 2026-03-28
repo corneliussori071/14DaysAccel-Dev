@@ -6,6 +6,7 @@ import type { Project } from "@/types/project";
 import ProjectReactions from "@/components/projects/ProjectReactions";
 import ProjectBuyButton from "@/components/projects/ProjectBuyButton";
 import RegisterInterestButton from "@/components/projects/RegisterInterestButton";
+import ProjectCommentsModal from "@/components/projects/ProjectCommentsModal";
 
 const statusStylesDark: Record<string, string> = {
   available: "bg-white/20 text-white",
@@ -22,7 +23,10 @@ interface Props {
 }
 
 function ProjectCard({ project }: { project: Project }) {
+  const [showComments, setShowComments] = useState(false);
+
   return (
+    <>
     <Link
       href={`/projects/${project.slug}`}
       className="group block rounded-lg border border-zinc-500 bg-zinc-700 transition-all hover:-translate-y-1 hover:border-zinc-400 hover:shadow-lg hover:shadow-black/20"
@@ -67,6 +71,7 @@ function ProjectCard({ project }: { project: Project }) {
             initialDislikes={project.dislikes_count ?? 0}
             initialComments={project.comments_count ?? 0}
             variant="dark"
+            onCommentClick={() => setShowComments(true)}
           />
         </div>
         <div className="mt-4 flex items-center gap-3">
@@ -89,6 +94,16 @@ function ProjectCard({ project }: { project: Project }) {
         </div>
       </div>
     </Link>
+
+      {showComments && (
+        <ProjectCommentsModal
+          projectId={project.id}
+          projectTitle={project.title}
+          commentsCount={project.comments_count ?? 0}
+          onClose={() => setShowComments(false)}
+        />
+      )}
+    </>
   );
 }
 

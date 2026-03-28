@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { sanitizeText, sanitizeEmail } from "@/lib/sanitize";
 
 interface RegisterInterestButtonProps {
   projectId: string;
@@ -23,7 +24,19 @@ export default function RegisterInterestButton({
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     e.stopPropagation();
-    if (loading || !email.trim()) return;
+    if (loading) return;
+
+    const cleanedEmail = sanitizeEmail(email);
+    if (!cleanedEmail) {
+      setError("Please enter a valid email address.");
+      return;
+    }
+
+    const cleanedName = name.trim() ? sanitizeText(name) : undefined;
+    if (name.trim() && !cleanedName) {
+      setError("Please enter a valid name.");
+      return;
+    }
 
     setLoading(true);
     setError("");
@@ -34,8 +47,8 @@ export default function RegisterInterestButton({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           projectId,
-          email: email.trim(),
-          name: name.trim() || undefined,
+          email: cleanedEmail,
+          name: cleanedName,
         }),
       });
 
@@ -117,7 +130,6 @@ export default function RegisterInterestButton({
     <form
       onSubmit={handleSubmit}
       onClick={(e) => {
-        e.preventDefault();
         e.stopPropagation();
       }}
       className={`rounded-lg p-3 space-y-2 ${isDark ? "bg-white/10" : "bg-zinc-50 border border-zinc-200"}`}

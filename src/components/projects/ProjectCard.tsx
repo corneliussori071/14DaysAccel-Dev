@@ -1,8 +1,12 @@
+"use client";
+
+import { useState } from "react";
 import Link from "next/link";
 import type { Project } from "@/types/project";
 import ProjectReactions from "./ProjectReactions";
 import ProjectBuyButton from "./ProjectBuyButton";
 import RegisterInterestButton from "./RegisterInterestButton";
+import ProjectCommentsModal from "./ProjectCommentsModal";
 
 const statusStyles: Record<Project["status"], string> = {
   available: "bg-zinc-100 text-zinc-700",
@@ -19,11 +23,14 @@ interface ProjectCardProps {
 }
 
 export default function ProjectCard({ project }: ProjectCardProps) {
+  const [showComments, setShowComments] = useState(false);
+
   return (
-    <Link
-      href={`/projects/${project.slug}`}
-      className="group rounded-lg border border-zinc-200 bg-white transition-shadow hover:shadow-sm"
-    >
+    <>
+      <Link
+        href={`/projects/${project.slug}`}
+        className="group rounded-lg border border-zinc-200 bg-white transition-shadow hover:shadow-sm"
+      >
       {project.profile_image && (
         <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-zinc-100">
           <img
@@ -64,6 +71,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
             initialDislikes={project.dislikes_count ?? 0}
             initialComments={project.comments_count ?? 0}
             variant="light"
+            onCommentClick={() => setShowComments(true)}
           />
         </div>
         <div className="mt-4 flex items-center gap-3">
@@ -86,5 +94,15 @@ export default function ProjectCard({ project }: ProjectCardProps) {
         </div>
       </div>
     </Link>
+
+      {showComments && (
+        <ProjectCommentsModal
+          projectId={project.id}
+          projectTitle={project.title}
+          commentsCount={project.comments_count ?? 0}
+          onClose={() => setShowComments(false)}
+        />
+      )}
+    </>
   );
 }

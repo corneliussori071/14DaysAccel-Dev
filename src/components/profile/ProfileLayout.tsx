@@ -8,18 +8,21 @@ import PersonalInfoSection from "@/components/profile/sections/PersonalInfoSecti
 import SoftwarePlannerSection from "@/components/profile/sections/SoftwarePlannerSection";
 import BillingSection from "@/components/profile/sections/BillingSection";
 import PlansSection from "@/components/profile/sections/PlansSection";
+import PurchasesSection from "@/components/profile/sections/PurchasesSection";
 
 type ProfileSection =
   | "personal-info"
   | "software-planner"
   | "billing"
-  | "plans";
+  | "plans"
+  | "purchases";
 
 const NAV_ITEMS: { id: ProfileSection; label: string }[] = [
   { id: "personal-info", label: "Personal Information" },
   { id: "software-planner", label: "Software Planner" },
   { id: "billing", label: "Billing" },
   { id: "plans", label: "Plans" },
+  { id: "purchases", label: "My Purchases" },
 ];
 
 export default function ProfileLayout() {
@@ -103,6 +106,7 @@ export default function ProfileLayout() {
         {activeSection === "software-planner" && <SoftwarePlannerSection />}
         {activeSection === "billing" && <BillingSection />}
         {activeSection === "plans" && <PlansSection />}
+        {activeSection === "purchases" && <PurchasesSection />}
       </main>
     </div>
   );

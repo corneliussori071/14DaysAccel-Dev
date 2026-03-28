@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/sanitize";
 import type { ProjectComment } from "@/types/project";
 
 interface ProjectCommentsProps {
@@ -85,7 +86,7 @@ export default function ProjectComments({
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ projectId, content: content.trim() }),
+        body: JSON.stringify({ projectId, content: sanitizeText(content) }),
       });
 
       if (res.ok) {

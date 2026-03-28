@@ -3,9 +3,12 @@ import { createClient } from "@supabase/supabase-js";
 import { verifyAdminSession } from "@/lib/adminSession";
 import { logError } from "@/lib/logger";
 
-const MAX_FILE_SIZE = 50 * 1024 * 1024; // 50MB
-const MAX_FILES = 5;
-const ALLOWED_TYPES = [
+const MAX_MEDIA_FILE_SIZE = 50 * 1024 * 1024; // 50MB
+const MAX_SOURCE_CODE_SIZE = 1024 * 1024 * 1024; // 1GB
+const MAX_MEDIA_FILES = 5;
+const MAX_SUPPLEMENTARY_FILES = 10;
+
+const MEDIA_TYPES = [
   "image/jpeg",
   "image/png",
   "image/webp",
@@ -16,6 +19,32 @@ const ALLOWED_TYPES = [
   "application/pdf",
   "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+];
+
+const SOURCE_CODE_TYPES = [
+  "application/zip",
+  "application/x-zip-compressed",
+  "application/x-rar-compressed",
+  "application/gzip",
+  "application/x-gzip",
+  "application/x-tar",
+  "application/x-compressed-tar",
+];
+
+const SUPPLEMENTARY_TYPES = [
+  ...SOURCE_CODE_TYPES,
+  "application/pdf",
+  "application/msword",
+  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "text/plain",
+  "text/markdown",
+  "image/jpeg",
+  "image/png",
+  "image/webp",
+  "image/gif",
+  "video/mp4",
+  "video/webm",
+  "video/quicktime",
 ];
 
 function getSupabaseAdmin() {
@@ -38,6 +67,7 @@ export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
     const projectSlug = formData.get("projectSlug");
+    const uploadType = String(formData.get("uploadType") || "media");
 
     if (!projectSlug || typeof projectSlug !== "string") {
       return NextResponse.json(
@@ -72,34 +102,67 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (files.length > MAX_FILES) {
+    let maxFiles: number;
+    let maxFileSize: number;
+    let allowedTypes: string[];
+    let bucketName: string;
+    let isPrivate: boolean;
+
+    if (uploadType === "source-code") {
+      maxFiles = 1;
+      maxFileSize = MAX_SOURCE_CODE_SIZE;
+      allowedTypes = SOURCE_CODE_TYPES;
+      bucketName = "project-source-code";
+      isPrivate = true;
+    } else if (uploadType === "supplementary") {
+      maxFiles = MAX_SUPPLEMENTARY_FILES;
+      maxFileSize = MAX_SOURCE_CODE_SIZE;
+      allowedTypes = SUPPLEMENTARY_TYPES;
+      bucketName = "project-source-code";
+      isPrivate = true;
+    } else {
+      maxFiles = MAX_MEDIA_FILES;
+      maxFileSize = MAX_MEDIA_FILE_SIZE;
+      allowedTypes = MEDIA_TYPES;
+      bucketName = "project-media";
+      isPrivate = false;
+    }
+
+    if (files.length > maxFiles) {
       return NextResponse.json(
-        { error: `Maximum ${MAX_FILES} files allowed` },
+        { error: `Maximum ${maxFiles} files allowed for ${uploadType} upload` },
+        { status: 400 }
+      );
+    }
+
+    const totalSize = files.reduce((sum, f) => sum + f.size, 0);
+    if (uploadType !== "media" && totalSize > MAX_SOURCE_CODE_SIZE) {
+      return NextResponse.json(
+        { error: "Combined file size exceeds 1GB limit" },
         { status: 400 }
       );
     }
 
     for (const file of files) {
-      if (file.size > MAX_FILE_SIZE) {
+      if (file.size > maxFileSize) {
+        const limitLabel = maxFileSize >= 1024 * 1024 * 1024 ? "1GB" : "50MB";
         return NextResponse.json(
-          { error: `File "${file.name}" exceeds 50MB limit` },
+          { error: `File "${file.name}" exceeds ${limitLabel} limit` },
           { status: 400 }
         );
       }
-      if (!ALLOWED_TYPES.includes(file.type)) {
+      if (!allowedTypes.includes(file.type)) {
         return NextResponse.json(
-          { error: `File type "${file.type}" is not allowed` },
+          { error: `File type "${file.type}" is not allowed for ${uploadType} uploads` },
           { status: 400 }
         );
       }
     }
 
     const supabase = getSupabaseAdmin();
-    const uploaded: { url: string; type: "image" | "video" | "document"; name: string }[] =
-      [];
+    const uploaded: { url: string; type: string; name: string; size: number }[] = [];
 
     for (const file of files) {
-      const ext = file.name.split(".").pop() || "bin";
       const safeName = file.name
         .replace(/[^a-zA-Z0-9._-]/g, "_")
         .slice(0, 100);
@@ -109,7 +172,7 @@ export async function POST(request: NextRequest) {
       const buffer = await file.arrayBuffer();
 
       const { error: uploadError } = await supabase.storage
-        .from("project-media")
+        .from(bucketName)
         .upload(storagePath, buffer, {
           contentType: file.type,
           upsert: false,
@@ -122,23 +185,39 @@ export async function POST(request: NextRequest) {
         );
       }
 
-      const {
-        data: { publicUrl },
-      } = supabase.storage.from("project-media").getPublicUrl(storagePath);
+      if (isPrivate) {
+        const fileType = file.type.startsWith("video/")
+          ? "video"
+          : file.type.startsWith("image/")
+            ? "image"
+            : "document";
 
-      const fileType: "image" | "video" | "document" = file.type.startsWith("video/")
-        ? "video"
-        : file.type === "application/pdf" ||
-            file.type === "application/msword" ||
-            file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-          ? "document"
-          : "image";
+        uploaded.push({
+          url: storagePath,
+          type: fileType,
+          name: safeName,
+          size: file.size,
+        });
+      } else {
+        const {
+          data: { publicUrl },
+        } = supabase.storage.from(bucketName).getPublicUrl(storagePath);
 
-      uploaded.push({
-        url: publicUrl,
-        type: fileType,
-        name: safeName,
-      });
+        const fileType: string = file.type.startsWith("video/")
+          ? "video"
+          : file.type === "application/pdf" ||
+              file.type === "application/msword" ||
+              file.type === "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
+            ? "document"
+            : "image";
+
+        uploaded.push({
+          url: publicUrl,
+          type: fileType,
+          name: safeName,
+          size: file.size,
+        });
+      }
     }
 
     return NextResponse.json({ files: uploaded }, { status: 201 });

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image, testing_available, testing_instructions, testing_url, testing_doc_url, testing_doc_name } = body;
+    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image, testing_available, testing_instructions, testing_url, testing_doc_url, testing_doc_name, price_usd, product_path, product_variable, source_code_url, source_code_name, source_code_size, supplementary_files } = body;
 
     if (!title || !slug || !description) {
       return NextResponse.json(
@@ -101,6 +101,13 @@ export async function POST(request: NextRequest) {
         testing_url: validateUrl(testing_url),
         testing_doc_url: testing_doc_url ? String(testing_doc_url).slice(0, 2000) : null,
         testing_doc_name: testing_doc_name ? String(testing_doc_name).slice(0, 200) : null,
+        price_usd: price_usd != null && Number(price_usd) > 0 ? Number(price_usd) : null,
+        product_path: product_path ? String(product_path).slice(0, 500) : null,
+        product_variable: product_variable ? String(product_variable).slice(0, 500) : null,
+        source_code_url: source_code_url ? String(source_code_url).slice(0, 2000) : null,
+        source_code_name: source_code_name ? String(source_code_name).slice(0, 200) : null,
+        source_code_size: source_code_size != null ? Number(source_code_size) : null,
+        supplementary_files: Array.isArray(supplementary_files) ? supplementary_files : [],
       })
       .select()
       .single();
@@ -184,6 +191,20 @@ export async function PUT(request: NextRequest) {
       sanitized.testing_doc_url = updates.testing_doc_url ? String(updates.testing_doc_url).slice(0, 2000) : null;
     if (updates.testing_doc_name !== undefined)
       sanitized.testing_doc_name = updates.testing_doc_name ? String(updates.testing_doc_name).slice(0, 200) : null;
+    if (updates.price_usd !== undefined)
+      sanitized.price_usd = updates.price_usd != null && Number(updates.price_usd) > 0 ? Number(updates.price_usd) : null;
+    if (updates.product_path !== undefined)
+      sanitized.product_path = updates.product_path ? String(updates.product_path).slice(0, 500) : null;
+    if (updates.product_variable !== undefined)
+      sanitized.product_variable = updates.product_variable ? String(updates.product_variable).slice(0, 500) : null;
+    if (updates.source_code_url !== undefined)
+      sanitized.source_code_url = updates.source_code_url ? String(updates.source_code_url).slice(0, 2000) : null;
+    if (updates.source_code_name !== undefined)
+      sanitized.source_code_name = updates.source_code_name ? String(updates.source_code_name).slice(0, 200) : null;
+    if (updates.source_code_size !== undefined)
+      sanitized.source_code_size = updates.source_code_size != null ? Number(updates.source_code_size) : null;
+    if (updates.supplementary_files !== undefined)
+      sanitized.supplementary_files = Array.isArray(updates.supplementary_files) ? updates.supplementary_files : [];
 
     const supabase = getSupabaseAdmin();
     const { data, error } = await supabase

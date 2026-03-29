@@ -18,12 +18,19 @@ const statusLabels: Record<string, string> = {
   upcoming: "Upcoming",
 };
 
+const DESCRIPTION_MAX_LENGTH = 600;
+
 interface Props {
   projects: Project[];
 }
 
 function ProjectCard({ project }: { project: Project }) {
   const [showComments, setShowComments] = useState(false);
+  const description = project.description || "";
+  const isTruncated = description.length > DESCRIPTION_MAX_LENGTH;
+  const displayDescription = isTruncated
+    ? description.slice(0, DESCRIPTION_MAX_LENGTH)
+    : description;
 
   return (
     <>
@@ -52,7 +59,12 @@ function ProjectCard({ project }: { project: Project }) {
           </span>
         </div>
         <p className="text-sm leading-relaxed text-white/80">
-          {project.description}
+          {displayDescription}
+          {isTruncated && (
+            <span className="ml-1 inline-block text-white font-medium hover:underline">
+              More...
+            </span>
+          )}
         </p>
         <div className="mt-4 flex flex-wrap gap-2">
           {project.tech_stack.map((tech) => (

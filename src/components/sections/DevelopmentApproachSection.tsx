@@ -49,15 +49,15 @@ export default function DevelopmentApproachSection() {
   }, []);
 
   return (
-    <section className="border-b border-zinc-500 bg-[#545454] px-6 py-20 md:px-12 lg:px-24">
+    <section className="border-b border-zinc-200 bg-[#EAB8E6] px-6 py-20 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <div className="mb-14 text-center">
           {isLoggedIn ? (
             <>
-              <p className="text-base font-medium text-white">
+              <p className="text-lg font-semibold text-zinc-900">
                 Professional software engineering prompts
               </p>
-              <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
+              <p className="mx-auto mt-2 max-w-lg text-base text-zinc-700">
                 The real challenge is not using AI. The real challenge is system
                 design, data structure, scalability, and security. If you do not
                 clearly define what you want your AI to build, you will not get
@@ -69,7 +69,7 @@ export default function DevelopmentApproachSection() {
               <div className="mt-5">
                 <Link
                   href="/software-designer"
-                  className="rounded-md bg-white px-5 py-2.5 text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                  className="rounded-md bg-zinc-900 px-5 py-2.5 text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-800"
                 >
                   Open Software Designer
                 </Link>
@@ -77,10 +77,10 @@ export default function DevelopmentApproachSection() {
             </>
           ) : (
             <>
-              <p className="text-base font-medium text-white">
+              <p className="text-lg font-semibold text-zinc-900">
                 Professional software engineering prompts
               </p>
-              <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
+              <p className="mx-auto mt-2 max-w-lg text-base text-zinc-700">
                 The real challenge is not using AI. The real challenge is system
                 design, data structure, scalability, and security. If you do not
                 clearly define what you want your AI to build, you will not get
@@ -92,13 +92,13 @@ export default function DevelopmentApproachSection() {
               <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link
                   href="/software-designer?auth=signup"
-                  className="rounded-md bg-white px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/90"
+                  className="rounded-md bg-zinc-900 px-5 py-2.5 text-center text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-800"
                 >
                   Create Free Account
                 </Link>
                 <Link
                   href="/software-designer?auth=login"
-                  className="rounded-md border border-white/30 px-5 py-2.5 text-center text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-white/10"
+                  className="rounded-md border border-zinc-400 px-5 py-2.5 text-center text-sm font-medium text-zinc-900 transition-all hover:-translate-y-0.5 hover:bg-white/40"
                 >
                   Log In
                 </Link>
@@ -108,13 +108,13 @@ export default function DevelopmentApproachSection() {
         </div>
 
         <div className="mb-12 text-center">
-          <h2 className="text-3xl font-semibold tracking-tight text-white">
+          <h2 className="text-3xl font-semibold tracking-tight text-zinc-900">
             How It Works
           </h2>
-          <p className="mt-3 text-sm text-white sm:text-base">
+          <p className="mt-3 text-base text-zinc-800">
             A Structured Approach to Modern Software Development
           </p>
-          <p className="mx-auto mt-2 max-w-xl text-sm leading-relaxed text-white/80">
+          <p className="mx-auto mt-2 max-w-xl text-base leading-relaxed text-zinc-700">
             We combine AI speed with disciplined engineering practices to
             deliver systems that are both fast to build and reliable in
             production.
@@ -129,14 +129,14 @@ export default function DevelopmentApproachSection() {
               style={{ animationDelay: `${index * 0.1}s` }}
             >
               <div className="w-full p-6 transition-all">
-                <h3 className="text-base font-semibold text-white">
+                <h3 className="text-base font-semibold text-zinc-900">
                   {item.title}
                 </h3>
-                <p className="mt-3 text-sm leading-relaxed text-white/80">
+                <p className="mt-3 text-base leading-relaxed text-zinc-700">
                   {item.description}
                 </p>
               </div>
-              <div className="group mt-6 h-44 w-44 overflow-hidden rounded-full border-2 border-zinc-500 transition-all duration-300 hover:border-white/60 hover:shadow-lg hover:shadow-white/10 lg:h-52 lg:w-52">
+              <div className="group mt-6 h-44 w-44 overflow-hidden rounded-full border-2 border-zinc-400 transition-all duration-300 hover:border-zinc-600 hover:shadow-lg lg:h-52 lg:w-52">
                 <video
                   src={item.video}
                   autoPlay

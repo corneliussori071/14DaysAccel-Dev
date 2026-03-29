@@ -9,8 +9,8 @@ import RegisterInterestButton from "@/components/projects/RegisterInterestButton
 import ProjectCommentsModal from "@/components/projects/ProjectCommentsModal";
 
 const statusStylesDark: Record<string, string> = {
-  available: "bg-white/20 text-white",
-  upcoming: "bg-white/20 text-white",
+  available: "bg-blue-100 text-blue-800",
+  upcoming: "bg-blue-100 text-blue-800",
 };
 
 const statusLabels: Record<string, string> = {
@@ -36,10 +36,10 @@ function ProjectCard({ project }: { project: Project }) {
     <>
     <Link
       href={`/projects/${project.slug}`}
-      className="group block rounded-lg border border-zinc-500 bg-zinc-700 transition-all hover:-translate-y-1 hover:border-zinc-400 hover:shadow-lg hover:shadow-black/20"
+      className="group block rounded-lg border border-blue-200 bg-blue-50 transition-all hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100/50"
     >
       {project.profile_image && (
-        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-zinc-600">
+        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-blue-100">
           <img
             src={project.profile_image}
             alt={project.title}
@@ -49,7 +49,7 @@ function ProjectCard({ project }: { project: Project }) {
       )}
       <div className="p-6">
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold text-white">
+          <h3 className="text-base font-semibold text-zinc-900">
             {project.title}
           </h3>
           <span
@@ -58,10 +58,10 @@ function ProjectCard({ project }: { project: Project }) {
             {statusLabels[project.status] || project.status}
           </span>
         </div>
-        <p className="text-sm leading-relaxed text-white/80">
+        <p className="text-sm leading-relaxed text-zinc-700">
           {displayDescription}
           {isTruncated && (
-            <span className="ml-1 inline-block text-white font-medium hover:underline">
+            <span className="ml-1 inline-block text-zinc-900 font-medium hover:underline">
               More...
             </span>
           )}
@@ -70,7 +70,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.tech_stack.map((tech) => (
             <span
               key={tech}
-              className="rounded border border-white/30 px-2 py-0.5 text-xs text-white/80"
+              className="rounded border border-blue-200 px-2 py-0.5 text-xs text-zinc-600"
             >
               {tech}
             </span>
@@ -82,25 +82,25 @@ function ProjectCard({ project }: { project: Project }) {
             initialLikes={project.likes_count ?? 0}
             initialDislikes={project.dislikes_count ?? 0}
             initialComments={project.comments_count ?? 0}
-            variant="dark"
+            variant="light"
             onCommentClick={() => setShowComments(true)}
           />
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <span className="rounded-md border border-white/30 px-4 py-2 text-xs font-medium text-white transition-colors group-hover:bg-white group-hover:text-zinc-900">
+          <span className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white group-hover:border-zinc-900">
             View Details
           </span>
           {project.status === "available" && project.price_usd && (
             <ProjectBuyButton
               projectId={project.id}
               priceUsd={project.price_usd}
-              variant="dark"
+              variant="light"
             />
           )}
           {project.status === "upcoming" && (
             <RegisterInterestButton
               projectId={project.id}
-              variant="dark"
+              variant="light"
             />
           )}
         </div>
@@ -166,7 +166,7 @@ export default function FeaturedProjectsCarousel({ projects }: Props) {
         <>
           <button
             onClick={prevPage}
-            className="absolute -left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-500 bg-zinc-800 text-white transition-colors hover:bg-zinc-700"
+            className="absolute -left-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition-colors hover:bg-zinc-100"
             aria-label="Previous projects"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -175,7 +175,7 @@ export default function FeaturedProjectsCarousel({ projects }: Props) {
           </button>
           <button
             onClick={nextPage}
-            className="absolute -right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-500 bg-zinc-800 text-white transition-colors hover:bg-zinc-700"
+            className="absolute -right-4 top-1/2 z-10 flex h-10 w-10 -translate-y-1/2 items-center justify-center rounded-full border border-zinc-200 bg-white text-zinc-700 transition-colors hover:bg-zinc-100"
             aria-label="Next projects"
           >
             <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
@@ -188,7 +188,7 @@ export default function FeaturedProjectsCarousel({ projects }: Props) {
                 key={i}
                 onClick={() => setPage(i)}
                 className={`h-1.5 rounded-full transition-all ${
-                  i === page ? "w-6 bg-white" : "w-1.5 bg-white/40"
+                  i === page ? "w-6 bg-zinc-700" : "w-1.5 bg-zinc-300"
                 }`}
                 aria-label={`Go to page ${i + 1}`}
               />

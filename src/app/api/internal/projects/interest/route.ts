@@ -13,8 +13,46 @@ function getSupabaseAdmin() {
 
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
+/* ── IP-based rate limiting: 5 submissions per 30 minutes ── */
+const RATE_LIMIT_MAX = 5;
+const RATE_LIMIT_WINDOW_MS = 30 * 60 * 1000;
+const rateLimitMap = new Map<string, { count: number; resetAt: number }>();
+
+function isRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const entry = rateLimitMap.get(ip);
+
+  if (!entry || now >= entry.resetAt) {
+    rateLimitMap.set(ip, { count: 1, resetAt: now + RATE_LIMIT_WINDOW_MS });
+    return false;
+  }
+
+  if (entry.count >= RATE_LIMIT_MAX) {
+    return true;
+  }
+
+  entry.count += 1;
+  return false;
+}
+
+function getClientIp(request: NextRequest): string {
+  return (
+    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    request.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
+    const clientIp = getClientIp(request);
+    if (isRateLimited(clientIp)) {
+      return NextResponse.json(
+        { error: "Too many submissions. Please wait 30 minutes before trying again." },
+        { status: 429 }
+      );
+    }
+
     const body = await request.json();
     const { projectId, email, name } = body;
 
@@ -59,16 +97,27 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    const { data: existing } = await supabase
+      .from("project_interests")
+      .select("id")
+      .eq("project_id", projectId)
+      .eq("email", sanitizedEmail)
+      .maybeSingle();
+
+    if (existing) {
+      return NextResponse.json(
+        { error: "This email has already registered interest for this project." },
+        { status: 409 }
+      );
+    }
+
     const { error } = await supabase
       .from("project_interests")
-      .upsert(
-        {
-          project_id: projectId,
-          email: sanitizedEmail,
-          name: sanitizedName,
-        },
-        { onConflict: "project_id,email" }
-      );
+      .insert({
+        project_id: projectId,
+        email: sanitizedEmail,
+        name: sanitizedName,
+      });
 
     if (error) throw error;
 

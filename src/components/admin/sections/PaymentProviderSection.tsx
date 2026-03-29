@@ -4,6 +4,9 @@ import { useCallback, useEffect, useState } from "react";
 
 interface PaymentProvidersConfig {
   active_provider: "lemonsqueezy" | "fastspring";
+  payments_disabled?: boolean;
+  disabled_message?: string;
+  disabled_redirect?: string;
 }
 
 const PROVIDERS = [
@@ -74,6 +77,51 @@ export default function PaymentProviderSection() {
     } catch (err) {
       setError(
         err instanceof Error ? err.message : "Failed to save payment provider settings."
+      );
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  async function handleSaveDeactivation() {
+    if (config.payments_disabled && !(config.disabled_message || "").trim()) {
+      setError("A message is required when deactivating payments.");
+      return;
+    }
+    setSaving(true);
+    setError("");
+    setSuccess("");
+    try {
+      const payload: PaymentProvidersConfig = {
+        ...config,
+        disabled_message: config.payments_disabled
+          ? (config.disabled_message || "").trim()
+          : config.disabled_message,
+        disabled_redirect: config.payments_disabled
+          ? (config.disabled_redirect || "").trim() || undefined
+          : config.disabled_redirect,
+      };
+      const res = await fetch("/api/internal/admin/payment-providers", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ config: payload }),
+      });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || "Failed to save");
+      }
+      const result = await res.json();
+      if (result.saved) {
+        setConfig(result.saved);
+      }
+      setSuccess(
+        config.payments_disabled
+          ? "Payments have been deactivated. Users will see the configured message."
+          : "Payments have been re-enabled."
+      );
+    } catch (err) {
+      setError(
+        err instanceof Error ? err.message : "Failed to save deactivation settings."
       );
     } finally {
       setSaving(false);
@@ -168,6 +216,129 @@ export default function PaymentProviderSection() {
               >
                 {saving ? "Saving..." : "Save Provider"}
               </button>
+            </div>
+
+            {/* Payment Deactivation Toggle */}
+            <div className="mt-8 rounded-lg border border-zinc-200 bg-white p-6">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h3 className="text-sm font-semibold text-zinc-900">
+                    Deactivate All Payments
+                  </h3>
+                  <p className="mt-0.5 text-xs text-zinc-500">
+                    When enabled, all payment buttons will be disabled and users
+                    will see your custom message instead of proceeding to
+                    checkout.
+                  </p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={config.payments_disabled ?? false}
+                  onClick={() =>
+                    setConfig((prev) => ({
+                      ...prev,
+                      payments_disabled: !prev.payments_disabled,
+                      disabled_message: !prev.payments_disabled
+                        ? prev.disabled_message || ""
+                        : prev.disabled_message,
+                    }))
+                  }
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+                    config.payments_disabled
+                      ? "bg-red-600"
+                      : "bg-zinc-300"
+                  }`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      config.payments_disabled
+                        ? "translate-x-6"
+                        : "translate-x-1"
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {config.payments_disabled && (
+                <div className="mt-5 space-y-4 border-t border-zinc-100 pt-5">
+                  <div>
+                    <label
+                      htmlFor="disabledMessage"
+                      className="mb-1.5 block text-sm font-medium text-zinc-700"
+                    >
+                      Message to display
+                      <span className="ml-1 text-red-400">*</span>
+                    </label>
+                    <textarea
+                      id="disabledMessage"
+                      value={config.disabled_message || ""}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          disabled_message: e.target.value,
+                        }))
+                      }
+                      maxLength={500}
+                      rows={3}
+                      placeholder="e.g. Payments are temporarily unavailable while we upgrade our systems."
+                      className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                    />
+                    <p className="mt-1 text-xs text-zinc-400">
+                      {(config.disabled_message || "").length}/500 — This
+                      message will be shown to users who attempt any payment
+                      action.
+                    </p>
+                  </div>
+
+                  <div>
+                    <label
+                      htmlFor="disabledRedirect"
+                      className="mb-1.5 block text-sm font-medium text-zinc-700"
+                    >
+                      Redirect link (optional)
+                    </label>
+                    <input
+                      id="disabledRedirect"
+                      type="url"
+                      value={config.disabled_redirect || ""}
+                      onChange={(e) =>
+                        setConfig((prev) => ({
+                          ...prev,
+                          disabled_redirect: e.target.value,
+                        }))
+                      }
+                      maxLength={500}
+                      placeholder="https://example.com/maintenance-info"
+                      className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                    />
+                    <p className="mt-1 text-xs text-zinc-400">
+                      If provided, users will see a link to this URL alongside
+                      the message.
+                    </p>
+                  </div>
+
+                  <button
+                    onClick={handleSaveDeactivation}
+                    disabled={
+                      saving || !(config.disabled_message || "").trim()
+                    }
+                    className="rounded-md bg-red-600 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-red-500 disabled:opacity-50"
+                  >
+                    {saving ? "Saving..." : "Save Deactivation Settings"}
+                  </button>
+                </div>
+              )}
+
+              {!config.payments_disabled && (
+                <button
+                  onClick={handleSaveDeactivation}
+                  disabled={saving}
+                  className="mt-4 rounded-md bg-zinc-900 px-5 py-2 text-sm font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
+                >
+                  {saving ? "Saving..." : "Re-enable Payments"}
+                </button>
+              )}
             </div>
           </>
         )}

@@ -152,6 +152,9 @@ function getDefault(section: string): unknown {
     },
     "payment-providers": {
       active_provider: "lemonsqueezy",
+      payments_disabled: false,
+      disabled_message: "",
+      disabled_redirect: "",
     },
   };
   return defaults[section] || {};

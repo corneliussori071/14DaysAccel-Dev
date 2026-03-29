@@ -7,6 +7,7 @@ import { TOKEN_PRICE_USD } from "@/types/softwarePlan";
 import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
+import PaymentDisabledModal from "@/components/projects/PaymentDisabledModal";
 
 declare global {
   interface Window {
@@ -43,6 +44,10 @@ function SubscriptionsContent() {
   const [customPlan, setCustomPlan] = useState<SubscriptionPlan | null>(null);
   const [checkingOut, setCheckingOut] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+  const [disabledInfo, setDisabledInfo] = useState<{
+    message: string;
+    redirect?: string | null;
+  } | null>(null);
   const sblLoaded = useRef(false);
 
   const paymentStatus = searchParams.get("payment");
@@ -105,6 +110,26 @@ function SubscriptionsContent() {
 
   async function initiateCheckout(tokens: number, amountCents: number, planName?: string, variantId?: string, planId?: string) {
     setError(null);
+
+    // Check if payments are disabled
+    try {
+      const statusRes = await fetch("/api/internal/payment-status", {
+        cache: "no-store",
+      });
+      if (statusRes.ok) {
+        const status = await statusRes.json();
+        if (status.disabled) {
+          setDisabledInfo({
+            message: status.message,
+            redirect: status.redirect,
+          });
+          return;
+        }
+      }
+    } catch {
+      // Continue to checkout if status check fails
+    }
+
     const {
       data: { session },
     } = await supabase.auth.getSession();
@@ -406,6 +431,14 @@ function SubscriptionsContent() {
           </div>
         )}
       </div>
+
+      {disabledInfo && (
+        <PaymentDisabledModal
+          message={disabledInfo.message}
+          redirect={disabledInfo.redirect}
+          onClose={() => setDisabledInfo(null)}
+        />
+      )}
     </main>
   );
 }

@@ -5,18 +5,21 @@ export default function HeroSection() {
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-24 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-16 text-center text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-          Accelerated Software Development
+          Your trusted software marketplace and automated software designer
         </h1>
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
           <div className="animate-fade-in-up">
             <p className="text-lg font-medium text-white sm:text-xl">
-              Build production-ready software faster using AI-powered
-              development guided by real engineering standards.
+              Acquire ready-to-deploy SaaS or custom software for your startup
+              or existing business in just a few clicks.
             </p>
             <p className="mt-4 text-sm leading-relaxed text-white/80 sm:text-base">
-              AI accelerates implementation while experienced engineers handle
-              architecture, security, and performance, ensuring every system is
-              built to scale from day one.
+              We use advanced AI tools to generate tens of thousands of lines of
+              production-grade code for complex projects, reducing development
+              costs to a few hundred dollars and cutting timelines to under 14
+              days. Every project is supervised by experienced engineers who
+              ensure proper security, clean data architecture, strong
+              performance, and long-term scalability.
             </p>
             <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <Link

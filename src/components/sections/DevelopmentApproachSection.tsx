@@ -55,11 +55,16 @@ export default function DevelopmentApproachSection() {
           {isLoggedIn ? (
             <>
               <p className="text-base font-medium text-white">
-                Generate professional software engineering prompts
+                Professional software engineering prompts
               </p>
               <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
-                Use your tokens to create structured development plans and build
-                prompts with the Software Designer.
+                The real challenge is not using AI. The real challenge is system
+                design, data structure, scalability, and security. If you do not
+                clearly define what you want your AI to build, you will not get
+                reliable results. Our tools handle the planning, structure, and
+                technical direction for you so you can focus on your idea while
+                the system produces prompts that lead to clean, scalable, and
+                production-ready software.
               </p>
               <div className="mt-5">
                 <Link
@@ -73,11 +78,16 @@ export default function DevelopmentApproachSection() {
           ) : (
             <>
               <p className="text-base font-medium text-white">
-                Sign up to generate professional software engineering prompts
+                Professional software engineering prompts
               </p>
               <p className="mx-auto mt-2 max-w-lg text-sm text-white/70">
-                Create a free account and receive 1,000 tokens to start
-                generating structured development plans and build prompts.
+                The real challenge is not using AI. The real challenge is system
+                design, data structure, scalability, and security. If you do not
+                clearly define what you want your AI to build, you will not get
+                reliable results. Our tools handle the planning, structure, and
+                technical direction for you so you can focus on your idea while
+                the system produces prompts that lead to clean, scalable, and
+                production-ready software.
               </p>
               <div className="mt-5 flex flex-col justify-center gap-3 sm:flex-row">
                 <Link

@@ -4,6 +4,7 @@ import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { sanitizeText } from "@/lib/sanitize";
 import type { SoftwarePlanRequest } from "@/types/softwarePlan";
 import { AI_MODELS, MIN_TOKENS_REQUIRED } from "@/types/softwarePlan";
 import type { AiModelId } from "@/types/softwarePlan";
@@ -107,27 +108,31 @@ function SoftwareDesignerContent() {
   function buildRequest(): SoftwarePlanRequest {
     if (goalType === "prompts") {
       return {
-        businessName,
+        businessName: sanitizeText(businessName),
         goalType: "prompts",
         modelId,
-        industry: selectedIndustry,
-        softwareFeatures,
-        techStack,
+        industry: sanitizeText(selectedIndustry),
+        softwareFeatures: sanitizeText(softwareFeatures),
+        techStack: sanitizeText(techStack),
       };
     }
     return {
-      businessName,
+      businessName: sanitizeText(businessName),
       goalType: "ideas",
       modelId,
-      dailyOperations,
-      softwareProblem,
+      dailyOperations: sanitizeText(dailyOperations),
+      softwareProblem: sanitizeText(softwareProblem),
     };
   }
 
   function isFormValid(): boolean {
     if (!businessName.trim() || !goalType) return false;
     if (goalType === "prompts") {
-      return !!(selectedIndustry.trim() && softwareFeatures.trim());
+      return !!(
+        selectedIndustry.trim() &&
+        softwareFeatures.trim() &&
+        techStack.trim()
+      );
     }
     return !!(dailyOperations.trim() && softwareProblem.trim());
   }
@@ -175,6 +180,7 @@ function SoftwareDesignerContent() {
               className="mb-1.5 block text-sm font-medium text-zinc-700"
             >
               Business Name / Software Name
+              <span className="ml-1 text-red-400">*</span>
             </label>
             <input
               id="businessName"
@@ -238,6 +244,7 @@ function SoftwareDesignerContent() {
                   className="mb-1.5 block text-sm font-medium text-zinc-700"
                 >
                   Industry
+                  <span className="ml-1 text-red-400">*</span>
                 </label>
                 <select
                   id="industry"
@@ -273,6 +280,7 @@ function SoftwareDesignerContent() {
                   className="mb-1.5 block text-sm font-medium text-zinc-700"
                 >
                   Describe Software Features
+                  <span className="ml-1 text-red-400">*</span>
                 </label>
                 <textarea
                   id="softwareFeatures"
@@ -292,6 +300,7 @@ function SoftwareDesignerContent() {
                   className="mb-1.5 block text-sm font-medium text-zinc-700"
                 >
                   Preferred Tech Stack
+                  <span className="ml-1 text-red-400">*</span>
                 </label>
                 <textarea
                   id="techStack"
@@ -315,6 +324,7 @@ function SoftwareDesignerContent() {
                   className="mb-1.5 block text-sm font-medium text-zinc-700"
                 >
                   Describe Daily Operations of Your Business
+                  <span className="ml-1 text-red-400">*</span>
                 </label>
                 <textarea
                   id="dailyOperations"
@@ -334,6 +344,7 @@ function SoftwareDesignerContent() {
                   className="mb-1.5 block text-sm font-medium text-zinc-700"
                 >
                   Describe the Software Problem You Want to Solve
+                  <span className="ml-1 text-red-400">*</span>
                 </label>
                 <textarea
                   id="softwareProblem"

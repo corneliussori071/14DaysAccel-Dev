@@ -5,7 +5,7 @@ export default function HeroSection() {
     <section className="border-b border-zinc-500 bg-[#545454] px-6 py-24 md:px-12 lg:px-24">
       <div className="mx-auto max-w-6xl">
         <h1 className="mb-16 text-center text-4xl font-bold tracking-tight text-white sm:text-5xl md:text-6xl">
-          Your trusted software marketplace and automated software designer
+          Your trusted software sourcecode and automated software designer tool
         </h1>
         <div className="grid grid-cols-1 gap-16 lg:grid-cols-2 lg:items-center">
           <div className="animate-fade-in-up">

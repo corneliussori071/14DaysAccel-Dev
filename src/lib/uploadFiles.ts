@@ -27,6 +27,14 @@ function uploadWithProgress(
     xhr.open("PUT", signedUrl, true);
     xhr.setRequestHeader("Content-Type", contentType);
 
+    // Supabase API gateway requires the apikey header for all requests
+    const apiKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    if (apiKey) {
+      xhr.setRequestHeader("apikey", apiKey);
+      xhr.setRequestHeader("Authorization", `Bearer ${apiKey}`);
+    }
+    xhr.setRequestHeader("x-upsert", "true");
+
     xhr.upload.addEventListener("progress", (e) => {
       if (e.lengthComputable) {
         onProgress(Math.round((e.loaded / e.total) * 100));
@@ -37,7 +45,7 @@ function uploadWithProgress(
       if (xhr.status >= 200 && xhr.status < 300) {
         resolve();
       } else {
-        reject(new Error(`Upload failed: ${xhr.status}`));
+        reject(new Error(`Upload failed (${xhr.status}): ${xhr.responseText || xhr.statusText}`));
       }
     });
 

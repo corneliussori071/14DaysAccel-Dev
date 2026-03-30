@@ -2,6 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import type { Project, ProjectMedia, SupplementaryFile } from "@/types/project";
+import { uploadFilesViaSignedUrl } from "@/lib/uploadFiles";
 
 interface ProjectFormModalProps {
   project: Project | null;
@@ -140,28 +141,10 @@ export default function ProjectFormModal({
     setUploading(true);
 
     try {
-      const formData = new FormData();
-      formData.set("projectSlug", currentSlug);
-      for (const file of filesToUpload) {
-        formData.append("files", file);
-      }
-
-      const res = await fetch("/api/internal/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!res.ok) {
-        const data = await res.json();
-        setError(data.error || "Upload failed.");
-        return;
-      }
-
-      const data = await res.json();
-      const newMedia: ProjectMedia[] = data.files;
-      setMediaFiles((prev) => [...prev, ...newMedia]);
-    } catch {
-      setError("Upload failed. Please try again.");
+      const newMedia = await uploadFilesViaSignedUrl(currentSlug, "media", filesToUpload);
+      setMediaFiles((prev) => [...prev, ...newMedia as ProjectMedia[]]);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Upload failed. Please try again.");
     } finally {
       setUploading(false);
       if (fileInputRef.current) {
@@ -493,25 +476,13 @@ export default function ProjectFormModal({
                           setUploadingDoc(true);
                           setError("");
                           try {
-                            const formData = new FormData();
-                            formData.set("projectSlug", currentSlug);
-                            formData.append("files", file);
-                            const res = await fetch("/api/internal/upload", {
-                              method: "POST",
-                              body: formData,
-                            });
-                            if (!res.ok) {
-                              const data = await res.json();
-                              setError(data.error || "Upload failed.");
-                              return;
+                            const uploaded = await uploadFilesViaSignedUrl(currentSlug, "media", [file]);
+                            if (uploaded[0]) {
+                              setTestingDocUrl(uploaded[0].url);
+                              setTestingDocName(uploaded[0].name);
                             }
-                            const data = await res.json();
-                            if (data.files?.[0]) {
-                              setTestingDocUrl(data.files[0].url);
-                              setTestingDocName(data.files[0].name);
-                            }
-                          } catch {
-                            setError("Document upload failed. Please try again.");
+                          } catch (err) {
+                            setError(err instanceof Error ? err.message : "Document upload failed. Please try again.");
                           } finally {
                             setUploadingDoc(false);
                             if (testingDocInputRef.current) {
@@ -642,27 +613,14 @@ export default function ProjectFormModal({
                     setUploadingSourceCode(true);
                     setError("");
                     try {
-                      const formData = new FormData();
-                      formData.set("projectSlug", currentSlug);
-                      formData.set("uploadType", "source-code");
-                      formData.append("files", file);
-                      const res = await fetch("/api/internal/upload", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      if (!res.ok) {
-                        const data = await res.json();
-                        setError(data.error || "Source code upload failed.");
-                        return;
+                      const uploaded = await uploadFilesViaSignedUrl(currentSlug, "source-code", [file]);
+                      if (uploaded[0]) {
+                        setSourceCodeUrl(uploaded[0].url);
+                        setSourceCodeName(uploaded[0].name);
+                        setSourceCodeSize(uploaded[0].size);
                       }
-                      const data = await res.json();
-                      if (data.files?.[0]) {
-                        setSourceCodeUrl(data.files[0].url);
-                        setSourceCodeName(data.files[0].name);
-                        setSourceCodeSize(data.files[0].size);
-                      }
-                    } catch {
-                      setError("Source code upload failed. Please try again.");
+                    } catch (err) {
+                      setError(err instanceof Error ? err.message : "Source code upload failed. Please try again.");
                     } finally {
                       setUploadingSourceCode(false);
                       if (sourceCodeInputRef.current) {
@@ -749,40 +707,21 @@ export default function ProjectFormModal({
                     setUploadingSupplementary(true);
                     setError("");
                     try {
-                      const formData = new FormData();
-                      formData.set("projectSlug", currentSlug);
-                      formData.set("uploadType", "supplementary");
-                      for (const file of filesToUpload) {
-                        formData.append("files", file);
-                      }
-                      const res = await fetch("/api/internal/upload", {
-                        method: "POST",
-                        body: formData,
-                      });
-                      if (!res.ok) {
-                        const data = await res.json();
-                        setError(
-                          data.error || "Supplementary file upload failed."
-                        );
-                        return;
-                      }
-                      const data = await res.json();
-                      if (data.files) {
+                      const uploaded = await uploadFilesViaSignedUrl(currentSlug, "supplementary", filesToUpload);
+                      if (uploaded.length > 0) {
                         setSupplementaryFiles((prev) => [
                           ...prev,
-                          ...data.files.map(
-                            (f: { url: string; name: string; size: number; type: string }) => ({
-                              url: f.url,
-                              name: f.name,
-                              size: f.size,
-                              type: f.type,
-                            })
-                          ),
+                          ...uploaded.map((f) => ({
+                            url: f.url,
+                            name: f.name,
+                            size: f.size,
+                            type: f.type,
+                          })),
                         ]);
                       }
-                    } catch {
+                    } catch (err) {
                       setError(
-                        "Supplementary file upload failed. Please try again."
+                        err instanceof Error ? err.message : "Supplementary file upload failed. Please try again."
                       );
                     } finally {
                       setUploadingSupplementary(false);

@@ -89,6 +89,9 @@ export async function POST(request: NextRequest) {
 
     const amountCents = Math.round(project.price_usd * 100);
 
+    // Build a full redirect URL from the request origin
+    const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || process.env.NEXT_PUBLIC_SITE_URL || "https://14daysaccel.com";
+
     const functionsUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-checkout`;
 
     const res = await fetch(functionsUrl, {
@@ -105,7 +108,7 @@ export async function POST(request: NextRequest) {
         projectId: project.id,
         redirectUrl:
           redirectUrl ||
-          `${process.env.NEXT_PUBLIC_SITE_URL || ""}/projects/${project.id}?payment=success`,
+          `${origin}/projects/${project.id}?payment=success`,
       }),
     });
 

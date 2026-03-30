@@ -18,6 +18,7 @@ export default function ProjectBuyButton({
   size = "sm",
 }: ProjectBuyButtonProps) {
   const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [disabledInfo, setDisabledInfo] = useState<{
     message: string;
     redirect?: string | null;
@@ -57,6 +58,7 @@ export default function ProjectBuyButton({
     }
 
     setLoading(true);
+    setError(null);
     try {
       const res = await fetch("/api/internal/projects/checkout", {
         method: "POST",
@@ -76,10 +78,12 @@ export default function ProjectBuyButton({
         const err = await res.json().catch(() => null);
         if (err?.error === "already_purchased") {
           window.location.href = "/purchases";
+        } else {
+          setError(err?.error || "Checkout failed. Please try again.");
         }
       }
     } catch {
-      // Fail silently
+      setError("Something went wrong. Please try again.");
     } finally {
       setLoading(false);
     }
@@ -109,8 +113,12 @@ export default function ProjectBuyButton({
           <circle cx="20" cy="21" r="1" />
           <path d="M1 1h4l2.68 13.39a2 2 0 0 0 2 1.61h9.72a2 2 0 0 0 2-1.61L23 6H6" />
         </svg>
-        {loading ? "Processing..." : `Buy — $${priceUsd.toFixed(2)}`}
+        {loading ? "Processing..." : `Buy $${priceUsd.toFixed(2)}`}
       </button>
+
+      {error && (
+        <p className="mt-1 text-xs text-red-600">{error}</p>
+      )}
 
       {disabledInfo && (
         <PaymentDisabledModal

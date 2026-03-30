@@ -29,6 +29,7 @@ const SOURCE_CODE_TYPES = [
   "application/x-gzip",
   "application/x-tar",
   "application/x-compressed-tar",
+  "application/octet-stream",
 ];
 
 const SUPPLEMENTARY_TYPES = [

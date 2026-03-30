@@ -24,9 +24,29 @@ const SOURCE_CODE_TYPES = [
   "application/x-gzip",
   "application/x-tar",
   "application/x-compressed-tar",
+  "application/octet-stream",
 ];
 
 const SUPPLEMENTARY_TYPES = [...SOURCE_CODE_TYPES, ...MEDIA_TYPES, "text/plain", "text/markdown"];
+
+/** Extensions allowed for source-code uploads (fallback when MIME is generic). */
+const SOURCE_CODE_EXTENSIONS = [".zip", ".rar", ".gz", ".tar", ".tgz", ".tar.gz"];
+const SUPPLEMENTARY_EXTENSIONS = [
+  ...SOURCE_CODE_EXTENSIONS, ".pdf", ".doc", ".docx", ".txt", ".md",
+  ".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".webm", ".mov",
+];
+const MEDIA_EXTENSIONS = [".jpg", ".jpeg", ".png", ".webp", ".gif", ".mp4", ".webm", ".mov", ".pdf", ".doc", ".docx"];
+
+function isAllowedFile(
+  fileName: string,
+  fileType: string,
+  allowedTypes: string[],
+  allowedExtensions: string[]
+): boolean {
+  if (allowedTypes.includes(fileType)) return true;
+  const ext = "." + (fileName.split(".").pop() || "").toLowerCase();
+  return allowedExtensions.includes(ext);
+}
 
 function getSupabaseAdmin() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -73,22 +93,26 @@ export async function POST(request: NextRequest) {
     }
 
     let allowedTypes: string[];
+    let allowedExtensions: string[];
     let bucketName: string;
     let maxFileSize: number;
     let maxFiles: number;
 
     if (uploadType === "source-code") {
       allowedTypes = SOURCE_CODE_TYPES;
+      allowedExtensions = SOURCE_CODE_EXTENSIONS;
       bucketName = "project-source-code";
       maxFileSize = 1024 * 1024 * 1024;
       maxFiles = 1;
     } else if (uploadType === "supplementary") {
       allowedTypes = SUPPLEMENTARY_TYPES;
+      allowedExtensions = SUPPLEMENTARY_EXTENSIONS;
       bucketName = "project-source-code";
       maxFileSize = 1024 * 1024 * 1024;
       maxFiles = 10;
     } else {
       allowedTypes = MEDIA_TYPES;
+      allowedExtensions = MEDIA_EXTENSIONS;
       bucketName = "project-media";
       maxFileSize = 50 * 1024 * 1024;
       maxFiles = 5;
@@ -109,7 +133,7 @@ export async function POST(request: NextRequest) {
           { status: 400 }
         );
       }
-      if (!allowedTypes.includes(file.type)) {
+      if (!isAllowedFile(file.name, file.type, allowedTypes, allowedExtensions)) {
         return NextResponse.json(
           { error: `File type "${file.type}" is not allowed for ${uploadType} uploads` },
           { status: 400 }

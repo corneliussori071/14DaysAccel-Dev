@@ -2,7 +2,7 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import type { Project, ProjectMedia, SupplementaryFile } from "@/types/project";
-import { uploadFilesViaSignedUrl } from "@/lib/uploadFiles";
+import { uploadFilesViaSignedUrl, type UploadProgress } from "@/lib/uploadFiles";
 
 interface ProjectFormModalProps {
   project: Project | null;
@@ -75,6 +75,7 @@ export default function ProjectFormModal({
   const [uploading, setUploading] = useState(false);
   const [uploadingSourceCode, setUploadingSourceCode] = useState(false);
   const [uploadingSupplementary, setUploadingSupplementary] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<UploadProgress[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
@@ -611,9 +612,15 @@ export default function ProjectFormModal({
                       return;
                     }
                     setUploadingSourceCode(true);
+                    setUploadProgress([]);
                     setError("");
                     try {
-                      const uploaded = await uploadFilesViaSignedUrl(currentSlug, "source-code", [file]);
+                      const uploaded = await uploadFilesViaSignedUrl(
+                        currentSlug,
+                        "source-code",
+                        [file],
+                        (progress) => setUploadProgress(progress)
+                      );
                       if (uploaded[0]) {
                         setSourceCodeUrl(uploaded[0].url);
                         setSourceCodeName(uploaded[0].name);
@@ -623,6 +630,7 @@ export default function ProjectFormModal({
                       setError(err instanceof Error ? err.message : "Source code upload failed. Please try again.");
                     } finally {
                       setUploadingSourceCode(false);
+                      setUploadProgress([]);
                       if (sourceCodeInputRef.current) {
                         sourceCodeInputRef.current.value = "";
                       }
@@ -639,6 +647,24 @@ export default function ProjectFormModal({
                 >
                   {uploadingSourceCode ? "Uploading..." : "Upload Source Code"}
                 </button>
+                {uploadingSourceCode && uploadProgress.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {uploadProgress.map((p, i) => (
+                      <div key={i}>
+                        <div className="flex items-center justify-between text-xs text-zinc-500">
+                          <span className="truncate">{p.fileName}</span>
+                          <span>{p.percent}%</span>
+                        </div>
+                        <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+                          <div
+                            className="h-full rounded-full bg-zinc-700 transition-all duration-200"
+                            style={{ width: `${p.percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -705,9 +731,15 @@ export default function ProjectFormModal({
                       remaining
                     );
                     setUploadingSupplementary(true);
+                    setUploadProgress([]);
                     setError("");
                     try {
-                      const uploaded = await uploadFilesViaSignedUrl(currentSlug, "supplementary", filesToUpload);
+                      const uploaded = await uploadFilesViaSignedUrl(
+                        currentSlug,
+                        "supplementary",
+                        filesToUpload,
+                        (progress) => setUploadProgress(progress)
+                      );
                       if (uploaded.length > 0) {
                         setSupplementaryFiles((prev) => [
                           ...prev,
@@ -725,6 +757,7 @@ export default function ProjectFormModal({
                       );
                     } finally {
                       setUploadingSupplementary(false);
+                      setUploadProgress([]);
                       if (supplementaryInputRef.current) {
                         supplementaryInputRef.current.value = "";
                       }
@@ -743,6 +776,24 @@ export default function ProjectFormModal({
                     ? "Uploading..."
                     : "Upload Supplementary Files"}
                 </button>
+                {uploadingSupplementary && uploadProgress.length > 0 && (
+                  <div className="mt-2 space-y-1">
+                    {uploadProgress.map((p, i) => (
+                      <div key={i}>
+                        <div className="flex items-center justify-between text-xs text-zinc-500">
+                          <span className="truncate">{p.fileName}</span>
+                          <span>{p.percent}%</span>
+                        </div>
+                        <div className="mt-0.5 h-1.5 w-full overflow-hidden rounded-full bg-zinc-200">
+                          <div
+                            className="h-full rounded-full bg-zinc-700 transition-all duration-200"
+                            style={{ width: `${p.percent}%` }}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
             )}
           </div>

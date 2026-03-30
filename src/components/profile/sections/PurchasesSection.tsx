@@ -15,6 +15,10 @@ export default function PurchasesSection() {
   const [loading, setLoading] = useState(true);
   const [purchases, setPurchases] = useState<PurchaseWithProject[]>([]);
   const [downloadingId, setDownloadingId] = useState<string | null>(null);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [supplementaryFiles, setSupplementaryFiles] = useState<
+    Record<string, Array<{ name: string; url: string }>>
+  >({});
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -44,6 +48,7 @@ export default function PurchasesSection() {
 
   async function handleDownload(purchaseId: string) {
     setDownloadingId(purchaseId);
+    setDownloadError(null);
     try {
       const session = (await supabase.auth.getSession()).data.session;
       if (!session) return;
@@ -55,15 +60,25 @@ export default function PurchasesSection() {
 
       if (res.ok) {
         const data = await res.json();
+
+        if (data.supplementaryFiles && data.supplementaryFiles.length > 0) {
+          setSupplementaryFiles((prev) => ({
+            ...prev,
+            [purchaseId]: data.supplementaryFiles,
+          }));
+        }
+
         if (data.sourceCodeUrl) {
           window.open(data.sourceCodeUrl, "_blank");
+        } else {
+          setDownloadError("No source code file is available for this project.");
         }
       } else {
         const err = await res.json().catch(() => null);
-        alert(err?.error || "Download failed. Please try again.");
+        setDownloadError(err?.error || "Download failed. Please try again.");
       }
     } catch {
-      alert("Download failed. Please try again.");
+      setDownloadError("Download failed. Please try again.");
     } finally {
       setDownloadingId(null);
     }
@@ -167,38 +182,82 @@ export default function PurchasesSection() {
                     </div>
 
                     {purchase.status === "completed" && !expired && (
-                      <div className="mt-4 flex items-center gap-3">
-                        <button
-                          onClick={() => handleDownload(purchase.id)}
-                          disabled={downloadingId === purchase.id}
-                          className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
-                        >
-                          <svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            strokeLinecap="round"
-                            strokeLinejoin="round"
+                      <div className="mt-4">
+                        <div className="flex items-center gap-3">
+                          <button
+                            onClick={() => handleDownload(purchase.id)}
+                            disabled={downloadingId === purchase.id}
+                            className="inline-flex items-center gap-2 rounded-md bg-zinc-900 px-4 py-2 text-xs font-medium text-white transition-colors hover:bg-zinc-800 disabled:opacity-50"
                           >
-                            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
-                            <polyline points="7 10 12 15 17 10" />
-                            <line x1="12" y1="15" x2="12" y2="3" />
-                          </svg>
-                          {downloadingId === purchase.id
-                            ? "Generating link..."
-                            : "Download Source Code"}
-                        </button>
-                        {purchase.project_slug && (
-                          <Link
-                            href={`/projects/${purchase.project_slug}`}
-                            className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
-                          >
-                            View project
-                          </Link>
+                            <svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                            >
+                              <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                              <polyline points="7 10 12 15 17 10" />
+                              <line x1="12" y1="15" x2="12" y2="3" />
+                            </svg>
+                            {downloadingId === purchase.id
+                              ? "Generating link..."
+                              : "Download Source Code"}
+                          </button>
+                          {purchase.project_slug && (
+                            <Link
+                              href={`/projects/${purchase.project_slug}`}
+                              className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors"
+                            >
+                              View project
+                            </Link>
+                          )}
+                        </div>
+
+                        {downloadError && downloadingId === null && (
+                          <p className="mt-2 text-xs text-red-600">{downloadError}</p>
                         )}
+
+                        {supplementaryFiles[purchase.id] &&
+                          supplementaryFiles[purchase.id].length > 0 && (
+                            <div className="mt-3 border-t border-zinc-100 pt-3">
+                              <p className="mb-2 text-xs font-medium text-zinc-600">
+                                Supplementary Files
+                              </p>
+                              <div className="space-y-1.5">
+                                {supplementaryFiles[purchase.id].map(
+                                  (file, idx) => (
+                                    <a
+                                      key={idx}
+                                      href={file.url}
+                                      target="_blank"
+                                      rel="noopener noreferrer"
+                                      className="inline-flex items-center gap-1.5 rounded border border-zinc-200 bg-zinc-50 px-3 py-1.5 text-xs text-zinc-700 transition-colors hover:bg-zinc-100 mr-2"
+                                    >
+                                      <svg
+                                        width="12"
+                                        height="12"
+                                        viewBox="0 0 24 24"
+                                        fill="none"
+                                        stroke="currentColor"
+                                        strokeWidth="2"
+                                        strokeLinecap="round"
+                                        strokeLinejoin="round"
+                                      >
+                                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
+                                        <polyline points="7 10 12 15 17 10" />
+                                        <line x1="12" y1="15" x2="12" y2="3" />
+                                      </svg>
+                                      {file.name}
+                                    </a>
+                                  )
+                                )}
+                              </div>
+                            </div>
+                          )}
                       </div>
                     )}
 

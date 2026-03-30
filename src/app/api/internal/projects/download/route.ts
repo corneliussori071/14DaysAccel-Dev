@@ -115,6 +115,15 @@ export async function GET(request: NextRequest) {
         .from("project-source-code")
         .createSignedUrl(project.source_code_url, 3600);
 
+      if (signError) {
+        await logError({
+          message: "Failed to create signed URL for source code",
+          source: "api",
+          path: "/api/internal/projects/download",
+          details: { storagePath: project.source_code_url, error: signError.message },
+        });
+      }
+
       if (!signError && signedData?.signedUrl) {
         sourceCode = {
           name: project.source_code_name || "source-code.zip",

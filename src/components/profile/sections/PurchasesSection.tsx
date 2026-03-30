@@ -37,7 +37,34 @@ export default function PurchasesSection() {
       });
       if (res.ok) {
         const data = await res.json();
-        setPurchases(data.purchases ?? []);
+        const items: PurchaseWithProject[] = data.purchases ?? [];
+        setPurchases(items);
+
+        // Pre-fetch supplementary files for all active (non-expired, completed) purchases
+        const active = items.filter(
+          (p) =>
+            p.status === "completed" &&
+            new Date(p.download_expires_at) >= new Date()
+        );
+        for (const p of active) {
+          try {
+            const dlRes = await fetch(
+              `/api/internal/projects/download?purchaseId=${encodeURIComponent(p.id)}`,
+              { headers: { Authorization: `Bearer ${token}` } }
+            );
+            if (dlRes.ok) {
+              const dlData = await dlRes.json();
+              if (dlData.supplementaryFiles?.length) {
+                setSupplementaryFiles((prev) => ({
+                  ...prev,
+                  [p.id]: dlData.supplementaryFiles,
+                }));
+              }
+            }
+          } catch {
+            // Non-critical; supplementary info will load on download click
+          }
+        }
       }
     } catch {
       // Fail silently

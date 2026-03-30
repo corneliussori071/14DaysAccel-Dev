@@ -6,8 +6,7 @@ import {
   createServiceClient,
 } from "../_shared/utils.ts";
 import { getProvider, getActiveProviderName } from "../_shared/payment.ts";
-import "../_shared/providers/lemonsqueezy.ts";
-import "../_shared/providers/fastspring.ts";
+import "../_shared/providers/creem.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -71,8 +70,7 @@ Deno.serve(async (req: Request) => {
       price_usd: number;
       tokens_per_month: number;
       plan_type: string;
-      lemon_variant_id?: string;
-      fastspring_product_path?: string;
+      creem_product_id?: string;
     }>;
 
     const matchedPlan = planId
@@ -115,14 +113,10 @@ Deno.serve(async (req: Request) => {
     const activeProviderName = await getActiveProviderName();
     const provider = getProvider(activeProviderName);
 
-    // Resolve the correct variant/product ID for the active provider
+    // Resolve the correct product ID for the active provider
     let resolvedVariantId = variantId;
     if (matchedPlan) {
-      if (activeProviderName === "fastspring") {
-        resolvedVariantId = matchedPlan.fastspring_product_path || variantId;
-      } else {
-        resolvedVariantId = matchedPlan.lemon_variant_id || variantId;
-      }
+      resolvedVariantId = matchedPlan.creem_product_id || variantId;
     }
 
     const siteUrl =

@@ -16,7 +16,7 @@ export interface CheckoutParams {
 export interface CheckoutResult {
   checkoutUrl: string;
   providerOrderId: string;
-  /** Session ID for Store Builder Library integrations (e.g. FastSpring) */
+  /** Session ID for session-based checkout integrations */
   sessionId?: string;
 }
 
@@ -53,7 +53,7 @@ export function registerProvider(
 
 export function getProvider(name?: string): PaymentProvider {
   const providerName =
-    name || Deno.env.get("PAYMENT_PROVIDER") || "lemonsqueezy";
+    name || Deno.env.get("PAYMENT_PROVIDER") || "creem";
   const factory = providers[providerName];
   if (!factory) {
     throw new Error(
@@ -79,7 +79,7 @@ export async function getActiveProviderName(): Promise<string> {
   } catch {
     // Fall back to env var / default
   }
-  return Deno.env.get("PAYMENT_PROVIDER") || "lemonsqueezy";
+  return Deno.env.get("PAYMENT_PROVIDER") || "creem";
 }
 
 // --- Token crediting (shared across all providers) ---

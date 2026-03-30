@@ -53,7 +53,7 @@ export default function PrivacyPolicyPage() {
               <li>
                 <span className="font-medium">Payment information:</span>{" "}
                 payment details processed through our third-party payment
-                provider (Lemon Squeezy). We do not store your credit card
+                provider (Creem). We do not store your credit card
                 numbers or bank account details on our servers.
               </li>
               <li>
@@ -138,7 +138,7 @@ export default function PrivacyPolicyPage() {
                 <span className="font-medium">Service providers:</span> we
                 share data with trusted third-party providers that help us
                 operate the Platform, including authentication services
-                (Supabase), payment processing (Lemon Squeezy), hosting
+                (Supabase), payment processing (Creem), hosting
                 (Vercel), and AI model providers (OpenAI, Anthropic). These
                 providers are contractually obligated to protect your data.
               </li>

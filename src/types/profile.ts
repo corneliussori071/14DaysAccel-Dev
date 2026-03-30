@@ -37,6 +37,5 @@ export interface SubscriptionPlan {
   plan_type: "subscription" | "custom";
   min_tokens?: number;
   max_tokens?: number;
-  lemon_variant_id?: string;
-  fastspring_product_path?: string;
+  creem_product_id?: string;
 }

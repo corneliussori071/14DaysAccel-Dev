@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 interface PaymentProvidersConfig {
-  active_provider: "lemonsqueezy" | "fastspring";
+  active_provider: "creem";
   payments_disabled?: boolean;
   disabled_message?: string;
   disabled_redirect?: string;
@@ -11,21 +11,15 @@ interface PaymentProvidersConfig {
 
 const PROVIDERS = [
   {
-    id: "lemonsqueezy" as const,
-    label: "Lemon Squeezy",
+    id: "creem" as const,
+    label: "Creem",
     description:
-      "Digital payments platform with built-in tax compliance and merchant of record services.",
-  },
-  {
-    id: "fastspring" as const,
-    label: "FastSpring",
-    description:
-      "Global digital commerce platform with international payment processing and tax management.",
+      "Global payment platform with checkout sessions, subscription management, and webhook integrations.",
   },
 ];
 
 const DEFAULT_CONFIG: PaymentProvidersConfig = {
-  active_provider: "lemonsqueezy",
+  active_provider: "creem",
 };
 
 export default function PaymentProviderSection() {

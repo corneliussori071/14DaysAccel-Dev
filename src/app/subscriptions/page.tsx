@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { TOKEN_PRICE_USD } from "@/types/softwarePlan";
@@ -8,18 +8,6 @@ import type { SubscriptionPlan } from "@/types/profile";
 import { supabase } from "@/lib/supabase";
 import type { User } from "@supabase/supabase-js";
 import PaymentDisabledModal from "@/components/projects/PaymentDisabledModal";
-
-declare global {
-  interface Window {
-    fastspring?: {
-      builder: {
-        push(data: Record<string, unknown>): void;
-        checkout(): void;
-        reset(): void;
-      };
-    };
-  }
-}
 
 export default function SubscriptionsPage() {
   return (
@@ -48,27 +36,8 @@ function SubscriptionsContent() {
     message: string;
     redirect?: string | null;
   } | null>(null);
-  const sblLoaded = useRef(false);
 
   const paymentStatus = searchParams.get("payment");
-
-  // Load the FastSpring Store Builder Library script once
-  useEffect(() => {
-    const storefront = process.env.NEXT_PUBLIC_FASTSPRING_STOREFRONT;
-    if (!storefront || sblLoaded.current) return;
-    if (document.getElementById("fsc-api")) {
-      sblLoaded.current = true;
-      return;
-    }
-    const script = document.createElement("script");
-    script.id = "fsc-api";
-    script.src =
-      "https://sbl.onfastspring.com/sbl/1.0.7/fastspring-builder.min.js";
-    script.type = "text/javascript";
-    script.setAttribute("data-storefront", storefront);
-    document.head.appendChild(script);
-    sblLoaded.current = true;
-  }, []);
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
@@ -161,19 +130,7 @@ function SubscriptionsContent() {
 
     const data = await res.json();
 
-    // FastSpring: trigger popup checkout via Store Builder Library
-    if (data.provider === "fastspring" && data.sessionId) {
-      if (!window.fastspring?.builder?.push) {
-        throw new Error(
-          "FastSpring checkout is not available. Please refresh and try again."
-        );
-      }
-      window.fastspring.builder.push({ checkout: data.sessionId });
-      setTimeout(() => setCheckingOut(null), 2000);
-      return;
-    }
-
-    // Lemon Squeezy (or other redirect-based provider)
+    // Redirect to Creem checkout page
     window.location.href = data.checkoutUrl;
   }
 
@@ -181,7 +138,7 @@ function SubscriptionsContent() {
     setCheckingOut(plan.id);
     try {
       const amountCents = Math.round(plan.price_usd * 100);
-      await initiateCheckout(plan.tokens_per_month, amountCents, plan.name, plan.lemon_variant_id, plan.id);
+      await initiateCheckout(plan.tokens_per_month, amountCents, plan.name, plan.creem_product_id, plan.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Checkout failed");
       setCheckingOut(null);
@@ -193,7 +150,7 @@ function SubscriptionsContent() {
     setCheckingOut("custom");
     try {
       const amountCents = Math.round(customTokens * TOKEN_PRICE_USD * 100);
-      await initiateCheckout(customTokens, amountCents, customPlan.name, customPlan.lemon_variant_id, customPlan.id);
+      await initiateCheckout(customTokens, amountCents, customPlan.name, customPlan.creem_product_id, customPlan.id);
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "Checkout failed");
       setCheckingOut(null);

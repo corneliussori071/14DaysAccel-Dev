@@ -151,7 +151,7 @@ function getDefault(section: string): unknown {
       disable_reason: "",
     },
     "payment-providers": {
-      active_provider: "lemonsqueezy",
+      active_provider: "creem",
       payments_disabled: false,
       disabled_message: "",
       disabled_redirect: "",

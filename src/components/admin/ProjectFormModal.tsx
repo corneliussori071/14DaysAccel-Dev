@@ -560,7 +560,7 @@ export default function ProjectFormModal({
                 </div>
                 <div>
                   <label htmlFor="productPath" className={labelClass}>
-                    Product Path (FastSpring)
+                    Creem Product ID (Subscription)
                   </label>
                   <input
                     id="productPath"
@@ -568,12 +568,12 @@ export default function ProjectFormModal({
                     value={productPath}
                     onChange={(e) => setProductPath(e.target.value)}
                     className={inputClass}
-                    placeholder="inventory-system"
+                    placeholder="prod_1234567890"
                   />
                 </div>
                 <div>
                   <label htmlFor="productVariable" className={labelClass}>
-                    Product Variable (Lemon Squeezy Variant ID)
+                    Creem Product ID (One-time)
                   </label>
                   <input
                     id="productVariable"
@@ -581,7 +581,7 @@ export default function ProjectFormModal({
                     value={productVariable}
                     onChange={(e) => setProductVariable(e.target.value)}
                     className={inputClass}
-                    placeholder="12345"
+                    placeholder="prod_1234567890"
                   />
                 </div>
               </div>

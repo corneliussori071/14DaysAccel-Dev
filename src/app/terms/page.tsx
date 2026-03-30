@@ -100,9 +100,22 @@ export default function TermsPage() {
               or discontinued at any time.
             </p>
             <p className="mt-3">
-              Payment processing is handled by third-party payment providers.
-              By making a purchase, you agree to the payment provider&apos;s
-              terms of service in addition to these Terms.
+              Payment processing for token purchases and project source code
+              purchases is handled by Creem (Armitage Labs OÜ), which acts
+              as the merchant of record for all transactions made through the
+              Platform. This means Creem processes your payment, issues the
+              invoice, and handles applicable sales taxes and VAT based on
+              your billing address. By making a purchase, you agree to
+              Creem&apos;s{" "}
+              <a
+                href="https://www.creem.io/terms"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-zinc-900 underline hover:text-zinc-600"
+              >
+                Buyer Terms
+              </a>{" "}
+              in addition to these Terms.
             </p>
           </section>
 
@@ -110,12 +123,27 @@ export default function TermsPage() {
             <h2 className="mb-3 text-lg font-semibold text-zinc-900">
               5. Refund Policy
             </h2>
+            <h3 className="mb-2 mt-2 text-sm font-semibold text-zinc-800">
+              5.1 Token Purchases
+            </h3>
             <p>
               Due to the nature of digital services and AI-generated content,
               all token purchases are generally non-refundable once tokens have
               been used. Refund requests for unused tokens may be considered on
               a case-by-case basis by contacting our support team. We reserve
               the right to issue refunds at our sole discretion.
+            </p>
+            <h3 className="mb-2 mt-4 text-sm font-semibold text-zinc-800">
+              5.2 Project Source Code Purchases
+            </h3>
+            <p>
+              All project source code purchases are processed by Creem as the
+              merchant of record. Due to the digital nature of source code
+              deliverables, purchases are generally non-refundable once
+              download access has been granted. Refund requests are handled in
+              accordance with Creem&apos;s policies and applicable consumer
+              protection laws. To request a refund, contact our support team
+              and we will coordinate with Creem to review your request.
             </p>
           </section>
 

@@ -15,7 +15,7 @@ function getConfig() {
 
   const baseUrl = isTestMode
     ? "https://test.dodopayments.com"
-    : "https://api.dodopayments.com";
+    : "https://live.dodopayments.com";
 
   return { apiKey, webhookSecret, baseUrl };
 }
@@ -45,7 +45,7 @@ function createDodoProvider(): PaymentProvider {
         },
       };
 
-      const response = await fetch(`${baseUrl}/v1/checkouts`, {
+      const response = await fetch(`${baseUrl}/checkouts`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

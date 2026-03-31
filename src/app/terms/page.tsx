@@ -14,7 +14,7 @@ export default function TermsPage() {
           Terms and Conditions
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          Last updated: March 18, 2026
+          Last updated: March 31, 2026
         </p>
 
         <div className="mt-10 space-y-8 text-sm leading-relaxed text-zinc-700">
@@ -101,20 +101,12 @@ export default function TermsPage() {
             </p>
             <p className="mt-3">
               Payment processing for token purchases and project source code
-              purchases is handled by Creem (Armitage Labs OÜ), which acts
-              as the merchant of record for all transactions made through the
-              Platform. This means Creem processes your payment, issues the
-              invoice, and handles applicable sales taxes and VAT based on
-              your billing address. By making a purchase, you agree to
-              Creem&apos;s{" "}
-              <a
-                href="https://www.creem.io/terms"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-zinc-900 underline hover:text-zinc-600"
-              >
-                Buyer Terms
-              </a>{" "}
+              purchases is handled by our designated payment processor, which
+              acts as the merchant of record for all transactions made through
+              the Platform. This means the payment processor processes your
+              payment, issues the invoice, and handles applicable sales taxes
+              and VAT based on your billing address. By making a purchase, you
+              agree to the applicable payment processor&apos;s terms of service
               in addition to these Terms.
             </p>
           </section>
@@ -137,13 +129,14 @@ export default function TermsPage() {
               5.2 Project Source Code Purchases
             </h3>
             <p>
-              All project source code purchases are processed by Creem as the
-              merchant of record. Due to the digital nature of source code
-              deliverables, purchases are generally non-refundable once
-              download access has been granted. Refund requests are handled in
-              accordance with Creem&apos;s policies and applicable consumer
-              protection laws. To request a refund, contact our support team
-              and we will coordinate with Creem to review your request.
+              All project source code purchases are processed by our
+              designated payment processor as the merchant of record. Due to
+              the digital nature of source code deliverables, purchases are
+              generally non-refundable once download access has been granted.
+              Refund requests are handled in accordance with the payment
+              processor&apos;s policies and applicable consumer protection
+              laws. To request a refund, contact our support team and we will
+              coordinate with the payment processor to review your request.
             </p>
           </section>
 

@@ -14,7 +14,7 @@ export default function PrivacyPolicyPage() {
           Privacy Policy
         </h1>
         <p className="mt-2 text-sm text-zinc-500">
-          Last updated: March 18, 2026
+          Last updated: March 31, 2026
         </p>
 
         <div className="mt-10 space-y-8 text-sm leading-relaxed text-zinc-700">
@@ -53,8 +53,8 @@ export default function PrivacyPolicyPage() {
               <li>
                 <span className="font-medium">Payment information:</span>{" "}
                 payment details processed through our third-party payment
-                provider (Creem). We do not store your credit card
-                numbers or bank account details on our servers.
+                processor. We do not store your credit card numbers or bank
+                account details on our servers.
               </li>
               <li>
                 <span className="font-medium">Project inputs:</span> business
@@ -138,9 +138,9 @@ export default function PrivacyPolicyPage() {
                 <span className="font-medium">Service providers:</span> we
                 share data with trusted third-party providers that help us
                 operate the Platform, including authentication services
-                (Supabase), payment processing (Creem), hosting
-                (Vercel), and AI model providers (OpenAI, Anthropic). These
-                providers are contractually obligated to protect your data.
+                (Supabase), payment processing, hosting (Vercel), and AI model
+                providers (OpenAI, Anthropic). These providers are
+                contractually obligated to protect your data.
               </li>
               <li>
                 <span className="font-medium">Legal requirements:</span> we

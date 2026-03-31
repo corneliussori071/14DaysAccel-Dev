@@ -3,7 +3,7 @@
 import { useCallback, useEffect, useState } from "react";
 
 interface PaymentProvidersConfig {
-  active_provider: "creem";
+  active_provider: "creem" | "dodo";
   payments_disabled?: boolean;
   disabled_message?: string;
   disabled_redirect?: string;
@@ -15,6 +15,12 @@ const PROVIDERS = [
     label: "Creem",
     description:
       "Global payment platform with checkout sessions, subscription management, and webhook integrations.",
+  },
+  {
+    id: "dodo" as const,
+    label: "Dodo Payments",
+    description:
+      "All-in-one payments and billing platform for SaaS and digital products. Merchant of record with global coverage in 150+ countries.",
   },
 ];
 
@@ -162,7 +168,7 @@ export default function PaymentProviderSection() {
                     key={provider.id}
                     type="button"
                     onClick={() =>
-                      setConfig({ active_provider: provider.id })
+                      setConfig((prev) => ({ ...prev, active_provider: provider.id }))
                     }
                     className={`flex w-full items-start gap-4 rounded-lg border p-5 text-left transition-colors ${
                       isActive

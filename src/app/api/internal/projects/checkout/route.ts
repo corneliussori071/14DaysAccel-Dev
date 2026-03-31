@@ -47,7 +47,7 @@ export async function POST(request: NextRequest) {
 
     const { data: project, error: projectError } = await supabase
       .from("projects")
-      .select("id, title, status, price_usd, product_path, product_variable")
+      .select("id, title, status, price_usd, product_path, product_variable, dodo_product_path, dodo_product_variable")
       .eq("id", projectId)
       .single();
 
@@ -89,6 +89,21 @@ export async function POST(request: NextRequest) {
 
     const amountCents = Math.round(project.price_usd * 100);
 
+    // Determine which product ID to use based on active payment provider
+    const { data: adminSettings } = await supabase
+      .from("admin_settings")
+      .select("value")
+      .eq("key", "payment_providers")
+      .single();
+
+    const activeProvider = adminSettings?.value?.active_provider || "creem";
+    let variantId: string | undefined;
+    if (activeProvider === "dodo") {
+      variantId = project.dodo_product_variable || project.dodo_product_path || undefined;
+    } else {
+      variantId = project.product_variable || project.product_path || undefined;
+    }
+
     // Build a full redirect URL from the request origin
     const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || process.env.NEXT_PUBLIC_SITE_URL || "https://14daysaccel.com";
 
@@ -104,7 +119,7 @@ export async function POST(request: NextRequest) {
         tokens: 0,
         amountCents,
         planName: project.title,
-        variantId: project.product_variable || project.product_path || undefined,
+        variantId,
         projectId: project.id,
         redirectUrl:
           redirectUrl ||

@@ -88,6 +88,12 @@ export default function ProjectFormModal({
   const [productVariable, setProductVariable] = useState(
     project?.product_variable ?? ""
   );
+  const [dodoProductPath, setDodoProductPath] = useState(
+    project?.dodo_product_path ?? ""
+  );
+  const [dodoProductVariable, setDodoProductVariable] = useState(
+    project?.dodo_product_variable ?? ""
+  );
   const [sourceCodeUrl, setSourceCodeUrl] = useState<string | null>(
     project?.source_code_url ?? null
   );
@@ -202,6 +208,8 @@ export default function ProjectFormModal({
       price_usd: priceUsd ? Number(priceUsd) : null,
       product_path: productPath || null,
       product_variable: productVariable || null,
+      dodo_product_path: dodoProductPath || null,
+      dodo_product_variable: dodoProductVariable || null,
       source_code_url: sourceCodeUrl,
       source_code_name: sourceCodeName,
       source_code_size: sourceCodeSize,
@@ -554,6 +562,32 @@ export default function ProjectFormModal({
                     onChange={(e) => setProductVariable(e.target.value)}
                     className={inputClass}
                     placeholder="prod_1234567890"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dodoProductPath" className={labelClass}>
+                    Dodo Product ID (Subscription)
+                  </label>
+                  <input
+                    id="dodoProductPath"
+                    type="text"
+                    value={dodoProductPath}
+                    onChange={(e) => setDodoProductPath(e.target.value)}
+                    className={inputClass}
+                    placeholder="pdt_1234567890"
+                  />
+                </div>
+                <div>
+                  <label htmlFor="dodoProductVariable" className={labelClass}>
+                    Dodo Product ID (One-time)
+                  </label>
+                  <input
+                    id="dodoProductVariable"
+                    type="text"
+                    value={dodoProductVariable}
+                    onChange={(e) => setDodoProductVariable(e.target.value)}
+                    className={inputClass}
+                    placeholder="pdt_1234567890"
                   />
                 </div>
               </div>

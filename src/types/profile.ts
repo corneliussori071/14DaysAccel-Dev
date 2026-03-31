@@ -38,4 +38,5 @@ export interface SubscriptionPlan {
   min_tokens?: number;
   max_tokens?: number;
   creem_product_id?: string;
+  dodo_product_id?: string;
 }

@@ -52,7 +52,7 @@ export async function POST(request: NextRequest) {
 
   try {
     const body = await request.json();
-    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image, testing_available, testing_instructions, testing_url, testing_doc_url, testing_doc_name, price_usd, product_path, product_variable, source_code_url, source_code_name, source_code_size, supplementary_files } = body;
+    const { title, slug, description, features, tech_stack, status, featured, upwork_link, youtube_link, tiktok_link, media_files, profile_image, testing_available, testing_instructions, testing_url, testing_doc_url, testing_doc_name, price_usd, product_path, product_variable, dodo_product_path, dodo_product_variable, source_code_url, source_code_name, source_code_size, supplementary_files } = body;
 
     if (!title || !slug || !description) {
       return NextResponse.json(
@@ -104,6 +104,8 @@ export async function POST(request: NextRequest) {
         price_usd: price_usd != null && Number(price_usd) > 0 ? Number(price_usd) : null,
         product_path: product_path ? String(product_path).slice(0, 500) : null,
         product_variable: product_variable ? String(product_variable).slice(0, 500) : null,
+        dodo_product_path: dodo_product_path ? String(dodo_product_path).slice(0, 500) : null,
+        dodo_product_variable: dodo_product_variable ? String(dodo_product_variable).slice(0, 500) : null,
         source_code_url: source_code_url ? String(source_code_url).slice(0, 2000) : null,
         source_code_name: source_code_name ? String(source_code_name).slice(0, 200) : null,
         source_code_size: source_code_size != null ? Number(source_code_size) : null,
@@ -197,6 +199,10 @@ export async function PUT(request: NextRequest) {
       sanitized.product_path = updates.product_path ? String(updates.product_path).slice(0, 500) : null;
     if (updates.product_variable !== undefined)
       sanitized.product_variable = updates.product_variable ? String(updates.product_variable).slice(0, 500) : null;
+    if (updates.dodo_product_path !== undefined)
+      sanitized.dodo_product_path = updates.dodo_product_path ? String(updates.dodo_product_path).slice(0, 500) : null;
+    if (updates.dodo_product_variable !== undefined)
+      sanitized.dodo_product_variable = updates.dodo_product_variable ? String(updates.dodo_product_variable).slice(0, 500) : null;
     if (updates.source_code_url !== undefined)
       sanitized.source_code_url = updates.source_code_url ? String(updates.source_code_url).slice(0, 2000) : null;
     if (updates.source_code_name !== undefined)

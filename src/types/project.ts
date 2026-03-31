@@ -33,6 +33,8 @@ export interface Project {
   price_usd: number | null;
   product_path: string | null;
   product_variable: string | null;
+  dodo_product_path: string | null;
+  dodo_product_variable: string | null;
   source_code_url: string | null;
   source_code_name: string | null;
   source_code_size: number | null;

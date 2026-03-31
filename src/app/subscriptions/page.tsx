@@ -130,7 +130,7 @@ function SubscriptionsContent() {
 
     const data = await res.json();
 
-    // Redirect to Creem checkout page
+    // Redirect to payment checkout page
     window.location.href = data.checkoutUrl;
   }
 

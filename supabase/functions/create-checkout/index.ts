@@ -7,6 +7,7 @@ import {
 } from "../_shared/utils.ts";
 import { getProvider, getActiveProviderName } from "../_shared/payment.ts";
 import "../_shared/providers/creem.ts";
+import "../_shared/providers/dodo.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -71,6 +72,7 @@ Deno.serve(async (req: Request) => {
       tokens_per_month: number;
       plan_type: string;
       creem_product_id?: string;
+      dodo_product_id?: string;
     }>;
 
     const matchedPlan = planId
@@ -116,7 +118,9 @@ Deno.serve(async (req: Request) => {
     // Resolve the correct product ID for the active provider
     let resolvedVariantId = variantId;
     if (matchedPlan) {
-      resolvedVariantId = matchedPlan.creem_product_id || variantId;
+      const productIdKey = `${activeProviderName}_product_id`;
+      const providerProductId = (matchedPlan as Record<string, unknown>)[productIdKey] as string | undefined;
+      resolvedVariantId = providerProductId || matchedPlan.creem_product_id || variantId;
     }
 
     const siteUrl =

@@ -1,6 +1,7 @@
 import { getCorsHeaders, errorResponse, jsonResponse } from "../_shared/utils.ts";
 import { getProvider, getActiveProviderName, creditTokensToUser, recordProjectPurchase } from "../_shared/payment.ts";
 import "../_shared/providers/creem.ts";
+import "../_shared/providers/dodo.ts";
 
 Deno.serve(async (req: Request) => {
   if (req.method === "OPTIONS") {
@@ -14,24 +15,40 @@ Deno.serve(async (req: Request) => {
   try {
     const rawBody = await req.text();
 
-    // Creem uses creem-signature header for webhook verification
-    const signature = req.headers.get("creem-signature") || "";
+    // Detect provider from webhook headers
+    const creemSig = req.headers.get("creem-signature") || "";
+    const dodoWebhookId = req.headers.get("webhook-id") || "";
+    const dodoWebhookSig = req.headers.get("webhook-signature") || "";
+    const dodoWebhookTs = req.headers.get("webhook-timestamp") || "";
 
-    if (!signature) {
-      console.error("Webhook received without signature");
+    let providerName: string;
+    let signature: string;
+
+    if (creemSig) {
+      providerName = "creem";
+      signature = creemSig;
+    } else if (dodoWebhookId && dodoWebhookSig && dodoWebhookTs) {
+      providerName = "dodo";
+      // Pack the Standard Webhooks headers into a single string for the provider
+      signature = `${dodoWebhookId}|${dodoWebhookTs}|${dodoWebhookSig}`;
+    } else {
+      console.error("Webhook received without recognizable signature headers");
       return errorResponse("Missing signature", 401);
     }
 
-    const provider = getProvider("creem");
+    const provider = getProvider(providerName);
     const verification = await provider.verifyWebhook(rawBody, signature);
 
     if (!verification.isValid) {
-      console.error("Webhook signature verification failed");
+      console.error(`${providerName} webhook signature verification failed`);
       return errorResponse("Invalid signature", 401);
     }
 
-    // Process completed checkout events from Creem
-    const completedEvents = ["checkout.completed"];
+    // Normalize completed event names across providers
+    const completedEvents = [
+      "checkout.completed",  // Creem
+      "payment.succeeded",   // Dodo
+    ];
     if (!completedEvents.includes(verification.eventName)) {
       return jsonResponse({ received: true, skipped: verification.eventName });
     }
@@ -55,7 +72,7 @@ Deno.serve(async (req: Request) => {
       );
 
       console.log(
-        `Project purchase processed: project ${verification.projectId} for user ${verification.userId}`
+        `Project purchase processed: project ${verification.projectId} for user ${verification.userId} via ${providerName}`
       );
     } else {
       if (!verification.tokens || verification.tokens <= 0) {
@@ -75,7 +92,7 @@ Deno.serve(async (req: Request) => {
       );
 
       console.log(
-        `Payment processed: ${verification.tokens} tokens credited to user ${verification.userId}`
+        `Payment processed: ${verification.tokens} tokens credited to user ${verification.userId} via ${providerName}`
       );
     }
 

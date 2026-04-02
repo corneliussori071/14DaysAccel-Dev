@@ -3,6 +3,7 @@ import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/sections/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import InactivityGuard from "@/components/layout/InactivityGuard";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -77,6 +78,7 @@ export default function RootLayout({
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Header />
+        <InactivityGuard />
         <ErrorBoundary>{children}</ErrorBoundary>
         <Footer />
       </body>

@@ -65,14 +65,14 @@ export default function SoftwarePlannerSection() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 sm:p-8">
         <p className="text-sm text-zinc-500">Loading plans...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:p-8">
       <h1 className="text-xl font-semibold text-zinc-900">
         Software Planner History
       </h1>

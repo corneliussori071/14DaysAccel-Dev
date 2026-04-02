@@ -20,7 +20,7 @@ export default function PlansSection() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 sm:p-8">
         <p className="text-sm text-zinc-500">Loading plan details...</p>
       </div>
     );
@@ -32,7 +32,7 @@ export default function PlansSection() {
     : "N/A";
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:p-8">
       <h1 className="text-xl font-semibold text-zinc-900">Plans</h1>
       <p className="mt-1 text-sm text-zinc-500">
         Your current subscription and token balance.

@@ -26,14 +26,14 @@ export default function BillingSection() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 sm:p-8">
         <p className="text-sm text-zinc-500">Loading transactions...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:p-8">
       <h1 className="text-xl font-semibold text-zinc-900">Billing</h1>
       <p className="mt-1 text-sm text-zinc-500">
         View your token transaction history.
@@ -63,8 +63,8 @@ export default function BillingSection() {
           </p>
         </div>
       ) : (
-        <div className="mt-6 overflow-hidden rounded-lg border border-zinc-200 bg-white">
-          <table className="w-full text-sm">
+        <div className="mt-6 overflow-x-auto rounded-lg border border-zinc-200 bg-white">
+          <table className="w-full min-w-[480px] text-sm">
             <thead>
               <tr className="border-b border-zinc-200 bg-zinc-50">
                 <th className="px-4 py-3 text-left font-medium text-zinc-600">

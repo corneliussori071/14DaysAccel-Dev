@@ -72,7 +72,7 @@ export default function PersonalInfoSection() {
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:p-8">
       <h1 className="text-xl font-semibold text-zinc-900">
         Personal Information
       </h1>

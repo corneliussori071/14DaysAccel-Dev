@@ -131,14 +131,14 @@ export default function PurchasesSection() {
 
   if (loading) {
     return (
-      <div className="p-8">
+      <div className="px-4 py-6 sm:p-8">
         <p className="text-sm text-zinc-400">Loading purchases...</p>
       </div>
     );
   }
 
   return (
-    <div className="p-8">
+    <div className="px-4 py-6 sm:p-8">
       <h1 className="text-2xl font-semibold tracking-tight text-zinc-900">
         My Purchases
       </h1>

@@ -6,12 +6,14 @@ interface TypewriterTextProps {
   text: string;
   charsPerTick?: number;
   intervalMs?: number;
+  onComplete?: () => void;
 }
 
 export default function TypewriterText({
   text,
   charsPerTick = 3,
   intervalMs = 18,
+  onComplete,
 }: TypewriterTextProps) {
   const [displayed, setDisplayed] = useState("");
   const [isComplete, setIsComplete] = useState(false);
@@ -20,6 +22,9 @@ export default function TypewriterText({
   const scrollToView = useCallback(() => {
     cursorRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }, []);
+
+  const onCompleteRef = useRef(onComplete);
+  onCompleteRef.current = onComplete;
 
   useEffect(() => {
     if (!text) {
@@ -38,6 +43,7 @@ export default function TypewriterText({
         setDisplayed(text);
         setIsComplete(true);
         clearInterval(timer);
+        onCompleteRef.current?.();
       } else {
         setDisplayed(text.slice(0, i));
       }

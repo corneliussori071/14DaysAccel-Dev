@@ -18,7 +18,7 @@ export default function PartnerProgramSection() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
               <a
-                href="https://14daysaccel-dev.affonso.io"
+                href="https://14daysacceldev.affonso.io/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="rounded-md bg-zinc-900 px-5 py-2.5 text-center text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-md"

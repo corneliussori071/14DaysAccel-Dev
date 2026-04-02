@@ -85,7 +85,7 @@ export default function ReferralDashboardSection() {
         <p className="text-xs text-zinc-500">
           Want to manage your affiliate account directly?{" "}
           <a
-            href="https://14daysaccel-dev.affonso.io"
+            href="https://14daysacceldev.affonso.io/"
             target="_blank"
             rel="noopener noreferrer"
             className="font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"

@@ -16,9 +16,54 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "14DaysAccel Dev",
+  title: {
+    default: "14DaysAccel Dev - Acquire Software for Your Business Under 14 Days",
+    template: "%s | 14DaysAccel Dev",
+  },
   description:
-    "AI-accelerated software development platform. Explore project catalogues and generate software architecture plans.",
+    "Get production-ready software systems built and delivered for your business in under 14 days. Browse our project catalogue, try before you buy, and deploy with confidence.",
+  keywords: [
+    "custom software development",
+    "production-ready software",
+    "software catalogue",
+    "business software",
+    "rapid software delivery",
+    "software architecture",
+    "AI software planning",
+  ],
+  metadataBase: new URL("https://14daysaccel.com"),
+  openGraph: {
+    title: "14DaysAccel Dev - Acquire Software for Your Business Under 14 Days",
+    description:
+      "Production-ready software systems built and delivered for your business in under 14 days. Browse, test, and deploy with confidence.",
+    url: "https://14daysaccel.com",
+    siteName: "14DaysAccel Dev",
+    images: [
+      {
+        url: "/logo.jpg",
+        width: 800,
+        height: 800,
+        alt: "14DaysAccel Dev",
+      },
+    ],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary",
+    title: "14DaysAccel Dev - Acquire Software for Your Business Under 14 Days",
+    description:
+      "Production-ready software systems built and delivered for your business in under 14 days.",
+    images: ["/logo.jpg"],
+  },
+  icons: {
+    icon: "/logo.jpg",
+    apple: "/logo.jpg",
+  },
+  robots: {
+    index: true,
+    follow: true,
+  },
 };
 
 export default function RootLayout({

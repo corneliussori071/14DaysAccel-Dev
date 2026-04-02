@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 
 interface TypewriterTextProps {
   text: string;
@@ -10,11 +10,16 @@ interface TypewriterTextProps {
 
 export default function TypewriterText({
   text,
-  charsPerTick = 12,
-  intervalMs = 20,
+  charsPerTick = 3,
+  intervalMs = 18,
 }: TypewriterTextProps) {
   const [displayed, setDisplayed] = useState("");
   const [isComplete, setIsComplete] = useState(false);
+  const cursorRef = useRef<HTMLSpanElement>(null);
+
+  const scrollToView = useCallback(() => {
+    cursorRef.current?.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }, []);
 
   useEffect(() => {
     if (!text) {
@@ -36,17 +41,22 @@ export default function TypewriterText({
       } else {
         setDisplayed(text.slice(0, i));
       }
+      scrollToView();
     }, intervalMs);
 
     return () => clearInterval(timer);
-  }, [text, charsPerTick, intervalMs]);
+  }, [text, charsPerTick, intervalMs, scrollToView]);
 
   return (
     <>
       {displayed}
       {!isComplete && text && (
-        <span className="inline-block w-1.5 h-4 ml-0.5 bg-zinc-500 animate-pulse align-middle" />
+        <span
+          ref={cursorRef}
+          className="inline-block w-1.5 h-4 ml-0.5 bg-zinc-500 animate-pulse align-middle"
+        />
       )}
+      {isComplete && <span ref={cursorRef} />}
     </>
   );
 }

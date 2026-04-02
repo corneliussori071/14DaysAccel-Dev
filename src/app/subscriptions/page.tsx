@@ -107,6 +107,12 @@ function SubscriptionsContent() {
       return;
     }
 
+    // Read Affonso affiliate referral cookie if present
+    const affiliateReferral = document.cookie
+      .split("; ")
+      .find((c) => c.startsWith("affonso_referral="))
+      ?.split("=")[1] || undefined;
+
     const res = await fetch("/api/internal/checkout", {
       method: "POST",
       headers: {
@@ -120,6 +126,7 @@ function SubscriptionsContent() {
         variantId,
         planId,
         redirectUrl: `${window.location.origin}/subscriptions?payment=success`,
+        affiliateReferral,
       }),
     });
 

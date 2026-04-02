@@ -21,7 +21,7 @@ Deno.serve(async (req: Request) => {
   try {
     const user = await verifyUser(req.headers.get("Authorization"));
 
-    const { tokens, amountCents, planName, variantId, planId, redirectUrl, projectId } = await req.json();
+    const { tokens, amountCents, planName, variantId, planId, redirectUrl, projectId, affiliateReferral } = await req.json();
 
     // Project purchases: skip token validation, require amountCents only
     if (projectId) {
@@ -44,6 +44,7 @@ Deno.serve(async (req: Request) => {
         planName,
         variantId: variantId || undefined,
         projectId,
+        affiliateReferral,
       });
 
       return jsonResponse({
@@ -136,6 +137,7 @@ Deno.serve(async (req: Request) => {
       redirectUrl: finalRedirectUrl,
       planName,
       variantId: resolvedVariantId,
+      affiliateReferral,
     });
 
     return jsonResponse({

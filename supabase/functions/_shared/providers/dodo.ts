@@ -42,6 +42,7 @@ function createDodoProvider(): PaymentProvider {
           user_id: params.userId,
           tokens: String(params.tokens),
           ...(params.projectId ? { project_id: params.projectId } : {}),
+          ...(params.affiliateReferral ? { affonso_referral: params.affiliateReferral } : {}),
         },
       };
 

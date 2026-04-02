@@ -60,13 +60,19 @@ export default function ProjectBuyButton({
     setLoading(true);
     setError(null);
     try {
+      // Read Affonso affiliate referral cookie if present
+      const affiliateReferral = document.cookie
+        .split("; ")
+        .find((c) => c.startsWith("affonso_referral="))
+        ?.split("=")[1] || undefined;
+
       const res = await fetch("/api/internal/projects/checkout", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
           Authorization: `Bearer ${session.access_token}`,
         },
-        body: JSON.stringify({ projectId }),
+        body: JSON.stringify({ projectId, affiliateReferral }),
       });
 
       if (res.ok) {

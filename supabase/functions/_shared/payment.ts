@@ -11,6 +11,7 @@ export interface CheckoutParams {
   planName?: string;
   variantId?: string;
   projectId?: string;
+  affiliateReferral?: string;
 }
 
 export interface CheckoutResult {

@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { projectId, redirectUrl } = body;
+    const { projectId, redirectUrl, affiliateReferral } = body;
 
     if (!projectId || typeof projectId !== "string") {
       return NextResponse.json(
@@ -124,6 +124,7 @@ export async function POST(request: NextRequest) {
         redirectUrl:
           redirectUrl ||
           `${origin}/projects/${project.id}?payment=success`,
+        affiliateReferral,
       }),
     });
 

@@ -78,6 +78,13 @@ export async function GET(request: NextRequest) {
               return NextResponse.redirect(errorRedirect);
             }
           }
+
+          // Flag new signups so the client can track with Affonso
+          if (isNewUser) {
+            const redirectWithSignup = new URL(redirectUrl);
+            redirectWithSignup.searchParams.set("new_signup", "true");
+            return NextResponse.redirect(redirectWithSignup, { headers: response.headers });
+          }
         }
       } catch (e) {
         console.error("[auth/callback] Signup check failed:", e);

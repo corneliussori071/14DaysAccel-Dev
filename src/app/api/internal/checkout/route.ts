@@ -37,7 +37,7 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const { tokens, amountCents, planName, redirectUrl, variantId, planId } = body;
+    const { tokens, amountCents, planName, redirectUrl, variantId, planId, affiliateReferral } = body;
 
     if (
       !tokens ||
@@ -62,7 +62,7 @@ export async function POST(request: NextRequest) {
         Authorization: `Bearer ${token}`,
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ tokens, amountCents, planName, variantId, planId, redirectUrl }),
+      body: JSON.stringify({ tokens, amountCents, planName, variantId, planId, redirectUrl, affiliateReferral }),
     });
 
     const data = await res.json();

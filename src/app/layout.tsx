@@ -1,9 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { Geist, Geist_Mono } from "next/font/google";
 import Header from "@/components/layout/Header";
 import Footer from "@/components/sections/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InactivityGuard from "@/components/layout/InactivityGuard";
+import AffonsoSignupTracker from "@/components/layout/AffonsoSignupTracker";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -74,11 +76,23 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <script
+          async
+          defer
+          src="https://affonso.io/js/pixel.min.js"
+          data-affonso="cmnhrlrmv007t12yp8mr2hqls"
+          data-cookie_duration="90"
+        />
+      </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Header />
         <InactivityGuard />
+        <Suspense fallback={null}>
+          <AffonsoSignupTracker />
+        </Suspense>
         <ErrorBoundary>{children}</ErrorBoundary>
         <Footer />
       </body>

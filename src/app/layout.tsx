@@ -80,7 +80,7 @@ export default function RootLayout({
         <script
           async
           defer
-          src="https://affonso.io/js/pixel.min.js"
+          src="https://cdn.affonso.io/js/pixel.min.js"
           data-affonso="cmnhrlrmv007t12yp8mr2hqls"
           data-cookie_duration="90"
         />

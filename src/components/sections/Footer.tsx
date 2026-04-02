@@ -13,6 +13,7 @@ const navigationLinks: NavLink[] = [
   { label: "Software Planner", href: "/software-designer" },
   { label: "Pricing", href: "/subscriptions" },
   { label: "Engineering Philosophy", href: "/#engineering" },
+  { label: "Partner Program", href: "https://14daysaccel-dev.affonso.io" },
 ];
 
 const accountLinks: NavLink[] = [

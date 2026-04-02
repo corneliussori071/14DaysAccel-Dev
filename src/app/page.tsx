@@ -4,6 +4,7 @@ import DevelopmentApproachSection from "@/components/sections/DevelopmentApproac
 import UpworkCTASection from "@/components/sections/UpworkCTASection";
 import FeaturedProjectsSection from "@/components/sections/FeaturedProjectsSection";
 import EngineeringSection from "@/components/sections/EngineeringSection";
+import PartnerProgramSection from "@/components/sections/PartnerProgramSection";
 import CallToActionSection from "@/components/sections/CallToActionSection";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,7 @@ export default function Home() {
       <UpworkCTASection />
       <FeaturedProjectsSection />
       <EngineeringSection />
+      <PartnerProgramSection />
       <CallToActionSection />
     </main>
   );

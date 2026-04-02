@@ -9,8 +9,8 @@ import RegisterInterestButton from "@/components/projects/RegisterInterestButton
 import ProjectCommentsModal from "@/components/projects/ProjectCommentsModal";
 
 const statusStylesDark: Record<string, string> = {
-  available: "bg-blue-100 text-blue-800",
-  upcoming: "bg-blue-100 text-blue-800",
+  available: "bg-white/20 text-white",
+  upcoming: "bg-white/20 text-white",
 };
 
 const statusLabels: Record<string, string> = {
@@ -36,10 +36,10 @@ function ProjectCard({ project }: { project: Project }) {
     <>
     <Link
       href={`/projects/${project.slug}`}
-      className="group block rounded-lg border border-blue-200 bg-blue-50 transition-all hover:-translate-y-1 hover:border-blue-300 hover:shadow-lg hover:shadow-blue-100/50"
+      className="group block rounded-lg border border-blue-700 bg-blue-600 transition-all hover:-translate-y-1 hover:border-blue-600 hover:shadow-lg hover:shadow-blue-900/30"
     >
       {project.profile_image && (
-        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-blue-100">
+        <div className="aspect-video w-full overflow-hidden rounded-t-lg bg-blue-700">
           <img
             src={project.profile_image}
             alt={project.title}
@@ -49,7 +49,7 @@ function ProjectCard({ project }: { project: Project }) {
       )}
       <div className="p-6">
         <div className="mb-3 flex items-start justify-between gap-3">
-          <h3 className="text-base font-semibold text-zinc-900">
+          <h3 className="text-base font-semibold text-white">
             {project.title}
           </h3>
           <span
@@ -58,10 +58,10 @@ function ProjectCard({ project }: { project: Project }) {
             {statusLabels[project.status] || project.status}
           </span>
         </div>
-        <p className="text-sm leading-relaxed text-zinc-700">
+        <p className="text-sm leading-relaxed text-blue-100">
           {displayDescription}
           {isTruncated && (
-            <span className="ml-1 inline-block text-zinc-900 font-medium hover:underline">
+            <span className="ml-1 inline-block text-white font-medium hover:underline">
               More...
             </span>
           )}
@@ -70,7 +70,7 @@ function ProjectCard({ project }: { project: Project }) {
           {project.tech_stack.map((tech) => (
             <span
               key={tech}
-              className="rounded border border-blue-200 px-2 py-0.5 text-xs text-zinc-600"
+              className="rounded border border-blue-400/40 px-2 py-0.5 text-xs text-blue-100"
             >
               {tech}
             </span>
@@ -82,25 +82,25 @@ function ProjectCard({ project }: { project: Project }) {
             initialLikes={project.likes_count ?? 0}
             initialDislikes={project.dislikes_count ?? 0}
             initialComments={project.comments_count ?? 0}
-            variant="light"
+            variant="dark"
             onCommentClick={() => setShowComments(true)}
           />
         </div>
         <div className="mt-4 flex items-center gap-3">
-          <span className="rounded-md border border-zinc-300 px-4 py-2 text-xs font-medium text-zinc-700 transition-colors group-hover:bg-zinc-900 group-hover:text-white group-hover:border-zinc-900">
+          <span className="rounded-md border border-white/30 px-4 py-2 text-xs font-medium text-white transition-colors group-hover:bg-white group-hover:text-blue-700 group-hover:border-white">
             View Details
           </span>
           {project.status === "available" && project.price_usd && (
             <ProjectBuyButton
               projectId={project.id}
               priceUsd={project.price_usd}
-              variant="light"
+              variant="dark"
             />
           )}
           {project.status === "upcoming" && (
             <RegisterInterestButton
               projectId={project.id}
-              variant="light"
+              variant="dark"
             />
           )}
         </div>

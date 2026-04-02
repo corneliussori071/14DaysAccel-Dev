@@ -96,6 +96,7 @@ export async function deductTokens(
   });
 
   if (error) {
+    console.error("deduct_tokens RPC error:", error.message, error.code, error.details);
     throw new Error(
       error.message.includes("Insufficient")
         ? "Insufficient token balance"

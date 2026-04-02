@@ -126,7 +126,12 @@ Deno.serve(async (req) => {
 
     let plan;
     try {
-      plan = JSON.parse(result.content);
+      // Claude often wraps JSON in ```json ... ``` fences — strip them before parsing
+      const cleaned = result.content
+        .replace(/^```(?:json)?\s*\n?/i, "")
+        .replace(/\n?```\s*$/i, "")
+        .trim();
+      plan = JSON.parse(cleaned);
     } catch {
       plan = {
         software_description: result.content,

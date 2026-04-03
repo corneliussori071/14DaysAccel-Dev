@@ -124,8 +124,19 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ success: true });
     }
 
+    // Read configured signup tokens for the email
+    let signupTokens = 1000;
+    const { data: benefitsSettings } = await supabase
+      .from("admin_settings")
+      .select("value")
+      .eq("key", "free_benefits")
+      .single();
+    if (benefitsSettings?.value?.free_tokens_on_signup != null) {
+      signupTokens = Number(benefitsSettings.value.free_tokens_on_signup);
+    }
+
     const confirmUrl = linkData.properties.action_link;
-    const htmlContent = buildConfirmationEmailHtml(confirmUrl);
+    const htmlContent = buildConfirmationEmailHtml(confirmUrl, signupTokens);
 
     const result = await sendEmailViaSendGrid({
       to: email.trim(),

@@ -2,16 +2,30 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { supabase } from "@/lib/supabase";
 import { getTokenWallet } from "@/services/tokenService";
 import type { TokenWallet } from "@/types/softwarePlan";
 
 export default function PlansSection() {
   const [wallet, setWallet] = useState<TokenWallet | null>(null);
+  const [signupTokens, setSignupTokens] = useState<number>(1000);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     async function load() {
-      const data = await getTokenWallet();
+      const [data] = await Promise.all([
+        getTokenWallet(),
+        (async () => {
+          const { data: settings } = await supabase
+            .from("admin_settings")
+            .select("value")
+            .eq("key", "free_benefits")
+            .single();
+          if (settings?.value?.free_tokens_on_signup != null) {
+            setSignupTokens(Number(settings.value.free_tokens_on_signup));
+          }
+        })(),
+      ]);
       setWallet(data);
       setLoading(false);
     }
@@ -45,7 +59,7 @@ export default function PlansSection() {
           </p>
           <p className="mt-2 text-lg font-semibold text-zinc-900">Free Tier</p>
           <p className="mt-1 text-sm text-zinc-500">
-            1,000 tokens on signup
+            {signupTokens.toLocaleString()} tokens on signup
           </p>
         </div>
 
@@ -85,7 +99,7 @@ export default function PlansSection() {
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-zinc-500">Starting tokens</span>
-            <span className="text-zinc-900">1,000</span>
+            <span className="text-zinc-900">{signupTokens.toLocaleString()}</span>
           </div>
           <div className="flex justify-between text-sm">
             <span className="text-zinc-500">Tokens remaining</span>
@@ -94,7 +108,7 @@ export default function PlansSection() {
           <div className="flex justify-between text-sm">
             <span className="text-zinc-500">Tokens used</span>
             <span className="text-zinc-900">
-              {(1000 - balance).toLocaleString()}
+              {Math.max(0, signupTokens - balance).toLocaleString()}
             </span>
           </div>
         </div>

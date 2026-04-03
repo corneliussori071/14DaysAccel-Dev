@@ -17,16 +17,24 @@ export async function GET() {
       auth: { autoRefreshToken: false, persistSession: false },
     });
 
-    const { data } = await supabase
-      .from("admin_settings")
-      .select("value")
-      .eq("key", "emergency")
-      .single();
+    const [{ data: emergencyData }, { data: benefitsData }] = await Promise.all([
+      supabase
+        .from("admin_settings")
+        .select("value")
+        .eq("key", "emergency")
+        .single(),
+      supabase
+        .from("admin_settings")
+        .select("value")
+        .eq("key", "free_benefits")
+        .single(),
+    ]);
 
-    const signupsDisabled = data?.value?.signups_disabled === true;
+    const signupsDisabled = emergencyData?.value?.signups_disabled === true;
+    const signupTokens = benefitsData?.value?.free_tokens_on_signup ?? 1000;
 
     return NextResponse.json(
-      { allowed: !signupsDisabled },
+      { allowed: !signupsDisabled, signupTokens: Number(signupTokens) },
       {
         headers: {
           "Cache-Control": "no-store, no-cache, must-revalidate",
@@ -35,6 +43,6 @@ export async function GET() {
       }
     );
   } catch {
-    return NextResponse.json({ allowed: true });
+    return NextResponse.json({ allowed: true, signupTokens: 1000 });
   }
 }

@@ -4,16 +4,10 @@ import { useCallback, useEffect, useState } from "react";
 
 interface FreeBenefitsConfig {
   free_tokens_on_signup: number;
-  free_trial_days: number;
-  trial_token_limit: number;
-  is_free_trial_active: boolean;
 }
 
 const DEFAULT_CONFIG: FreeBenefitsConfig = {
   free_tokens_on_signup: 1000,
-  free_trial_days: 14,
-  trial_token_limit: 5000,
-  is_free_trial_active: true,
 };
 
 export default function FreeBenefitsSection() {
@@ -65,10 +59,10 @@ export default function FreeBenefitsSection() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-8">
           <h1 className="text-2xl font-semibold text-zinc-900">
-            Free Benefits Duration
+            Free Benefits
           </h1>
           <p className="mt-1 text-sm text-zinc-500">
-            Configure free signup tokens, trial duration, and limits.
+            Configure free signup tokens for new users.
           </p>
         </div>
 
@@ -91,32 +85,6 @@ export default function FreeBenefitsSection() {
         ) : (
           <div className="rounded-lg border border-zinc-200 bg-white p-6">
             <div className="space-y-5">
-              <div className="flex items-center justify-between">
-                <div>
-                  <h3 className="text-sm font-medium text-zinc-900">
-                    Free Trial Active
-                  </h3>
-                  <p className="text-xs text-zinc-500">
-                    Enable or disable the free trial for new users.
-                  </p>
-                </div>
-                <button
-                  onClick={() =>
-                    setConfig((c) => ({
-                      ...c,
-                      is_free_trial_active: !c.is_free_trial_active,
-                    }))
-                  }
-                  className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                    config.is_free_trial_active
-                      ? "bg-green-100 text-green-700"
-                      : "bg-zinc-100 text-zinc-500"
-                  }`}
-                >
-                  {config.is_free_trial_active ? "Active" : "Inactive"}
-                </button>
-              </div>
-
               <div>
                 <label className="mb-1 block text-sm font-medium text-zinc-700">
                   Free Tokens on Signup
@@ -135,45 +103,6 @@ export default function FreeBenefitsSection() {
                 />
                 <p className="mt-1 text-xs text-zinc-400">
                   Number of tokens awarded to new users upon registration.
-                </p>
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
-                  Free Trial Duration (days)
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={config.free_trial_days}
-                  onChange={(e) =>
-                    setConfig((c) => ({
-                      ...c,
-                      free_trial_days: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                />
-              </div>
-
-              <div>
-                <label className="mb-1 block text-sm font-medium text-zinc-700">
-                  Trial Token Limit
-                </label>
-                <input
-                  type="number"
-                  min="0"
-                  value={config.trial_token_limit}
-                  onChange={(e) =>
-                    setConfig((c) => ({
-                      ...c,
-                      trial_token_limit: parseInt(e.target.value) || 0,
-                    }))
-                  }
-                  className="w-full rounded-md border border-zinc-300 bg-white px-4 py-2.5 text-sm text-zinc-900 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                />
-                <p className="mt-1 text-xs text-zinc-400">
-                  Maximum token usage allowed during the trial period.
                 </p>
               </div>
             </div>

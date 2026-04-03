@@ -21,6 +21,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
   const [success, setSuccess] = useState("");
   const [signupsAllowed, setSignupsAllowed] = useState(true);
   const [checkingSignups, setCheckingSignups] = useState(false);
+  const [signupTokens, setSignupTokens] = useState<number | null>(null);
 
   const checkSignupStatus = useCallback(async () => {
     setCheckingSignups(true);
@@ -29,6 +30,9 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
       if (res.ok) {
         const data = await res.json();
         setSignupsAllowed(data.allowed);
+        if (data.signupTokens != null) {
+          setSignupTokens(data.signupTokens);
+        }
         if (!data.allowed && mode === "signup") {
           setError("New account registration is temporarily disabled. Please try again later.");
         }
@@ -182,7 +186,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
     mode === "login"
       ? "Log in to generate your software plan."
       : mode === "signup"
-        ? "Create an account to get started. You will receive 1,000 free tokens."
+        ? `Create an account to get started.${signupTokens ? ` You will receive ${signupTokens.toLocaleString()} free tokens.` : ""}`
         : "Enter your email and we will send you a password reset link.";
 
   return (

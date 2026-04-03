@@ -63,10 +63,21 @@ export async function checkTokenBalance(
     .single();
 
   if (error || !data) {
+    // Read configured signup tokens from admin_settings
+    let signupTokens = 1000;
+    const { data: settings } = await serviceClient
+      .from("admin_settings")
+      .select("value")
+      .eq("key", "free_benefits")
+      .single();
+    if (settings?.value?.free_tokens_on_signup != null) {
+      signupTokens = Number(settings.value.free_tokens_on_signup);
+    }
+
     // Auto-provision wallet for users who signed up before the trigger existed
     const { data: newWallet, error: insertError } = await serviceClient
       .from("token_wallets")
-      .insert({ user_id: userId, balance_tokens: 1000 })
+      .insert({ user_id: userId, balance_tokens: signupTokens })
       .select("balance_tokens")
       .single();
 

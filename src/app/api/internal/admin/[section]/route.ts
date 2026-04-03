@@ -132,9 +132,6 @@ function getDefault(section: string): unknown {
     "subscription-plans": [],
     "free-benefits": {
       free_tokens_on_signup: 1000,
-      free_trial_days: 14,
-      trial_token_limit: 5000,
-      is_free_trial_active: true,
     },
     communication: {
       support_email: "",

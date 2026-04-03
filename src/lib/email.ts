@@ -66,11 +66,12 @@ function wrapEmail(title: string, bodyHtml: string): string {
 </html>`;
 }
 
-export function buildConfirmationEmailHtml(confirmUrl: string): string {
+export function buildConfirmationEmailHtml(confirmUrl: string, signupTokens: number = 1000): string {
+  const formattedTokens = signupTokens.toLocaleString();
   const body = `<h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">Confirm Your Email</h2>
 <div style="color:#3f3f46;font-size:14px;line-height:1.7;">
   <p style="margin:0 0 16px;">Welcome to 14DaysAccel Dev. Click the button below to confirm your email address and activate your account.</p>
-  <p style="margin:0 0 24px;">You will receive 1,000 free tokens to get started with our AI-powered software planning tools.</p>
+  <p style="margin:0 0 24px;">You will receive ${formattedTokens} free tokens to get started with our AI-powered software planning tools.</p>
 </div>
 <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;">
   <tr>

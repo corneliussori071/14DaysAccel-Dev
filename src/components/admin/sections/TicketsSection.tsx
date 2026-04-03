@@ -13,6 +13,27 @@ interface Ticket {
   updated_at: string;
 }
 
+interface TicketReply {
+  id: string;
+  ticket_id: string;
+  message: string;
+  admin_name: string;
+  created_at: string;
+}
+
+interface TicketActivity {
+  id: string;
+  ticket_id: string;
+  action: string;
+  admin_name: string;
+  details: string | null;
+  created_at: string;
+}
+
+type TimelineEntry =
+  | { type: "reply"; data: TicketReply }
+  | { type: "activity"; data: TicketActivity };
+
 const CATEGORY_TABS = [
   { value: "all", label: "All" },
   { value: "subscriptions", label: "Subscriptions" },
@@ -42,6 +63,52 @@ export default function TicketsSection() {
   const [replying, setReplying] = useState(false);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const [actionMessage, setActionMessage] = useState("");
+  const [adminName, setAdminName] = useState(() => {
+    if (typeof window !== "undefined") {
+      return localStorage.getItem("admin_staff_name") || "";
+    }
+    return "";
+  });
+  const [timeline, setTimeline] = useState<TimelineEntry[]>([]);
+  const [timelineLoading, setTimelineLoading] = useState(false);
+
+  const persistAdminName = (name: string) => {
+    setAdminName(name);
+    if (typeof window !== "undefined") {
+      localStorage.setItem("admin_staff_name", name);
+    }
+  };
+
+  const fetchTimeline = useCallback(async (ticketId: string) => {
+    setTimelineLoading(true);
+    try {
+      const res = await fetch(`/api/internal/admin/tickets/${ticketId}`);
+      if (!res.ok) {
+        setTimeline([]);
+        return;
+      }
+      const data = await res.json();
+      const replies: TicketReply[] = data.replies || [];
+      const activity: TicketActivity[] = data.activity || [];
+
+      const entries: TimelineEntry[] = [
+        ...replies.map((r) => ({ type: "reply" as const, data: r })),
+        ...activity
+          .filter((a) => a.action !== "replied")
+          .map((a) => ({ type: "activity" as const, data: a })),
+      ];
+      entries.sort(
+        (a, b) =>
+          new Date(a.data.created_at).getTime() -
+          new Date(b.data.created_at).getTime()
+      );
+      setTimeline(entries);
+    } catch {
+      setTimeline([]);
+    } finally {
+      setTimelineLoading(false);
+    }
+  }, []);
 
   const fetchTickets = useCallback(async (search?: string) => {
     try {
@@ -84,7 +151,7 @@ export default function TicketsSection() {
       const res = await fetch(`/api/internal/admin/tickets/${ticketId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ status: newStatus }),
+        body: JSON.stringify({ status: newStatus, adminName }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -95,6 +162,7 @@ export default function TicketsSection() {
         prev.map((t) => (t.id === ticketId ? { ...t, status: newStatus } : t))
       );
       setActionMessage(`Ticket ${newStatus === "closed" ? "closed" : "re-opened"} and user notified.`);
+      fetchTimeline(ticketId);
     } catch {
       setActionMessage("Failed to update ticket status.");
     } finally {
@@ -110,7 +178,7 @@ export default function TicketsSection() {
       const res = await fetch(`/api/internal/admin/tickets/${ticketId}`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ message: replyText.trim() }),
+        body: JSON.stringify({ message: replyText.trim(), adminName }),
       });
       if (!res.ok) {
         const data = await res.json();
@@ -119,6 +187,7 @@ export default function TicketsSection() {
       }
       setReplyText("");
       setActionMessage("Reply sent to user.");
+      fetchTimeline(ticketId);
     } catch {
       setActionMessage("Failed to send reply.");
     } finally {
@@ -234,9 +303,15 @@ export default function TicketsSection() {
                 >
                   <button
                     onClick={() => {
-                      setExpandedTicket(isExpanded ? null : ticket.id);
+                      const opening = !isExpanded;
+                      setExpandedTicket(opening ? ticket.id : null);
                       setReplyText("");
                       setActionMessage("");
+                      if (opening) {
+                        fetchTimeline(ticket.id);
+                      } else {
+                        setTimeline([]);
+                      }
                     }}
                     className="flex w-full items-center justify-between px-5 py-4 text-left"
                   >
@@ -280,11 +355,77 @@ export default function TicketsSection() {
 
                   {isExpanded && (
                     <div className="border-t border-zinc-100 px-5 py-4">
+                      {/* Admin Name */}
+                      <div className="mb-4">
+                        <label className="mb-1 block text-xs font-medium text-zinc-500">
+                          Your staff name
+                        </label>
+                        <input
+                          type="text"
+                          value={adminName}
+                          onChange={(e) => persistAdminName(e.target.value)}
+                          placeholder="Enter your name"
+                          maxLength={100}
+                          className="w-full max-w-xs rounded-md border border-zinc-300 bg-white px-3 py-1.5 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                        />
+                      </div>
+
+                      {/* Original description */}
                       <div className="mb-4">
                         <p className="mb-1 text-xs font-medium text-zinc-500">Description</p>
                         <p className="whitespace-pre-wrap text-sm text-zinc-700">
                           {ticket.description}
                         </p>
+                      </div>
+
+                      {/* Conversation Timeline */}
+                      <div className="mb-4">
+                        <p className="mb-2 text-xs font-medium text-zinc-500">Activity</p>
+                        {timelineLoading ? (
+                          <p className="text-xs text-zinc-400">Loading activity...</p>
+                        ) : timeline.length === 0 ? (
+                          <p className="text-xs text-zinc-400">No activity yet.</p>
+                        ) : (
+                          <div className="space-y-2">
+                            {timeline.map((entry) => {
+                              if (entry.type === "reply") {
+                                const r = entry.data;
+                                return (
+                                  <div
+                                    key={`reply-${r.id}`}
+                                    className="rounded-md border border-blue-100 bg-blue-50 px-3 py-2"
+                                  >
+                                    <div className="flex items-center gap-2 text-xs text-blue-600">
+                                      <span className="font-medium">{r.admin_name}</span>
+                                      <span>replied</span>
+                                      <span className="ml-auto text-blue-400">
+                                        {new Date(r.created_at).toLocaleString()}
+                                      </span>
+                                    </div>
+                                    <p className="mt-1 whitespace-pre-wrap text-sm text-zinc-700">
+                                      {r.message}
+                                    </p>
+                                  </div>
+                                );
+                              }
+                              const a = entry.data;
+                              return (
+                                <div
+                                  key={`activity-${a.id}`}
+                                  className="rounded-md border border-zinc-100 bg-zinc-50 px-3 py-2"
+                                >
+                                  <div className="flex items-center gap-2 text-xs text-zinc-500">
+                                    <span className="font-medium">{a.admin_name}</span>
+                                    <span>{a.details || a.action}</span>
+                                    <span className="ml-auto text-zinc-400">
+                                      {new Date(a.created_at).toLocaleString()}
+                                    </span>
+                                  </div>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        )}
                       </div>
 
                       {/* Actions */}

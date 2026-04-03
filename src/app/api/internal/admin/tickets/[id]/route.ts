@@ -23,6 +23,40 @@ function getSupabaseAdmin() {
   });
 }
 
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  if (!(await verifyAdminSession())) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { id } = await params;
+  const supabase = getSupabaseAdmin();
+
+  const [repliesResult, activityResult] = await Promise.all([
+    supabase
+      .from("ticket_replies")
+      .select("id, ticket_id, message, admin_name, created_at")
+      .eq("ticket_id", id)
+      .order("created_at", { ascending: true }),
+    supabase
+      .from("ticket_activity")
+      .select("id, ticket_id, action, admin_name, details, created_at")
+      .eq("ticket_id", id)
+      .order("created_at", { ascending: true }),
+  ]);
+
+  if (repliesResult.error || activityResult.error) {
+    return NextResponse.json({ error: "Failed to load ticket details" }, { status: 500 });
+  }
+
+  return NextResponse.json({
+    replies: repliesResult.data || [],
+    activity: activityResult.data || [],
+  });
+}
+
 export async function PATCH(
   request: NextRequest,
   { params }: { params: Promise<{ id: string }> }
@@ -33,7 +67,8 @@ export async function PATCH(
 
   const { id } = await params;
   const body = await request.json();
-  const { status } = body;
+  const { status, adminName } = body;
+  const staffName = typeof adminName === "string" && adminName.trim() ? adminName.trim().slice(0, 100) : "Admin";
 
   if (!status || !["open", "closed"].includes(status)) {
     return NextResponse.json({ error: "Invalid status" }, { status: 400 });
@@ -64,6 +99,14 @@ export async function PATCH(
   if (updateError) {
     return NextResponse.json({ error: updateError.message }, { status: 500 });
   }
+
+  // Log activity
+  await supabase.from("ticket_activity").insert({
+    ticket_id: id,
+    action: "status_changed",
+    admin_name: staffName,
+    details: status === "closed" ? "Closed the ticket" : "Re-opened the ticket",
+  });
 
   // Send status change email
   const htmlContent = buildTicketStatusEmailHtml(id, status);
@@ -96,7 +139,8 @@ export async function POST(
 
   const { id } = await params;
   const body = await request.json();
-  const { message } = body;
+  const { message, adminName } = body;
+  const staffName = typeof adminName === "string" && adminName.trim() ? adminName.trim().slice(0, 100) : "Admin";
 
   if (!message || typeof message !== "string" || message.trim().length < 1) {
     return NextResponse.json({ error: "Reply message is required" }, { status: 400 });
@@ -116,14 +160,22 @@ export async function POST(
     return NextResponse.json({ error: "Ticket not found" }, { status: 404 });
   }
 
-  // Insert reply
+  // Insert reply with admin name
   const { error: insertError } = await supabase
     .from("ticket_replies")
-    .insert({ ticket_id: id, message: trimmedMessage });
+    .insert({ ticket_id: id, message: trimmedMessage, admin_name: staffName });
 
   if (insertError) {
     return NextResponse.json({ error: insertError.message }, { status: 500 });
   }
+
+  // Log activity
+  await supabase.from("ticket_activity").insert({
+    ticket_id: id,
+    action: "replied",
+    admin_name: staffName,
+    details: trimmedMessage,
+  });
 
   // Send reply email
   const htmlContent = buildTicketReplyEmailHtml(id, trimmedMessage);

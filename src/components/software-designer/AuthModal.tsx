@@ -240,6 +240,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
             <input
               id="auth-email"
               type="email"
+              autoComplete="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required
@@ -260,6 +261,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
                 <input
                   id="auth-password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete={mode === "signup" ? "new-password" : "current-password"}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
@@ -295,6 +297,7 @@ export default function AuthModal({ onClose, initialMode = "login" }: AuthModalP
                 <input
                   id="auth-confirm-password"
                   type={showPassword ? "text" : "password"}
+                  autoComplete="new-password"
                   value={confirmPassword}
                   onChange={(e) => setConfirmPassword(e.target.value)}
                   required

@@ -1,4 +1,4 @@
-const AFFILIATE_LINK = "https://14daysacceldev.affonso.io/";
+const AFFILIATE_LINK = "https://14daysaccel.com/partners";
 
 function escapeHtml(str: string): string {
   return str

@@ -1,3 +1,5 @@
+import Link from "next/link";
+
 export default function PartnerProgramSection() {
   return (
     <section className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
@@ -17,14 +19,12 @@ export default function PartnerProgramSection() {
               paid consistently.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:gap-4">
-              <a
-                href="https://14daysacceldev.affonso.io/"
-                target="_blank"
-                rel="noopener noreferrer"
+              <Link
+                href="/partners"
                 className="rounded-md bg-zinc-900 px-5 py-2.5 text-center text-sm font-medium text-white transition-all hover:-translate-y-0.5 hover:bg-zinc-800 hover:shadow-md"
               >
                 Join Partner Program
-              </a>
+              </Link>
             </div>
           </div>
           <div className="space-y-4">

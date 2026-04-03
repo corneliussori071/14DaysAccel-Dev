@@ -134,6 +134,7 @@ export async function sendEmailViaSendGrid(params: {
   to: string;
   subject: string;
   html: string;
+  from?: { email: string; name: string };
 }): Promise<{ ok: boolean; status?: number; error?: string }> {
   const sendgridApiKey = process.env.SENDGRID_API_KEY;
   if (!sendgridApiKey) {
@@ -148,7 +149,7 @@ export async function sendEmailViaSendGrid(params: {
     },
     body: JSON.stringify({
       personalizations: [{ to: [{ email: params.to }] }],
-      from: AUTH_EMAIL_FROM,
+      from: params.from || AUTH_EMAIL_FROM,
       subject: params.subject,
       content: [{ type: "text/html", value: params.html }],
     }),
@@ -160,4 +161,65 @@ export async function sendEmailViaSendGrid(params: {
   }
 
   return { ok: true };
+}
+
+export const SUPPORT_EMAIL_FROM = {
+  email: "support@14daysaccel.dev",
+  name: "14DaysAccel Dev",
+};
+
+export function buildTicketConfirmationEmailHtml(ticketId: string, category: string): string {
+  const body = `<h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">Support Ticket Created</h2>
+<div style="color:#3f3f46;font-size:14px;line-height:1.7;">
+  <p style="margin:0 0 16px;">Your support ticket has been created. Our team will review it and respond as soon as possible.</p>
+  <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;width:100%;">
+    <tr>
+      <td style="padding:12px 16px;background-color:#fafafa;border-bottom:1px solid #e4e4e7;font-size:13px;color:#71717a;width:120px;">Ticket ID</td>
+      <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;font-size:14px;font-weight:600;color:#18181b;font-family:monospace;">${escapeHtml(ticketId)}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 16px;background-color:#fafafa;font-size:13px;color:#71717a;">Category</td>
+      <td style="padding:12px 16px;font-size:14px;color:#18181b;">${escapeHtml(category)}</td>
+    </tr>
+  </table>
+  <p style="margin:0 0 8px;">Please reference this ticket ID in any future communication regarding this issue:</p>
+  <p style="margin:0;padding:10px 16px;background-color:#f4f4f5;border-radius:4px;font-family:monospace;font-size:15px;font-weight:600;color:#18181b;">${escapeHtml(ticketId)}</p>
+</div>`;
+
+  return wrapEmail("Support Ticket Created - 14DaysAccel Dev", body);
+}
+
+export function buildTicketReplyEmailHtml(ticketId: string, replyMessage: string): string {
+  const body = `<h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">New Reply on Your Ticket</h2>
+<div style="color:#3f3f46;font-size:14px;line-height:1.7;">
+  <p style="margin:0 0 8px;color:#71717a;font-size:13px;">Ticket ID: <span style="font-family:monospace;font-weight:600;color:#18181b;">${escapeHtml(ticketId)}</span></p>
+  <div style="margin:16px 0 24px;padding:16px;background-color:#fafafa;border:1px solid #e4e4e7;border-radius:6px;">
+    <p style="margin:0;white-space:pre-wrap;">${escapeHtml(replyMessage)}</p>
+  </div>
+  <p style="margin:0;color:#71717a;font-size:13px;">Please reference your ticket ID <strong>${escapeHtml(ticketId)}</strong> in any future communication.</p>
+</div>`;
+
+  return wrapEmail("Reply on Ticket " + escapeHtml(ticketId) + " - 14DaysAccel Dev", body);
+}
+
+export function buildTicketStatusEmailHtml(ticketId: string, newStatus: "open" | "closed"): string {
+  const statusLabel = newStatus === "closed" ? "Closed" : "Re-opened";
+  const statusColor = newStatus === "closed" ? "#dc2626" : "#16a34a";
+  const body = `<h2 style="margin:0 0 16px;color:#18181b;font-size:20px;font-weight:600;">Ticket ${statusLabel}</h2>
+<div style="color:#3f3f46;font-size:14px;line-height:1.7;">
+  <p style="margin:0 0 16px;">Your support ticket has been <span style="font-weight:600;color:${statusColor};">${statusLabel.toLowerCase()}</span>.</p>
+  <table cellpadding="0" cellspacing="0" style="margin:0 0 24px;border:1px solid #e4e4e7;border-radius:6px;overflow:hidden;width:100%;">
+    <tr>
+      <td style="padding:12px 16px;background-color:#fafafa;border-bottom:1px solid #e4e4e7;font-size:13px;color:#71717a;width:120px;">Ticket ID</td>
+      <td style="padding:12px 16px;border-bottom:1px solid #e4e4e7;font-size:14px;font-weight:600;color:#18181b;font-family:monospace;">${escapeHtml(ticketId)}</td>
+    </tr>
+    <tr>
+      <td style="padding:12px 16px;background-color:#fafafa;font-size:13px;color:#71717a;">Status</td>
+      <td style="padding:12px 16px;font-size:14px;font-weight:600;color:${statusColor};">${statusLabel}</td>
+    </tr>
+  </table>
+  <p style="margin:0;color:#71717a;font-size:13px;">Please reference your ticket ID <strong>${escapeHtml(ticketId)}</strong> in any future communication.</p>
+</div>`;
+
+  return wrapEmail("Ticket " + statusLabel + " - 14DaysAccel Dev", body);
 }

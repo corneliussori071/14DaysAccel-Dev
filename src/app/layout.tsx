@@ -6,6 +6,7 @@ import Footer from "@/components/sections/Footer";
 import ErrorBoundary from "@/components/ErrorBoundary";
 import InactivityGuard from "@/components/layout/InactivityGuard";
 import AffonsoSignupTracker from "@/components/layout/AffonsoSignupTracker";
+import SupportChatButton from "@/components/support/SupportChatButton";
 import "./globals.css";
 
 const geistSans = Geist({
@@ -95,6 +96,7 @@ export default function RootLayout({
         </Suspense>
         <ErrorBoundary>{children}</ErrorBoundary>
         <Footer />
+        <SupportChatButton />
       </body>
     </html>
   );

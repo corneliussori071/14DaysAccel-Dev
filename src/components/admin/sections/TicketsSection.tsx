@@ -450,29 +450,35 @@ export default function TicketsSection() {
                       </div>
 
                       {/* Reply */}
-                      <div>
-                        <p className="mb-1.5 text-xs font-medium text-zinc-500">Reply to user</p>
-                        <textarea
-                          value={replyText}
-                          onChange={(e) => setReplyText(e.target.value)}
-                          rows={3}
-                          maxLength={2000}
-                          placeholder="Type your reply..."
-                          className="w-full resize-none rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
-                        />
-                        <div className="mt-2 flex items-center justify-between">
-                          <span className="text-xs text-zinc-400">
-                            {replyText.length}/2000
-                          </span>
-                          <button
-                            onClick={() => handleReply(ticket.id)}
-                            disabled={replying || !replyText.trim()}
-                            className="rounded-md bg-zinc-900 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
-                          >
-                            {replying ? "Sending..." : "Send Reply"}
-                          </button>
+                      {ticket.status === "open" ? (
+                        <div>
+                          <p className="mb-1.5 text-xs font-medium text-zinc-500">Reply to user</p>
+                          <textarea
+                            value={replyText}
+                            onChange={(e) => setReplyText(e.target.value)}
+                            rows={3}
+                            maxLength={2000}
+                            placeholder="Type your reply..."
+                            className="w-full resize-none rounded-md border border-zinc-300 bg-white px-3 py-2 text-sm text-zinc-900 placeholder-zinc-400 focus:border-zinc-500 focus:outline-none focus:ring-1 focus:ring-zinc-500"
+                          />
+                          <div className="mt-2 flex items-center justify-between">
+                            <span className="text-xs text-zinc-400">
+                              {replyText.length}/2000
+                            </span>
+                            <button
+                              onClick={() => handleReply(ticket.id)}
+                              disabled={replying || !replyText.trim()}
+                              className="rounded-md bg-zinc-900 px-4 py-1.5 text-xs font-medium text-white transition-colors hover:bg-zinc-700 disabled:opacity-50"
+                            >
+                              {replying ? "Sending..." : "Send Reply"}
+                            </button>
+                          </div>
                         </div>
-                      </div>
+                      ) : (
+                        <p className="text-xs text-zinc-400">
+                          This ticket is closed. Re-open it to reply.
+                        </p>
+                      )}
                     </div>
                   )}
                 </div>

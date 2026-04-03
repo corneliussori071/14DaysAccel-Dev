@@ -6,7 +6,31 @@ import {
   sendEmailViaSendGrid,
   SUPPORT_EMAIL_FROM,
 } from "@/lib/email";
-import { sanitizeText, sanitizeEmail, sanitizeName } from "@/lib/sanitize";
+
+// Server-safe sanitization (no DOMPurify / jsdom dependency)
+const HTML_TAG_RE = /<[^>]*>/g;
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+function stripHtml(input: string): string {
+  return input.replace(HTML_TAG_RE, "").trim();
+}
+
+function serverSanitizeText(input: unknown): string {
+  if (input === null || input === undefined) return "";
+  return stripHtml(String(input)).slice(0, 500);
+}
+
+function serverSanitizeName(input: unknown): string | null {
+  if (!input) return null;
+  const cleaned = stripHtml(String(input)).slice(0, 200);
+  return cleaned.length >= 1 ? cleaned : null;
+}
+
+function serverSanitizeEmail(input: unknown): string | null {
+  if (!input) return null;
+  const cleaned = stripHtml(String(input)).toLowerCase().slice(0, 320);
+  return EMAIL_RE.test(cleaned) ? cleaned : null;
+}
 
 const VALID_CATEGORIES = new Set([
   "subscriptions",
@@ -74,7 +98,7 @@ export async function POST(request: NextRequest) {
     const { name: rawName, email: rawEmail, category, description: rawDescription } = body;
 
     // Sanitize inputs
-    const name = sanitizeName(rawName);
+    const name = serverSanitizeName(rawName);
     if (!name) {
       return NextResponse.json(
         { error: "A valid name is required." },
@@ -82,7 +106,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const email = sanitizeEmail(rawEmail);
+    const email = serverSanitizeEmail(rawEmail);
     if (!email) {
       return NextResponse.json(
         { error: "A valid email address is required." },
@@ -97,7 +121,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const description = sanitizeText(rawDescription);
+    const description = serverSanitizeText(rawDescription);
     if (!description || description.length < 10) {
       return NextResponse.json(
         { error: "Description must be at least 10 characters." },

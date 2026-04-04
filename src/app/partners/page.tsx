@@ -216,6 +216,12 @@ export default function PartnersPage() {
               Join the Partner Program
             </a>
             <Link
+              href="/partners/marketing-toolkit"
+              className="text-sm text-zinc-400 transition-colors hover:text-white"
+            >
+              Marketing Toolkit
+            </Link>
+            <Link
               href="/"
               className="text-sm text-zinc-400 transition-colors hover:text-white"
             >

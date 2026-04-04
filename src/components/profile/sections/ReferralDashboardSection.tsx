@@ -81,18 +81,31 @@ export default function ReferralDashboardSection() {
         </div>
       )}
 
-      <div className="mt-6 rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3">
-        <p className="text-xs text-zinc-500">
-          Want to manage your affiliate account directly?{" "}
-          <a
-            href="https://14daysacceldev.affonso.io/"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
-          >
-            Open partner portal
-          </a>
-        </p>
+      <div className="mt-6 space-y-3">
+        <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3">
+          <p className="text-xs text-zinc-500">
+            Access embeddable banners, widgets, pop-ups, and more with your referral link built in.{" "}
+            <a
+              href="/partners/marketing-toolkit"
+              className="font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
+            >
+              Open Marketing Toolkit
+            </a>
+          </p>
+        </div>
+        <div className="rounded-md border border-zinc-200 bg-zinc-50 px-4 py-3">
+          <p className="text-xs text-zinc-500">
+            Want to manage your affiliate account directly?{" "}
+            <a
+              href="https://14daysacceldev.affonso.io/"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="font-medium text-zinc-700 underline underline-offset-2 hover:text-zinc-900"
+            >
+              Open partner portal
+            </a>
+          </p>
+        </div>
       </div>
     </div>
   );

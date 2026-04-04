@@ -13,7 +13,7 @@ const benefits = [
   {
     title: "30% Recurring Commission",
     description:
-      "Earn on every payment your referrals make — including monthly and annual subscriptions, for the lifetime of the customer.",
+      "Earn on every payment your referrals make, including monthly and annual subscriptions, for the lifetime of the customer.",
   },
   {
     title: "90-Day Cookie Window",
@@ -33,7 +33,7 @@ const benefits = [
   {
     title: "Marketing Resources",
     description:
-      "Get access to copy, assets, and talking points to help you promote 14DaysAccel Dev effectively.",
+      "Get access to banners, widgets, email templates, and more from the Marketing Toolkit to promote 14DaysAccel Dev effectively.",
   },
 ];
 
@@ -68,7 +68,7 @@ const steps = [
     step: 4,
     title: "Earn Commissions",
     description:
-      "Earn 30% on every sale from your referrals — for as long as they remain a customer.",
+      "Earn 30% on every sale from your referrals, for as long as they remain a customer.",
   },
 ];
 
@@ -85,8 +85,8 @@ export default function PartnersPage() {
             Earn 30% recurring commission
           </h1>
           <p className="mx-auto mt-6 max-w-2xl text-base leading-relaxed text-zinc-400 md:text-lg">
-            Refer clients and audiences to 14DaysAccel Dev — the platform where
-            businesses acquire production-ready software in under 14 days — and
+            Refer clients and audiences to 14DaysAccel Dev, the platform where
+            businesses acquire production-ready software in under 14 days, and
             earn 30% on every payment they make.
           </p>
           <div className="mt-10">
@@ -142,7 +142,7 @@ export default function PartnersPage() {
               <p className="mt-4 text-base leading-relaxed text-zinc-600">
                 Our affiliate program is built for anyone with an audience that
                 needs software. If you work with startups, small businesses, or
-                tech-savvy professionals looking for rapid software delivery —
+                tech-savvy professionals looking for rapid software delivery,
                 this program is for you.
               </p>
             </div>

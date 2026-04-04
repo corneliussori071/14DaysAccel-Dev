@@ -30,7 +30,7 @@ function productCard(c: AdConfig): string {
   const accent =
     c.productType === "designer" ? "#a78bfa" : c.productType === "subscription" ? "#38bdf8" : "#f59e0b";
   const priceDisplay = c.productType === "subscription"
-    ? `<span style="font-size:28px;font-weight:800;color:#18181b">${c.price.replace("/mo", "")}</span><span style="font-size:12px;color:#71717a">/month</span>`
+    ? `<span style="font-size:28px;font-weight:800;color:#18181b">${c.price}</span><span style="font-size:12px;color:#71717a">/month</span>`
     : `<span style="font-size:28px;font-weight:800;color:#18181b">${c.price}</span>`;
 
   return `<!-- 14DaysAccel Dev - Product Card: ${c.productName} - Sponsored -->

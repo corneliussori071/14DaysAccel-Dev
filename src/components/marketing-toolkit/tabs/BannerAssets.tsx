@@ -137,7 +137,7 @@ function mobileBannerInner(c: AdConfig): string {
         : "Software in 14 Days";
   const sub =
     c.productType === "designer"
-      ? "Free. Plan smarter."
+      ? "Start for free. Plan smarter."
       : `From ${c.price}. Ship faster.`;
 
   return `<div style="position:absolute;inset:0;background:linear-gradient(90deg,#18181b 0%,#1e3a5f 100%)"></div>

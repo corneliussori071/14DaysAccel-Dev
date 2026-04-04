@@ -33,7 +33,7 @@ function timedPopupBody(c: AdConfig): string {
       : { num: "14", label: "Day Delivery" };
   const stat2 =
     c.productType === "designer"
-      ? { num: "Free", label: "No Cost" }
+      ? { num: c.price, label: "" }
       : { num: c.price, label: c.productType === "subscription" ? "Per Month" : "Starting Price" };
 
   return `<div style="position:relative;background:linear-gradient(135deg,#18181b 0%,#292524 100%);padding:32px 28px 24px;text-align:center">

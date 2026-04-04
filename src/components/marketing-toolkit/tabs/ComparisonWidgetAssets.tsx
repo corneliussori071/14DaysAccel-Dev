@@ -64,7 +64,7 @@ function hiringComparison(c: AdConfig): string {
     <div style="padding:24px 20px;background:#f0fdf4;position:relative">
       <div style="position:absolute;top:12px;right:12px;background:#22c55e;color:#fff;font-size:9px;font-weight:700;padding:3px 8px;border-radius:10px;animation:accelBadgePulse 2s ease-in-out infinite">Recommended</div>
       <div style="font-size:12px;font-weight:700;color:#16a34a;text-transform:uppercase;letter-spacing:1px;margin-bottom:16px">${accelLabel}</div>
-      <div style="margin-bottom:16px"><span style="font-size:32px;font-weight:800;color:#18181b">${accelPrice}</span><span style="font-size:12px;color:#71717a"> ${c.productType === "subscription" ? "/month" : "starting"}</span></div>
+      <div style="margin-bottom:16px"><span style="font-size:32px;font-weight:800;color:#18181b">${accelPrice}</span><span style="font-size:12px;color:#71717a"> ${c.productType === "designer" ? "" : c.productType === "subscription" ? "/month" : "starting"}</span></div>
       <div>
         ${rightBullets.map((b) => `<div style="display:flex;align-items:flex-start;gap:8px;margin-bottom:10px"><span style="color:#22c55e;font-size:14px;flex-shrink:0;margin-top:1px">&#10003;</span><span style="font-size:12px;color:#052e16;line-height:1.5">${b}</span></div>`).join("")}
       </div>
@@ -120,12 +120,12 @@ function costTimeline(c: AdConfig): string {
     <div style="background:#f0fdf4;border:1px solid #bbf7d0;border-radius:8px;padding:12px;margin-bottom:16px">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
         <span style="font-size:12px;font-weight:700;color:#16a34a">${barLabel}</span>
-        <span style="font-size:12px;font-weight:700;color:#16a34a">From ${c.price}</span>
+        <span style="font-size:12px;font-weight:700;color:#16a34a">${c.productType === "designer" ? c.price : `From ${c.price}`}</span>
       </div>
       <div style="background:#dcfce7;height:8px;border-radius:4px;overflow:hidden"><div style="width:15%;height:100%;background:linear-gradient(90deg,#4ade80,#22c55e);border-radius:4px;animation:accelBarGrow 1s ease-out"></div></div>
       <div style="font-size:10px;color:#16a34a;font-weight:600;margin-top:3px">${c.productType === "designer" ? "Free AI planning. Done in minutes." : "14 days. Done."}</div>
     </div>
-    <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="display:block;text-align:center;background:#18181b;color:#fff;padding:12px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='#3f3f46'" onmouseout="this.style.background='#18181b'">Start for ${c.price}</a>
+    <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="display:block;text-align:center;background:#18181b;color:#fff;padding:12px;border-radius:6px;font-size:13px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='#3f3f46'" onmouseout="this.style.background='#18181b'">${c.productType === "designer" ? c.price : `Start for ${c.price}`}</a>
   </div>
   <style>@keyframes accelBarGrow{from{width:0}to{width:15%}}</style>
 </div>`;

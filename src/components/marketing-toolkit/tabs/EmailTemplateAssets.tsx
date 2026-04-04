@@ -73,8 +73,8 @@ function promoEmailBody(c: AdConfig): string {
       : c.productType === "subscription"
         ? `${c.tagline}. AI-powered development from ${c.price}.`
         : `Production-ready in 14 days. Starting at ${c.price}.`;
-  const stat2Label = c.productType === "designer" ? "Free" : c.price;
-  const stat2Sub = c.productType === "subscription" ? "Per Month" : c.productType === "designer" ? "No Cost" : "Starting Price";
+  const stat2Label = c.price;
+  const stat2Sub = c.productType === "subscription" ? "Per Month" : c.productType === "designer" ? "" : "Starting Price";
 
   return `<div style="background:linear-gradient(135deg,#18181b,#3f3f46);padding:32px;text-align:center;border-radius:8px 8px 0 0">
     <div style="color:#f59e0b;font-size:11px;font-weight:600;text-transform:uppercase;letter-spacing:2px;margin-bottom:12px">14DaysAccel Dev</div>

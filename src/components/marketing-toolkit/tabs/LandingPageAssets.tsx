@@ -35,8 +35,8 @@ function minimalLandingPage(c: AdConfig): string {
         : "Stop waiting months and spending thousands. Get your software built, tested, and deployed fast.";
   const stat1 = c.productType === "designer" ? "AI" : "14";
   const stat1Label = c.productType === "designer" ? "Powered" : "Day Delivery";
-  const stat2 = c.productType === "designer" ? "Free" : c.price;
-  const stat2Label = c.productType === "designer" ? "No Cost" : c.productType === "subscription" ? "Per Month" : "Starting Price";
+  const stat2 = c.price;
+  const stat2Label = c.productType === "designer" ? "" : c.productType === "subscription" ? "Per Month" : "Starting Price";
 
   return `<!-- 14DaysAccel Dev - Minimal Landing Page - Sponsored -->
 <!DOCTYPE html>

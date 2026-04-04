@@ -96,7 +96,7 @@ function floatingWidgetBody(c: AdConfig): { headline: string; sub: string } {
         : "Need Software Built Fast?";
   const sub =
     c.productType === "designer"
-      ? "Free AI planner. No sign-up."
+      ? "Start for free. No sign-up."
       : c.productType === "subscription"
         ? `${c.price}. ${c.tagline}.`
         : `14-day delivery. From ${c.price}.`;

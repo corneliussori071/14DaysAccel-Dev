@@ -57,6 +57,7 @@ function productCard(item: ProductItem, referralLink: string): string {
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all product cards with your settings.",
   "Click 'Copy Code' to copy the product card HTML to your clipboard.",
   "Paste the card into your website where you want to showcase a specific product or plan.",
   "Cards are 300px wide and adapt well to grid layouts. Place multiple cards side-by-side for comparison.",

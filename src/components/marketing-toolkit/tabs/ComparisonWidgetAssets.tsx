@@ -132,6 +132,7 @@ function costTimeline(c: AdConfig): string {
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all comparison widgets with your settings.",
   "Click 'Copy Code' to copy the comparison widget HTML to your clipboard.",
   "Paste the code into blog posts, landing pages, or sidebars where a comparison would be relevant.",
   "The hiring comparison works best in content about software development costs, hiring, or outsourcing.",

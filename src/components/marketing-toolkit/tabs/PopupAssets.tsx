@@ -153,6 +153,7 @@ function exitIntentPreview(c: AdConfig): string {
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all pop-ups with your settings.",
   "Click 'Copy Code' to copy the popup HTML, CSS, and JavaScript to your clipboard.",
   "Paste the code just before the closing </body> tag in your HTML page.",
   "The timed popup appears automatically after 5 seconds on the page. It only shows once per session.",

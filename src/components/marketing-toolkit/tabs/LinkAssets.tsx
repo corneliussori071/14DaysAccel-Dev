@@ -86,6 +86,7 @@ function inlineRecommendation(c: AdConfig): string {
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all links with your settings.",
   "Click 'Copy Code' to copy the link HTML to your clipboard.",
   "Styled text links can be placed inline within blog posts, articles, or any text content.",
   "CTA text links and inline recommendations work well at the end of articles or in sidebar sections.",

@@ -196,6 +196,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;c
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all landing pages with your settings.",
   "Click 'Copy Code' to copy the entire landing page HTML to your clipboard.",
   "These are complete, standalone HTML pages. Save the code as an .html file and host it on your domain or landing page platform.",
   "Each template is self-contained with embedded CSS and no external dependencies.",

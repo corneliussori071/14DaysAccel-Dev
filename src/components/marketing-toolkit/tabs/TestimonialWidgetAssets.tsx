@@ -137,6 +137,7 @@ function testimonialStrip(c: AdConfig): string {
 }
 
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all testimonial widgets with your settings.",
   "Click 'Copy Code' to copy the testimonial widget HTML to your clipboard.",
   "The single testimonial card works well in sidebars, articles, and landing page sections.",
   "The carousel auto-rotates every 6 seconds and includes navigation arrows. Place it where extended social proof is helpful.",

@@ -4,6 +4,9 @@ import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import { fetchReferralLink } from "@/services/referralLinkService";
+import { getAllProjects } from "@/services/projectService";
+import type { Project } from "@/types/project";
+import type { SubscriptionPlan } from "@/components/marketing-toolkit/AdSettingsPanel";
 import AuthModal from "@/components/software-designer/AuthModal";
 import BannerAssets from "@/components/marketing-toolkit/tabs/BannerAssets";
 import WidgetAssets from "@/components/marketing-toolkit/tabs/WidgetAssets";
@@ -47,6 +50,8 @@ export default function MarketingToolkitLayout() {
   const [referralLink, setReferralLink] = useState<string>("");
   const [referralError, setReferralError] = useState<string>("");
   const [activeTab, setActiveTab] = useState<AssetTab>("banners");
+  const [projects, setProjects] = useState<Project[]>([]);
+  const [subscriptions, setSubscriptions] = useState<SubscriptionPlan[]>([]);
 
   useEffect(() => {
     async function checkAuth() {
@@ -57,6 +62,7 @@ export default function MarketingToolkitLayout() {
       if (session?.user) {
         setAuthenticated(true);
         loadReferralLink();
+        loadCatalog();
       } else {
         setShowAuth(true);
       }
@@ -72,6 +78,7 @@ export default function MarketingToolkitLayout() {
         setAuthenticated(true);
         setShowAuth(false);
         loadReferralLink();
+        loadCatalog();
       } else {
         setAuthenticated(false);
         setReferralLink("");
@@ -90,6 +97,21 @@ export default function MarketingToolkitLayout() {
       setReferralError(
         err instanceof Error ? err.message : "Failed to load referral link."
       );
+    }
+  }
+
+  async function loadCatalog() {
+    try {
+      const [allProjects, subsRes] = await Promise.all([
+        getAllProjects(),
+        fetch("/api/internal/subscriptions").then((r) =>
+          r.ok ? r.json() : []
+        ),
+      ]);
+      setProjects(allProjects);
+      if (Array.isArray(subsRes)) setSubscriptions(subsRes);
+    } catch {
+      // use defaults
     }
   }
 
@@ -221,31 +243,31 @@ export default function MarketingToolkitLayout() {
           {referralLink && (
             <>
               {activeTab === "banners" && (
-                <BannerAssets referralLink={referralLink} />
+                <BannerAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "widgets" && (
-                <WidgetAssets referralLink={referralLink} />
+                <WidgetAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "popups" && (
-                <PopupAssets referralLink={referralLink} />
+                <PopupAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "links" && (
-                <LinkAssets referralLink={referralLink} />
+                <LinkAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "product-cards" && (
-                <ProductCardAssets referralLink={referralLink} />
+                <ProductCardAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "email-templates" && (
-                <EmailTemplateAssets referralLink={referralLink} />
+                <EmailTemplateAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "landing-pages" && (
-                <LandingPageAssets referralLink={referralLink} />
+                <LandingPageAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "comparison" && (
-                <ComparisonWidgetAssets referralLink={referralLink} />
+                <ComparisonWidgetAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
               {activeTab === "testimonials" && (
-                <TestimonialWidgetAssets referralLink={referralLink} />
+                <TestimonialWidgetAssets referralLink={referralLink} projects={projects} subscriptions={subscriptions} />
               )}
             </>
           )}

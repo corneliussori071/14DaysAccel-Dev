@@ -6,6 +6,7 @@ interface AssetPreviewProps {
   title: string;
   description: string;
   embedCode: string;
+  previewCode?: string;
   previewHeight?: number;
   disclosureLabel?: "Ad" | "Sponsored";
 }
@@ -14,6 +15,7 @@ export default function AssetPreview({
   title,
   description,
   embedCode,
+  previewCode,
   previewHeight = 320,
   disclosureLabel = "Ad",
 }: AssetPreviewProps) {
@@ -27,10 +29,12 @@ export default function AssetPreview({
     setTimeout(() => setCopied(false), 2000);
   }
 
+  const displayCode = previewCode || embedCode;
+
   const srcdoc = `<!DOCTYPE html>
 <html>
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f4f5}</style></head>
-<body>${embedCode}</body>
+<body>${displayCode}</body>
 </html>`;
 
   useEffect(() => {

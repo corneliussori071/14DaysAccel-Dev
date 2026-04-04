@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState } from "react";
 
 interface AssetPreviewProps {
   title: string;
@@ -21,7 +21,6 @@ export default function AssetPreview({
 }: AssetPreviewProps) {
   const [copied, setCopied] = useState(false);
   const [showCode, setShowCode] = useState(false);
-  const iframeRef = useRef<HTMLIFrameElement>(null);
 
   async function handleCopy() {
     await navigator.clipboard.writeText(embedCode);
@@ -36,12 +35,6 @@ export default function AssetPreview({
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f4f5}</style></head>
 <body>${displayCode}</body>
 </html>`;
-
-  useEffect(() => {
-    if (iframeRef.current) {
-      iframeRef.current.srcdoc = srcdoc;
-    }
-  }, [srcdoc]);
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden">
@@ -81,7 +74,7 @@ export default function AssetPreview({
       ) : (
         <div className="bg-zinc-100 p-4">
           <iframe
-            ref={iframeRef}
+            srcDoc={srcdoc}
             sandbox="allow-scripts"
             style={{ width: "100%", height: previewHeight, border: "none", borderRadius: 6, background: "#f4f4f5" }}
             title={title}

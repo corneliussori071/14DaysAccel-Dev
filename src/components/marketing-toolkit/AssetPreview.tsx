@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 
 interface AssetPreviewProps {
   title: string;
@@ -9,6 +9,14 @@ interface AssetPreviewProps {
   previewCode?: string;
   previewHeight?: number;
   disclosureLabel?: "Ad" | "Sponsored";
+}
+
+function hashString(str: string): number {
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash + str.charCodeAt(i)) | 0;
+  }
+  return hash;
 }
 
 export default function AssetPreview({
@@ -35,6 +43,8 @@ export default function AssetPreview({
 <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><style>*{margin:0;padding:0;box-sizing:border-box}body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;display:flex;align-items:center;justify-content:center;min-height:100vh;background:#f4f4f5}</style></head>
 <body>${displayCode}</body>
 </html>`;
+
+  const iframeKey = useMemo(() => hashString(srcdoc), [srcdoc]);
 
   return (
     <div className="rounded-lg border border-zinc-200 bg-white overflow-hidden">
@@ -74,6 +84,7 @@ export default function AssetPreview({
       ) : (
         <div className="bg-zinc-100 p-4">
           <iframe
+            key={iframeKey}
             srcDoc={srcdoc}
             sandbox="allow-scripts"
             style={{ width: "100%", height: previewHeight, border: "none", borderRadius: 6, background: "#f4f4f5" }}

@@ -86,7 +86,7 @@ function buildConfig(
   if (productType === "designer") {
     return {
       referralLink: targetUrl,
-      price: "Free",
+      price: "Start for free",
       numericPrice: 0,
       productName: "AI Software Planner",
       productType: "designer",
@@ -100,8 +100,8 @@ function buildConfig(
     if (plan) {
       return {
         referralLink: targetUrl,
-        price: `$${plan.price_usd}/mo`,
-        numericPrice: plan.price_usd,
+        price: "$5",
+        numericPrice: 5,
         productName: plan.name,
         productType: "subscription",
         ctaText: "Subscribe Now",
@@ -110,7 +110,7 @@ function buildConfig(
     }
     return {
       referralLink: targetUrl,
-      price: "$5/mo",
+      price: "$5",
       numericPrice: 5,
       productName: "Starter Plan",
       productType: "subscription",

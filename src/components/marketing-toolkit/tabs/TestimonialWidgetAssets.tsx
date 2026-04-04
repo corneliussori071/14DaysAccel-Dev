@@ -1,13 +1,27 @@
 "use client";
 
+import { useState } from "react";
 import AssetPreview from "@/components/marketing-toolkit/AssetPreview";
 import AssetInstructions from "@/components/marketing-toolkit/AssetInstructions";
+import AdSettingsPanel from "@/components/marketing-toolkit/AdSettingsPanel";
+import type { SubscriptionPlan } from "@/components/marketing-toolkit/AdSettingsPanel";
+import type { Project } from "@/types/project";
+import type { AdConfig } from "@/types/adConfig";
 
 interface TestimonialWidgetAssetsProps {
   referralLink: string;
+  projects: Project[];
+  subscriptions: SubscriptionPlan[];
 }
 
-function testimonialCard(referralLink: string): string {
+function testimonialCard(c: AdConfig): string {
+  const ctaLine =
+    c.productType === "designer"
+      ? "Try the AI Software Planner"
+      : c.productType === "subscription"
+        ? `Learn more about ${c.productName}`
+        : "Learn more about 14DaysAccel Dev";
+
   return `<!-- 14DaysAccel Dev - Testimonial Card - Sponsored -->
 <div style="max-width:400px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:12px;overflow:hidden;box-shadow:0 4px 20px rgba(0,0,0,0.08);animation:accelTestIn 0.5s ease-out">
   <div style="background:#fff;padding:24px;border:1px solid #e4e4e7;border-radius:12px;position:relative">
@@ -22,14 +36,21 @@ function testimonialCard(referralLink: string): string {
       </div>
     </div>
     <div style="border-top:1px solid #f4f4f5;padding-top:12px">
-      <a href="${referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:12px;color:#0ea5e9;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:color 0.2s" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#0ea5e9'">Learn more about 14DaysAccel Dev &#8594;</a>
+      <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:12px;color:#0ea5e9;text-decoration:none;font-weight:600;display:inline-flex;align-items:center;gap:4px;transition:color 0.2s" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#0ea5e9'">${ctaLine} &#8594;</a>
     </div>
   </div>
   <style>@keyframes accelTestIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}</style>
 </div>`;
 }
 
-function testimonialCarousel(referralLink: string): string {
+function testimonialCarousel(c: AdConfig): string {
+  const ctaLine =
+    c.productType === "designer"
+      ? "Try the AI Software Planner"
+      : c.productType === "subscription"
+        ? `Start with ${c.productName}`
+        : "Start your project with 14DaysAccel Dev";
+
   return `<!-- 14DaysAccel Dev - Testimonial Carousel - Sponsored -->
 <div id="accel-testimonial-carousel" style="max-width:520px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.1)">
   <div style="background:#18181b;padding:14px 20px;display:flex;align-items:center;justify-content:space-between">
@@ -57,7 +78,7 @@ function testimonialCarousel(referralLink: string): string {
     <div style="display:flex;justify-content:center;gap:6px;margin-top:16px" id="accel-testimonial-dots"></div>
   </div>
   <div style="background:#f8fafc;border-top:1px solid #e4e4e7;padding:12px 20px;text-align:center">
-    <a href="${referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:12px;color:#18181b;text-decoration:none;font-weight:600;transition:color 0.2s" onmouseover="this.style.color='#71717a'" onmouseout="this.style.color='#18181b'">Start your project with 14DaysAccel Dev &#8594;</a>
+    <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:12px;color:#18181b;text-decoration:none;font-weight:600;transition:color 0.2s" onmouseover="this.style.color='#71717a'" onmouseout="this.style.color='#18181b'">${ctaLine} &#8594;</a>
   </div>
 </div>
 <script>
@@ -86,7 +107,14 @@ function testimonialCarousel(referralLink: string): string {
 </script>`;
 }
 
-function testimonialStrip(referralLink: string): string {
+function testimonialStrip(c: AdConfig): string {
+  const ctaLabel =
+    c.productType === "designer"
+      ? "Try the Planner"
+      : c.productType === "subscription"
+        ? "Subscribe"
+        : "Try it";
+
   return `<!-- 14DaysAccel Dev - Testimonial Strip - Sponsored -->
 <div style="max-width:600px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;background:#f8fafc;border:1px solid #e2e8f0;border-radius:10px;padding:16px 20px;display:flex;align-items:center;gap:16px;animation:accelStripIn 0.4s ease-out">
   <div style="flex-shrink:0">
@@ -102,7 +130,7 @@ function testimonialStrip(referralLink: string): string {
   </div>
   <div style="flex-shrink:0;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
     <span style="font-size:8px;font-weight:700;color:#78350f;background:#fef3c7;padding:2px 5px;border-radius:3px;text-transform:uppercase;letter-spacing:0.5px">Sponsored</span>
-    <a href="${referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:11px;color:#0ea5e9;text-decoration:none;font-weight:600;white-space:nowrap;transition:color 0.2s" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#0ea5e9'">Try it &#8594;</a>
+    <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer sponsored" style="font-size:11px;color:#0ea5e9;text-decoration:none;font-weight:600;white-space:nowrap;transition:color 0.2s" onmouseover="this.style.color='#0369a1'" onmouseout="this.style.color='#0ea5e9'">${ctaLabel} &#8594;</a>
   </div>
   <style>@keyframes accelStripIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
 </div>`;
@@ -123,24 +151,34 @@ const complianceNotes = [
   "The carousel script uses standard DOM manipulation and does not track user behavior.",
 ];
 
-export default function TestimonialWidgetAssets({ referralLink }: TestimonialWidgetAssetsProps) {
+export default function TestimonialWidgetAssets({ referralLink, projects, subscriptions }: TestimonialWidgetAssetsProps) {
+  const [config, setConfig] = useState<AdConfig>({
+    referralLink,
+    price: "$200",
+    numericPrice: 200,
+    productName: "Custom Software Project",
+    productType: "project",
+    ctaText: "Start Your Project",
+    tagline: "Production-ready software in 14 days",
+  });
+
   const widgets = [
     {
       title: "Testimonial Card",
       description: "Single testimonial card with quote, attribution, and CTA link. Clean and focused.",
-      code: testimonialCard(referralLink),
+      code: testimonialCard(config),
       height: 320,
     },
     {
       title: "Testimonial Carousel",
       description: "Auto-rotating carousel with three testimonials, navigation arrows, and dot indicators. 6-second rotation.",
-      code: testimonialCarousel(referralLink),
+      code: testimonialCarousel(config),
       height: 340,
     },
     {
       title: "Testimonial Strip",
       description: "Compact horizontal strip with stacked avatars and a short quote. Minimal footprint.",
-      code: testimonialStrip(referralLink),
+      code: testimonialStrip(config),
       height: 100,
     },
   ];
@@ -153,6 +191,13 @@ export default function TestimonialWidgetAssets({ referralLink }: TestimonialWid
           Social proof widgets featuring client testimonials. Use these to build trust alongside your referral links.
         </p>
       </div>
+
+      <AdSettingsPanel
+        referralLink={referralLink}
+        projects={projects}
+        subscriptions={subscriptions}
+        onConfigChange={setConfig}
+      />
 
       {widgets.map((widget) => (
         <div key={widget.title}>

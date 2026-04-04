@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect } from "react";
 import type { Project } from "@/types/project";
 import type { AdConfig, ProductType } from "@/types/adConfig";
 
@@ -153,7 +153,6 @@ export default function AdSettingsPanel({
   const [selectedProjectIdx, setSelectedProjectIdx] = useState(0);
   const [selectedSubIdx, setSelectedSubIdx] = useState(0);
   const [applyStatus, setApplyStatus] = useState<"idle" | "success">("idle");
-  const initialEmitted = useRef(false);
 
   const availableProjects = projects.filter(
     (p) => p.status?.toLowerCase() === "available"
@@ -162,10 +161,8 @@ export default function AdSettingsPanel({
     (s) => s.is_active && s.plan_type !== "custom"
   );
 
-  // Emit default config on mount only
+  // Emit config on mount and when data arrives (projects/subs load async)
   useEffect(() => {
-    if (initialEmitted.current) return;
-    initialEmitted.current = true;
     const config = buildConfig(
       referralLink,
       productType,
@@ -176,8 +173,9 @@ export default function AdSettingsPanel({
       selectedSubIdx
     );
     onConfigChange(config);
+    // Re-emit when referralLink or data availability changes
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [referralLink]);
+  }, [referralLink, availableProjects.length, activeSubs.length]);
 
   function handleApply() {
     const config = buildConfig(

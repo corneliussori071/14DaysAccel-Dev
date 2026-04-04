@@ -110,8 +110,8 @@ function buildConfig(
     }
     return {
       referralLink: targetUrl,
-      price: "$19/mo",
-      numericPrice: 19,
+      price: "$5/mo",
+      numericPrice: 5,
       productName: "Starter Plan",
       productType: "subscription",
       ctaText: "Subscribe Now",
@@ -152,9 +152,12 @@ export default function AdSettingsPanel({
   const [targetUrlType, setTargetUrlType] = useState<TargetUrlType>("product-page");
   const [selectedProjectIdx, setSelectedProjectIdx] = useState(0);
   const [selectedSubIdx, setSelectedSubIdx] = useState(0);
+  const [applyStatus, setApplyStatus] = useState<"idle" | "success">("idle");
   const initialEmitted = useRef(false);
 
-  const availableProjects = projects.filter((p) => p.status === "available");
+  const availableProjects = projects.filter(
+    (p) => p.status?.toLowerCase() === "available"
+  );
   const activeSubs = subscriptions.filter(
     (s) => s.is_active && s.plan_type !== "custom"
   );
@@ -187,6 +190,8 @@ export default function AdSettingsPanel({
       selectedSubIdx
     );
     onConfigChange(config);
+    setApplyStatus("success");
+    setTimeout(() => setApplyStatus("idle"), 2500);
   }
 
   const selectedProject = availableProjects[selectedProjectIdx];
@@ -297,7 +302,12 @@ export default function AdSettingsPanel({
       </div>
 
       {/* Apply button */}
-      <div className="mt-4 flex items-center justify-end">
+      <div className="mt-4 flex items-center justify-end gap-3">
+        {applyStatus === "success" && (
+          <span className="text-xs font-medium text-emerald-600">
+            Settings applied successfully
+          </span>
+        )}
         <button
           onClick={handleApply}
           className="rounded-md bg-zinc-900 px-5 py-2 text-xs font-semibold text-white transition-colors hover:bg-zinc-700"

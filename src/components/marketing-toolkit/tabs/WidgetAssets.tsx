@@ -34,8 +34,46 @@ function sidebarWidget(c: AdConfig): string {
         ? [`${c.tagline}`, "Advanced AI models", `${c.price}`]
         : ["Rapid 14-day delivery", "Production-quality code", `Starting at ${c.price}`];
 
+  return sidebarWidgetHtml(c, headline, sub, bullets, true);
+}
+
+function sidebarWidgetPreview(c: AdConfig): string {
+  const headline =
+    c.productType === "designer"
+      ? "Plan Your Software with AI"
+      : c.productType === "subscription"
+        ? `${c.productName}`
+        : "Get Your Software Built in 14 Days";
+  const sub =
+    c.productType === "designer"
+      ? "Free AI-powered project planner. Security-first architecture. No sign-up required to start."
+      : c.productType === "subscription"
+        ? `${c.tagline}. Access advanced AI models for software planning and development.`
+        : `Production-ready applications starting at ${c.price}. No months of waiting.`;
+  const bullets =
+    c.productType === "designer"
+      ? ["AI-generated architecture", "Security-first approach", "Free to use"]
+      : c.productType === "subscription"
+        ? [`${c.tagline}`, "Advanced AI models", `${c.price}`]
+        : ["Rapid 14-day delivery", "Production-quality code", `Starting at ${c.price}`];
+
+  return sidebarWidgetHtml(c, headline, sub, bullets, false);
+}
+
+function sidebarWidgetHtml(
+  c: AdConfig,
+  headline: string,
+  sub: string,
+  bullets: string[],
+  withAnimation: boolean
+): string {
+  const animStyle = withAnimation ? "animation:accelSlideIn 0.5s ease-out" : "";
+  const animKeyframes = withAnimation
+    ? `\n  <style>@keyframes accelSlideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}</style>`
+    : "";
+
   return `<!-- 14DaysAccel Dev - Sidebar Widget - Sponsored -->
-<div id="accel-sidebar-widget" style="width:280px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);animation:accelSlideIn 0.5s ease-out">
+<div id="accel-sidebar-widget" style="width:280px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;border-radius:12px;overflow:hidden;box-shadow:0 4px 24px rgba(0,0,0,0.12);${animStyle}">
   <div style="position:relative;background:linear-gradient(135deg,#18181b,#292524);padding:20px;text-align:center">
     <div style="position:absolute;top:8px;right:8px;background:rgba(251,191,36,0.9);color:#78350f;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase">Sponsored</div>
     <div style="color:#f59e0b;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px">14DaysAccel Dev</div>
@@ -45,8 +83,7 @@ function sidebarWidget(c: AdConfig): string {
   <div style="background:#fff;padding:16px 20px">
     ${bullets.map((b) => `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px"><div style="width:6px;height:6px;border-radius:50%;background:#22c55e"></div><span style="font-size:11px;color:#52525b">${b}</span></div>`).join("")}
     <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:#18181b;color:#fff;padding:10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;transition:background 0.2s" onmouseover="this.style.background='#3f3f46'" onmouseout="this.style.background='#18181b'">${c.ctaText}</a>
-  </div>
-  <style>@keyframes accelSlideIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:translateX(0)}}</style>
+  </div>${animKeyframes}
 </div>`;
 }
 
@@ -129,7 +166,7 @@ export default function WidgetAssets({ referralLink, projects, subscriptions }: 
       title: "Sidebar Widget",
       description: "Compact widget designed for website sidebars. Features key selling points and a call-to-action.",
       code: sidebarWidget(config),
-      previewCode: undefined as string | undefined,
+      previewCode: sidebarWidgetPreview(config),
       height: 340,
     },
     {

@@ -1,20 +1,50 @@
 "use client";
 
+import { useState } from "react";
 import AssetPreview from "@/components/marketing-toolkit/AssetPreview";
 import AssetInstructions from "@/components/marketing-toolkit/AssetInstructions";
+import AdSettingsPanel from "@/components/marketing-toolkit/AdSettingsPanel";
+import type { SubscriptionPlan } from "@/components/marketing-toolkit/AdSettingsPanel";
+import type { Project } from "@/types/project";
+import type { AdConfig } from "@/types/adConfig";
 
 interface LandingPageAssetsProps {
   referralLink: string;
+  projects: Project[];
+  subscriptions: SubscriptionPlan[];
 }
 
-function minimalLandingPage(referralLink: string): string {
+function minimalLandingPage(c: AdConfig): string {
+  const title =
+    c.productType === "designer"
+      ? "Plan Your Software with AI | 14DaysAccel Dev"
+      : c.productType === "subscription"
+        ? `${c.productName} | 14DaysAccel Dev`
+        : "Get Software Built in 14 Days | 14DaysAccel Dev";
+  const headline =
+    c.productType === "designer"
+      ? "AI-Powered Software Planning"
+      : c.productType === "subscription"
+        ? `Unlock ${c.productName}`
+        : "Production-Ready Software in 14 Days";
+  const sub =
+    c.productType === "designer"
+      ? "Generate security-first architecture, project plans, and technical docs in minutes. Free to use."
+      : c.productType === "subscription"
+        ? `${c.tagline}. Advanced AI models for real development, starting at ${c.price}.`
+        : "Stop waiting months and spending thousands. Get your software built, tested, and deployed fast.";
+  const stat1 = c.productType === "designer" ? "AI" : "14";
+  const stat1Label = c.productType === "designer" ? "Powered" : "Day Delivery";
+  const stat2 = c.productType === "designer" ? "Free" : c.price;
+  const stat2Label = c.productType === "designer" ? "No Cost" : c.productType === "subscription" ? "Per Month" : "Starting Price";
+
   return `<!-- 14DaysAccel Dev - Minimal Landing Page - Sponsored -->
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Get Software Built in 14 Days | 14DaysAccel Dev</title>
+<title>${title}</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;color:#18181b;background:#fff}
@@ -41,21 +71,75 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;c
 <section class="accel-hero">
   <span class="accel-badge">Sponsored</span>
   <div class="accel-brand">14DaysAccel Dev</div>
-  <h1 class="accel-h1">Production-Ready Software in 14 Days</h1>
-  <p class="accel-sub">Stop waiting months and spending thousands. Get your software built, tested, and deployed fast.</p>
-  <a href="${referralLink}" class="accel-cta">Start Your Project</a>
+  <h1 class="accel-h1">${headline}</h1>
+  <p class="accel-sub">${sub}</p>
+  <a href="${c.referralLink}" class="accel-cta">${c.ctaText}</a>
   <div class="accel-stats">
-    <div><div class="accel-stat-num">14</div><div class="accel-stat-label">Day Delivery</div></div>
-    <div><div class="accel-stat-num">$200</div><div class="accel-stat-label">Starting Price</div></div>
+    <div><div class="accel-stat-num">${stat1}</div><div class="accel-stat-label">${stat1Label}</div></div>
+    <div><div class="accel-stat-num">${stat2}</div><div class="accel-stat-label">${stat2Label}</div></div>
     <div><div class="accel-stat-num">100%</div><div class="accel-stat-label">Production Code</div></div>
   </div>
 </section>
-<footer class="accel-footer">Sponsored content. <a href="${referralLink}">14DaysAccel Dev</a></footer>
+<footer class="accel-footer">Sponsored content. <a href="${c.referralLink}">14DaysAccel Dev</a></footer>
 </body>
 </html>`;
 }
 
-function featureLandingPage(referralLink: string): string {
+function featureLandingPage(c: AdConfig): string {
+  const heroH1 =
+    c.productType === "designer"
+      ? "Plan Software Architecture with AI"
+      : c.productType === "subscription"
+        ? `Why Developers Choose ${c.productName}`
+        : "Why Top Teams Choose 14DaysAccel Dev";
+  const heroSub =
+    c.productType === "designer"
+      ? "Security-first project planning, powered by AI. Free."
+      : c.productType === "subscription"
+        ? `${c.tagline}. AI-powered development from ${c.price}.`
+        : "The fastest path from idea to production-ready software.";
+
+  const features =
+    c.productType === "designer"
+      ? [
+          { title: "AI Architecture", desc: "Generate security-first software architecture automatically. No guesswork, just proven patterns." },
+          { title: "Free to Use", desc: "The AI Software Planner is completely free. No credit card, no commitment." },
+          { title: "Security First", desc: "Every generated plan follows security best practices. Authentication, authorization, and data protection built in." },
+          { title: "Export Ready", desc: "Download your project plan, tech stack recommendations, and deployment strategy as a document." },
+          { title: "Vibe Code", desc: "Use your plan as a blueprint for AI-assisted coding. Structure meets speed." },
+          { title: "Production Grade", desc: "Plans designed for real-world deployment. Scalable, maintainable, and battle-tested patterns." },
+        ]
+      : c.productType === "subscription"
+        ? [
+            { title: `${c.tagline}`, desc: "Access advanced AI models for real development work, not toy demos." },
+            { title: "Affordable", desc: `Starting at ${c.price}. Scale up as you grow with transparent pricing.` },
+            { title: "AI Planning", desc: "Use the AI Software Planner to scope out projects before you write a single line of code." },
+            { title: "Full-Stack", desc: "Frontend, backend, database, deployment. Everything handled end-to-end." },
+            { title: "Production Quality", desc: "Modern tech stacks, clean architecture, and code that is built to scale." },
+            { title: "Transparent", desc: "Track progress, provide feedback, and stay in control throughout the entire build." },
+          ]
+        : [
+            { title: "14-Day Delivery", desc: "From initial concept to deployed, production-ready application. No months of waiting or scope creep." },
+            { title: "Fair Pricing", desc: `Projects start at ${c.price}. No hidden fees, no hourly billing surprises. Know your cost upfront.` },
+            { title: "Production Quality", desc: "Modern tech stacks, clean architecture, and code that is built to scale. Not prototypes or MVPs." },
+            { title: "AI-Powered Planning", desc: "Free AI Software Planner helps you scope your project before committing a single dollar." },
+            { title: "Full-Stack", desc: "Frontend, backend, database, deployment. Everything handled end-to-end by experienced engineers." },
+            { title: "Transparent Process", desc: "Track progress, provide feedback, and stay in control throughout the entire build." },
+          ];
+
+  const bottomH2 =
+    c.productType === "designer"
+      ? "Ready to plan?"
+      : c.productType === "subscription"
+        ? "Ready to subscribe?"
+        : "Ready to build?";
+  const bottomSub =
+    c.productType === "designer"
+      ? "Generate your first software architecture plan in minutes."
+      : c.productType === "subscription"
+        ? `Join developers using ${c.productName} to build smarter.`
+        : "Join hundreds of businesses shipping software faster with 14DaysAccel Dev.";
+
   return `<!-- 14DaysAccel Dev - Feature Landing Page - Sponsored -->
 <!DOCTYPE html>
 <html lang="en">
@@ -92,26 +176,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;c
 <body>
 <header class="accel-header">
   <div style="display:flex;align-items:center;gap:10px"><span class="accel-logo">14DaysAccel Dev</span><span class="accel-header-badge">Sponsored</span></div>
-  <a href="${referralLink}" class="accel-header-btn">Get Started</a>
+  <a href="${c.referralLink}" class="accel-header-btn">${c.ctaText}</a>
 </header>
 <section class="accel-hero2">
-  <h1>Why Top Teams Choose 14DaysAccel Dev</h1>
-  <p>The fastest path from idea to production-ready software.</p>
+  <h1>${heroH1}</h1>
+  <p>${heroSub}</p>
 </section>
 <section class="accel-features">
-  <div class="accel-feature"><h3>14-Day Delivery</h3><p>From initial concept to deployed, production-ready application. No months of waiting or scope creep.</p></div>
-  <div class="accel-feature"><h3>Fair Pricing</h3><p>Projects start at $200. No hidden fees, no hourly billing surprises. Know your cost upfront.</p></div>
-  <div class="accel-feature"><h3>Production Quality</h3><p>Modern tech stacks, clean architecture, and code that is built to scale. Not prototypes or MVPs.</p></div>
-  <div class="accel-feature"><h3>AI-Powered Planning</h3><p>Free AI Software Planner helps you scope your project before committing a single dollar.</p></div>
-  <div class="accel-feature"><h3>Full-Stack</h3><p>Frontend, backend, database, deployment. Everything handled end-to-end by experienced engineers.</p></div>
-  <div class="accel-feature"><h3>Transparent Process</h3><p>Track progress, provide feedback, and stay in control throughout the entire build.</p></div>
+  ${features.map((f) => `<div class="accel-feature"><h3>${f.title}</h3><p>${f.desc}</p></div>`).join("\n  ")}
 </section>
 <section class="accel-bottom-cta">
-  <h2>Ready to build?</h2>
-  <p>Join hundreds of businesses shipping software faster with 14DaysAccel Dev.</p>
-  <a href="${referralLink}">Start Your Project</a>
+  <h2>${bottomH2}</h2>
+  <p>${bottomSub}</p>
+  <a href="${c.referralLink}">${c.ctaText}</a>
 </section>
-<footer class="accel-lp-footer">Sponsored by <a href="${referralLink}">14DaysAccel Dev</a></footer>
+<footer class="accel-lp-footer">Sponsored by <a href="${c.referralLink}">14DaysAccel Dev</a></footer>
 </body>
 </html>`;
 }
@@ -133,18 +212,28 @@ const complianceNotes = [
   "Ensure your hosting domain is not misleading or impersonating 14DaysAccel Dev.",
 ];
 
-export default function LandingPageAssets({ referralLink }: LandingPageAssetsProps) {
+export default function LandingPageAssets({ referralLink, projects, subscriptions }: LandingPageAssetsProps) {
+  const [config, setConfig] = useState<AdConfig>({
+    referralLink,
+    price: "$200",
+    numericPrice: 200,
+    productName: "Custom Software Project",
+    productType: "project",
+    ctaText: "Start Your Project",
+    tagline: "Production-ready software in 14 days",
+  });
+
   const pages = [
     {
       title: "Minimal Hero Landing Page",
       description: "Clean, single-section landing page with animated hero, stats, and a strong CTA. High-impact, low distraction.",
-      code: minimalLandingPage(referralLink),
+      code: minimalLandingPage(config),
       height: 520,
     },
     {
       title: "Feature Landing Page",
       description: "Multi-section page with header, hero, feature grid, and bottom CTA. Great for detailed promotion.",
-      code: featureLandingPage(referralLink),
+      code: featureLandingPage(config),
       height: 600,
     },
   ];
@@ -157,6 +246,13 @@ export default function LandingPageAssets({ referralLink }: LandingPageAssetsPro
           Full standalone HTML landing pages. Self-contained with inline CSS. Host on your own domain for maximum conversion.
         </p>
       </div>
+
+      <AdSettingsPanel
+        referralLink={referralLink}
+        projects={projects}
+        subscriptions={subscriptions}
+        onConfigChange={setConfig}
+      />
 
       {pages.map((page) => (
         <div key={page.title}>

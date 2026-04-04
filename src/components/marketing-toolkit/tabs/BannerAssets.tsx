@@ -76,7 +76,7 @@ function mediumRectBanner(c: AdConfig): string {
 </div>`;
 }
 
-function skyscraperBanner(c: AdConfig): string {
+function skyscraperBannerInner(c: AdConfig): string {
   const headline =
     c.productType === "designer"
       ? "Plan<br>Software<br>with AI"
@@ -96,9 +96,7 @@ function skyscraperBanner(c: AdConfig): string {
   const accentColor =
     c.productType === "designer" ? "#38bdf8" : "#f59e0b";
 
-  return `<!-- 14DaysAccel Dev - Skyscraper (160x600) - Ad -->
-<div style="width:160px;height:600px;position:relative;overflow:hidden;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;cursor:pointer" onclick="window.open('${c.referralLink}','_blank')">
-  <div style="position:absolute;inset:0;background:linear-gradient(180deg,#18181b 0%,#292524 50%,#18181b 100%)"></div>
+  return `<div style="position:absolute;inset:0;background:linear-gradient(180deg,#18181b 0%,#292524 50%,#18181b 100%)"></div>
   <div style="position:absolute;top:8px;left:8px;background:rgba(251,191,36,0.9);color:#78350f;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase;z-index:2">Ad</div>
   <div style="position:relative;z-index:1;display:flex;flex-direction:column;align-items:center;justify-content:space-between;height:100%;padding:40px 14px 30px;text-align:center">
     <div>
@@ -113,11 +111,24 @@ function skyscraperBanner(c: AdConfig): string {
       <div style="background:${accentColor};color:#18181b;padding:10px 24px;border-radius:6px;font-size:12px;font-weight:700;margin-top:16px;animation:fadeIn 0.6s ease-out 0.6s both">${c.ctaText}</div>
     </div>
   </div>
-  <style>@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>
+  <style>@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}</style>`;
+}
+
+function skyscraperBanner(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Skyscraper (160x600) - Ad -->
+<div style="width:160px;height:600px;position:relative;overflow:hidden;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;cursor:pointer" onclick="window.open('${c.referralLink}','_blank')">
+  ${skyscraperBannerInner(c)}
 </div>`;
 }
 
-function mobileBanner(c: AdConfig): string {
+function skyscraperBannerPreview(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Skyscraper Preview -->
+<div style="width:160px;height:600px;position:relative;overflow:hidden;border-radius:10px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  ${skyscraperBannerInner(c)}
+</div>`;
+}
+
+function mobileBannerInner(c: AdConfig): string {
   const headline =
     c.productType === "designer"
       ? "AI Software Planner"
@@ -129,9 +140,7 @@ function mobileBanner(c: AdConfig): string {
       ? "Free. Plan smarter."
       : `From ${c.price}. Ship faster.`;
 
-  return `<!-- 14DaysAccel Dev - Mobile Banner (320x50) - Ad -->
-<div style="width:320px;max-width:100%;height:50px;position:relative;overflow:hidden;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;cursor:pointer" onclick="window.open('${c.referralLink}','_blank')">
-  <div style="position:absolute;inset:0;background:linear-gradient(90deg,#18181b 0%,#1e3a5f 100%)"></div>
+  return `<div style="position:absolute;inset:0;background:linear-gradient(90deg,#18181b 0%,#1e3a5f 100%)"></div>
   <div style="position:absolute;top:4px;left:6px;background:rgba(251,191,36,0.9);color:#78350f;font-size:7px;font-weight:700;padding:1px 4px;border-radius:2px;letter-spacing:0.5px;text-transform:uppercase;z-index:2">Ad</div>
   <div style="position:relative;z-index:1;display:flex;align-items:center;justify-content:space-between;height:100%;padding:0 12px 0 32px">
     <div>
@@ -140,11 +149,25 @@ function mobileBanner(c: AdConfig): string {
     </div>
     <div style="background:#0ea5e9;color:#fff;padding:6px 14px;border-radius:4px;font-size:11px;font-weight:600;white-space:nowrap;animation:mobileGlow 2s ease-in-out infinite">${c.ctaText}</div>
   </div>
-  <style>@keyframes mobileGlow{0%,100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}50%{box-shadow:0 0 12px 2px rgba(14,165,233,0.4)}}</style>
+  <style>@keyframes mobileGlow{0%,100%{box-shadow:0 0 0 0 rgba(14,165,233,0)}50%{box-shadow:0 0 12px 2px rgba(14,165,233,0.4)}}</style>`;
+}
+
+function mobileBanner(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Mobile Banner (320x50) - Ad -->
+<div style="width:320px;max-width:100%;height:50px;position:relative;overflow:hidden;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;cursor:pointer" onclick="window.open('${c.referralLink}','_blank')">
+  ${mobileBannerInner(c)}
 </div>`;
 }
 
+function mobileBannerPreview(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Mobile Banner Preview -->
+<div style="width:320px;max-width:100%;height:50px;position:relative;overflow:hidden;border-radius:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  ${mobileBannerInner(c)}
+</div>`
+}
+
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all banners with your settings.",
   "Click 'Copy Code' to copy the HTML embed code to your clipboard.",
   "Paste the code into your website's HTML where you want the banner to appear.",
   "The banner is self-contained with inline styles and animations. No external CSS or JS is required.",
@@ -175,24 +198,28 @@ export default function BannerAssets({ referralLink, projects, subscriptions }: 
       title: "Leaderboard Banner (728 x 90)",
       description: "Standard horizontal banner for website headers and article tops. High visibility placement.",
       code: leaderboardBanner(config),
+      previewCode: undefined as string | undefined,
       height: 130,
     },
     {
       title: "Medium Rectangle (300 x 250)",
       description: "Versatile ad unit for sidebars, in-content placement, and article breaks.",
       code: mediumRectBanner(config),
+      previewCode: undefined as string | undefined,
       height: 300,
     },
     {
       title: "Skyscraper (160 x 600)",
       description: "Tall vertical banner ideal for website sidebars. Strong visibility with scrolling content.",
       code: skyscraperBanner(config),
+      previewCode: skyscraperBannerPreview(config),
       height: 640,
     },
     {
       title: "Mobile Banner (320 x 50)",
       description: "Compact banner optimized for mobile screens and sticky footer placements.",
       code: mobileBanner(config),
+      previewCode: mobileBannerPreview(config),
       height: 90,
     },
   ];
@@ -219,6 +246,7 @@ export default function BannerAssets({ referralLink, projects, subscriptions }: 
             title={banner.title}
             description={banner.description}
             embedCode={banner.code}
+            previewCode={banner.previewCode}
             previewHeight={banner.height}
             disclosureLabel="Ad"
           />

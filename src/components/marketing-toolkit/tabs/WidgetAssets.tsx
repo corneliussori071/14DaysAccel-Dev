@@ -50,7 +50,7 @@ function sidebarWidget(c: AdConfig): string {
 </div>`;
 }
 
-function floatingWidget(c: AdConfig): string {
+function floatingWidgetBody(c: AdConfig): { headline: string; sub: string } {
   const headline =
     c.productType === "designer"
       ? "Plan Software with AI"
@@ -63,10 +63,12 @@ function floatingWidget(c: AdConfig): string {
       : c.productType === "subscription"
         ? `${c.price}. ${c.tagline}.`
         : `14-day delivery. From ${c.price}.`;
+  return { headline, sub };
+}
 
-  return `<!-- 14DaysAccel Dev - Floating Widget - Sponsored -->
-<div id="accel-floating-widget" style="position:fixed;bottom:20px;right:20px;z-index:9998;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;animation:accelFloatIn 0.6s cubic-bezier(0.16,1,0.3,1)">
-  <div style="position:relative;width:300px;max-width:calc(100vw - 40px);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
+function floatingWidgetInner(c: AdConfig): string {
+  const { headline, sub } = floatingWidgetBody(c);
+  return `<div style="position:relative;width:300px;max-width:calc(100vw - 40px);border-radius:12px;overflow:hidden;box-shadow:0 8px 32px rgba(0,0,0,0.18)">
     <button onclick="document.getElementById('accel-floating-widget').style.display='none'" style="position:absolute;top:8px;right:8px;z-index:2;background:rgba(255,255,255,0.2);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;font-size:14px;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(4px);transition:background 0.2s" onmouseover="this.style.background='rgba(255,255,255,0.4)'" onmouseout="this.style.background='rgba(255,255,255,0.2)'" aria-label="Close">&#10005;</button>
     <div style="position:absolute;top:8px;left:8px;background:rgba(251,191,36,0.9);color:#78350f;font-size:8px;font-weight:700;padding:2px 5px;border-radius:3px;letter-spacing:0.5px;text-transform:uppercase;z-index:2">Sponsored</div>
     <div style="background:linear-gradient(135deg,#0f172a,#1e3a5f);padding:24px 20px 16px;text-align:center">
@@ -77,12 +79,26 @@ function floatingWidget(c: AdConfig): string {
     <div style="background:#fff;padding:14px 20px">
       <a href="${c.referralLink}" target="_blank" rel="noopener noreferrer" style="display:block;text-align:center;background:linear-gradient(135deg,#0ea5e9,#2563eb);color:#fff;padding:10px;border-radius:6px;font-size:12px;font-weight:600;text-decoration:none;transition:opacity 0.2s" onmouseover="this.style.opacity='0.9'" onmouseout="this.style.opacity='1'">${c.ctaText}</a>
     </div>
-  </div>
+  </div>`;
+}
+
+function floatingWidget(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Floating Widget - Sponsored -->
+<div id="accel-floating-widget" style="position:fixed;bottom:20px;right:20px;z-index:9998;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif;animation:accelFloatIn 0.6s cubic-bezier(0.16,1,0.3,1)">
+  ${floatingWidgetInner(c)}
   <style>@keyframes accelFloatIn{from{opacity:0;transform:translateY(30px) scale(0.95)}to{opacity:1;transform:translateY(0) scale(1)}}</style>
 </div>`;
 }
 
+function floatingWidgetPreview(c: AdConfig): string {
+  return `<!-- 14DaysAccel Dev - Floating Widget Preview -->
+<div style="font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,sans-serif">
+  ${floatingWidgetInner(c)}
+</div>`;
+}
+
 const instructions = [
+  "Use the Ad Settings panel above to choose a product type, select a specific project or plan, and set the target URL. Click 'Apply' to update all widgets with your settings.",
   "Click 'Copy Code' to copy the widget HTML to your clipboard.",
   "For the sidebar widget, paste the code into a sidebar column or any container that is approximately 280px wide.",
   "For the floating widget, paste the code just before the closing </body> tag. It uses fixed positioning and will appear in the bottom-right corner.",
@@ -113,12 +129,14 @@ export default function WidgetAssets({ referralLink, projects, subscriptions }: 
       title: "Sidebar Widget",
       description: "Compact widget designed for website sidebars. Features key selling points and a call-to-action.",
       code: sidebarWidget(config),
+      previewCode: undefined as string | undefined,
       height: 340,
     },
     {
       title: "Floating Widget",
       description: "Fixed-position widget that appears in the bottom-right corner. Includes a close button for user control.",
       code: floatingWidget(config),
+      previewCode: floatingWidgetPreview(config),
       height: 280,
     },
   ];
@@ -145,6 +163,7 @@ export default function WidgetAssets({ referralLink, projects, subscriptions }: 
             title={widget.title}
             description={widget.description}
             embedCode={widget.code}
+            previewCode={widget.previewCode}
             previewHeight={widget.height}
             disclosureLabel="Sponsored"
           />

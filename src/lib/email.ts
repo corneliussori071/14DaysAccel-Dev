@@ -1,4 +1,4 @@
-const AFFILIATE_LINK = "https://14daysaccel.com/partners";
+const AFFILIATE_LINK = "https://14daysaccel.dev/partners";
 
 function escapeHtml(str: string): string {
   return str
@@ -17,9 +17,9 @@ function footerHtml(): string {
           <p style="margin:0 0 4px;font-weight:600;color:#52525b;">14DaysAccel Dev</p>
           <p style="margin:0 0 12px;">This is an automated message. Please do not reply to this email.</p>
           <p style="margin:0;">
-            <a href="https://14daysaccel.com" style="color:#3b82f6;text-decoration:none;">Website</a>
+            <a href="https://14daysaccel.dev" style="color:#3b82f6;text-decoration:none;">Website</a>
             &nbsp;&middot;&nbsp;
-            <a href="https://14daysaccel.com/projects" style="color:#3b82f6;text-decoration:none;">Projects</a>
+            <a href="https://14daysaccel.dev/projects" style="color:#3b82f6;text-decoration:none;">Projects</a>
             &nbsp;&middot;&nbsp;
             <a href="${AFFILIATE_LINK}" style="color:#3b82f6;text-decoration:none;">Partner Program</a>
           </p>

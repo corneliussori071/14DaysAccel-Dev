@@ -36,12 +36,12 @@ export const metadata: Metadata = {
     "software architecture",
     "AI software planning",
   ],
-  metadataBase: new URL("https://14daysaccel.com"),
+  metadataBase: new URL("https://14daysaccel.dev"),
   openGraph: {
     title: "14DaysAccel Dev - Acquire Software for Your Business Under 14 Days",
     description:
       "Production-ready software systems built and delivered for your business in under 14 days. Browse, test, and deploy with confidence.",
-    url: "https://14daysaccel.com",
+    url: "https://14daysaccel.dev",
     siteName: "14DaysAccel Dev",
     images: [
       {

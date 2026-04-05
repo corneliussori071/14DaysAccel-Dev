@@ -105,7 +105,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Build a full redirect URL from the request origin
-    const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || process.env.NEXT_PUBLIC_SITE_URL || "https://14daysaccel.com";
+    const origin = request.headers.get("origin") || request.headers.get("referer")?.replace(/\/[^/]*$/, "") || process.env.NEXT_PUBLIC_SITE_URL || "https://14daysaccel.dev";
 
     const functionsUrl = `${process.env.NEXT_PUBLIC_SUPABASE_URL}/functions/v1/create-checkout`;
 

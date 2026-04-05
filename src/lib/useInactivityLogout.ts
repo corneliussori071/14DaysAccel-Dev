@@ -15,6 +15,7 @@ const ACTIVITY_EVENTS: (keyof WindowEventMap)[] = [
 
 export function useInactivityLogout() {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const listenersAttached = useRef(false);
 
   useEffect(() => {
     let mounted = true;
@@ -23,40 +24,57 @@ export function useInactivityLogout() {
       if (timerRef.current) clearTimeout(timerRef.current);
       timerRef.current = setTimeout(async () => {
         if (!mounted) return;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (session) {
-          await supabase.auth.signOut();
-          window.location.href = "/?session_expired=1";
-        }
+        await supabase.auth.signOut();
+        window.location.href = "/?session_expired=1";
       }, INACTIVITY_TIMEOUT_MS);
     }
 
-    // Only start tracking if user is logged in
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session || !mounted) return;
-      resetTimer();
+    function attachListeners() {
+      if (listenersAttached.current) return;
       for (const event of ACTIVITY_EVENTS) {
         window.addEventListener(event, resetTimer, { passive: true });
       }
-    });
+      listenersAttached.current = true;
+    }
 
+    function detachListeners() {
+      if (!listenersAttached.current) return;
+      for (const event of ACTIVITY_EVENTS) {
+        window.removeEventListener(event, resetTimer);
+      }
+      listenersAttached.current = false;
+    }
+
+    function startTracking() {
+      attachListeners();
+      resetTimer();
+    }
+
+    function stopTracking() {
+      detachListeners();
+      if (timerRef.current) {
+        clearTimeout(timerRef.current);
+        timerRef.current = null;
+      }
+    }
+
+    // Use onAuthStateChange as sole source of truth.
+    // INITIAL_SESSION fires immediately on subscribe in supabase-js v2.39+,
+    // so this handles both the initial session check and subsequent changes.
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
       (_event, session) => {
+        if (!mounted) return;
         if (session) {
-          resetTimer();
-        } else if (timerRef.current) {
-          clearTimeout(timerRef.current);
-          timerRef.current = null;
+          startTracking();
+        } else {
+          stopTracking();
         }
       }
     );
 
     return () => {
       mounted = false;
-      if (timerRef.current) clearTimeout(timerRef.current);
-      for (const event of ACTIVITY_EVENTS) {
-        window.removeEventListener(event, resetTimer);
-      }
+      stopTracking();
       subscription.unsubscribe();
     };
   }, []);

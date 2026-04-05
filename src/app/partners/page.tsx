@@ -102,6 +102,27 @@ export default function PartnersPage() {
         </div>
       </section>
 
+      {/* Marketing Toolkit Banner */}
+      <section className="border-b border-zinc-200 bg-zinc-50 px-6 py-5 md:px-12 lg:px-24">
+        <div className="mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-lg border border-zinc-200 bg-white px-6 py-4">
+          <div>
+            <p className="text-sm font-semibold text-zinc-900">
+              Marketing Toolkit
+            </p>
+            <p className="mt-0.5 text-xs text-zinc-500">
+              Access banners, widgets, email templates, and promotional assets
+              to grow your referrals.
+            </p>
+          </div>
+          <Link
+            href="/partners/marketing-toolkit"
+            className="shrink-0 rounded-md bg-zinc-900 px-5 py-2 text-xs font-semibold text-white transition-all hover:-translate-y-0.5 hover:shadow-lg"
+          >
+            Open Toolkit
+          </Link>
+        </div>
+      </section>
+
       {/* What You Get */}
       <section className="border-b border-zinc-200 bg-white px-6 py-20 md:px-12 lg:px-24">
         <div className="mx-auto max-w-6xl">
